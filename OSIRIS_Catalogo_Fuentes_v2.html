@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSIRIS | Catálogo de Fuentes de Información — v2</title>
+  <style>
+    :root {
+      --primary: #005f73;
+      --primary-light: #0a9396;
+      --accent: #ee9b00;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text: #212529;
+      --text-light: #6c757d;
+      --border: #dee2e6;
+      --shadow: 0 2px 6px rgba(0,0,0,0.08);
+      --radius: 8px;
+      --transition: 0.25s ease;
+      /* anillos */
+      --a1: #0a9396;
+      --a2: #ee9b00;
+      --a3: #ae2012;
+      --a0: #5a189a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px;
+    }
+    header {
+      max-width: 1200px;
+      margin: 0 auto 16px;
+      padding: 20px;
+      background: var(--primary);
+      color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    header h1 { font-size: 1.7rem; margin-bottom: 6px; }
+    header p { opacity: 0.92; font-size: 0.95rem; }
+
+    .legend {
+      max-width: 1200px;
+      margin: 0 auto 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+    }
+    .legend .item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+    .legend .item b { display: block; margin-bottom: 3px; }
+    .legend .a1 { border-left-color: var(--a1); }
+    .legend .a2 { border-left-color: var(--a2); }
+    .legend .a3 { border-left-color: var(--a3); }
+    .legend .a0 { border-left-color: var(--a0); }
+
+    .controls {
+      max-width: 1200px;
+      margin: 0 auto 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #search {
+      flex: 1 1 300px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+    #search:focus { outline: 2px solid var(--primary-light); border-color: transparent; }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+    .filter-btn {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: var(--transition);
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .count {
+      max-width: 1200px;
+      margin: 0 auto 12px;
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .card.an-a1 { border-left-color: var(--a1); }
+    .card.an-a2 { border-left-color: var(--a2); }
+    .card.an-a3 { border-left-color: var(--a3); }
+    .card.an-a0 { border-left-color: var(--a0); }
+
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+    .card-title { font-weight: 600; font-size: 1.05rem; }
+    .badges { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+    .badge {
+      padding: 3px 8px;
+      font-size: 0.72rem;
+      border-radius: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #212529;
+    }
+    .cat-nucleo { background: #d7f0f1; }
+    .cat-local  { background: #d4edda; }
+    .cat-robj   { background: #cce5ff; }
+    .cat-proy   { background: #fff3cd; }
+    .cat-policy { background: #e2d9f3; }
+    .cat-clin   { background: #f8d7da; }
+    .cat-ciudadana { background: #ffe8cc; }
+    .cat-idstd  { background: #e9ecef; }
+
+    .lvl-bajo  { background: #d4edda; color: #155724; }
+    .lvl-medio { background: #fff3cd; color: #856404; }
+    .lvl-alto  { background: #f8d7da; color: #721c24; }
+
+    .summary { color: var(--text-light); font-size: 0.9rem; line-height: 1.4; }
+    .details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+      margin-top: 0;
+    }
+    .card.expanded .details { max-height: 900px; margin-top: 10px; }
+    .card.expanded .summary { color: var(--text); }
+    .details dl {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4px 10px;
+      font-size: 0.84rem;
+      margin-bottom: 10px;
+    }
+    .details dt { color: var(--text-light); font-weight: 600; }
+    .details dd { color: var(--text); word-break: break-word; }
+    .details p.note { font-size: 0.86rem; margin-bottom: 10px; }
+    .link-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      transition: var(--transition);
+    }
+    .link-btn:hover { background: var(--primary-light); }
+
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--text-light); }
+
+    footer {
+      max-width: 1200px;
+      margin: 30px auto 0;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-light);
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+      .controls { flex-direction: column; align-items: stretch; }
+      #search { flex: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>OSIRIS | Catálogo de Fuentes de Información — v2</h1>
+  <p>Identificación, acceso técnico, licencia y justificación de inclusión para el mapeo de producción científica de FISABIO. Complementa al CRIS propietario (Fundanet) con fuentes no tradicionales.</p>
+</header>
+
+<div class="legend">
+  <div class="item a1"><b>Anillo 1 · Núcleo abierto cosechable</b>Metadatos abiertos, API y/o volcado masivo, sin barrera de licencia.</div>
+  <div class="item a2"><b>Anillo 2 · Fuentes locales / OAI</b>Cobertura territorial y lingüística; cosecha vía OAI-PMH (endpoint a validar en Fase 1).</div>
+  <div class="item a3"><b>Anillo 3 · Conectores licenciados</b>Enriquecimiento opcional sujeto a licencia/coste; nunca backbone.</div>
+  <div class="item a0"><b>Identidad y estándares</b>No son fuentes de contenido: son vocabularios e identificadores para normalizar y exportar.</div>
+</div>
+
+<main>
+  <div class="controls">
+    <input type="text" id="search" placeholder="Buscar por nombre, categoría, protocolo o justificación...">
+    <div class="filters" id="filters"></div>
+  </div>
+  <p class="count" id="count"></p>
+  <div class="grid" id="sources-grid"></div>
+  <p class="empty-state" id="empty" style="display:none;">No se encontraron fuentes que coincidan con la búsqueda.</p>
+</main>
+
+<footer>
+  OSIRIS Framework v2 · Revisión del catálogo v1 (Qwen, 14-10-2026) · Uso interno FISABIO · Reutilización institucional permitida.<br>
+  Las etiquetas «(verificar)» señalan endpoints que deben confirmarse en la Fase 1 del proyecto antes de automatizar la cosecha.
+</footer>
+
+<script>
+  // ------------------------------------------------------------------
+  // Modelo de datos
+  // anillo: a1 (núcleo abierto) | a2 (local/OAI) | a3 (licenciado) | a0 (identidad/estándares)
+  // cat: nucleo | local | robj | proy | policy | clin | ciudadana | idstd
+  // nivel (coste/riesgo): bajo | medio | alto
+  // ------------------------------------------------------------------
+  const CAT = {
+    nucleo: "Núcleo abierto",
+    local: "Local / Ibérico",
+    robj: "Research Objects",
+    proy: "Proyectos y financiación",
+    policy: "Política y datos oficiales",
+    clin: "Evidencia clínica y guías",
+    ciudadana: "Ciencia ciudadana / transferencia",
+    idstd: "Identidad y estándares"
+  };
+
+  const sources = [
+    // ---------------------- ANILLO 1 ----------------------
+    { id: 1, name: "OpenAlex", anillo: "a1", cat: "nucleo", url: "https://openalex.org",
+      protocol: "REST + volcado masivo (snapshot S3)",
+      endpoint: "api.openalex.org · snapshot: s3://openalex",
+      licMeta: "CC0", licCont: "Enlace a versión OA (según fuente)", coste: "Freemium", costeLvl: "medio",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE2, OE3",
+      summary: "Catálogo global abierto de obras, autores, instituciones y citas.",
+      details: "Sustituto fiable de WoS/Scopus para sistemas interoperables. ATENCIÓN: desde feb-2026 exige API key y cobra por créditos en búsqueda; el snapshot completo sigue siendo GRATIS. Uso sostenible = snapshot S3 como base + API solo para registros sueltos." },
+
+    { id: 2, name: "Crossref", anillo: "a1", cat: "nucleo", url: "https://www.crossref.org",
+      protocol: "REST + Public Data File + OAI-PMH",
+      endpoint: "api.crossref.org · data.crossref.org",
+      licMeta: "Abierta (CC0)", licCont: "Enlace (no aloja texto)", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3, OE4",
+      summary: "Registro oficial de metadatos con DOI. Normaliza artículos, libros, capítulos, datasets y software.",
+      details: "Vincula versiones, autores, afiliaciones y financiadores. Esencial para deduplicación, clustering de versiones y enriquecimiento estructurado." },
+
+    { id: 3, name: "Europe PMC", anillo: "a1", cat: "nucleo", url: "https://europepmc.org",
+      protocol: "REST + volcado masivo + OAI-PMH",
+      endpoint: "ebi.ac.uk/europepmc/webservices/rest",
+      licMeta: "Abierta", licCont: "OA cuando existe (CC varios)", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3",
+      summary: "Base biomédica que integra artículos, preprints, citas, grants y afiliaciones.",
+      details: "Cobertura sanitaria superior a PubMed. Permite búsquedas por proyecto, autor y afiliación. Imprescindible por el perfil investigador de FISABIO." },
+
+    { id: 4, name: "PubMed", anillo: "a1", cat: "nucleo", url: "https://pubmed.ncbi.nlm.nih.gov",
+      protocol: "E-utilities (REST)", endpoint: "eutils.ncbi.nlm.nih.gov",
+      licMeta: "Abierta", licCont: "Enlace", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3",
+      summary: "Indexación biomédica de referencia. Complementa a Europe PMC en cobertura clínica y epidemiológica.",
+      details: "Con API key el límite sube a 10 req/s (sin key, 3 req/s). Útil para validación cruzada y literatura indexada histórica." },
+
+    { id: 5, name: "DataCite", anillo: "a1", cat: "nucleo", url: "https://www.datacite.org",
+      protocol: "REST / GraphQL + OAI-PMH", endpoint: "api.datacite.org",
+      licMeta: "CC0", licCont: "Enlace OA cuando existe", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3, OE5",
+      summary: "Registro de identificadores persistentes (DOI) para datasets, software, informes y otros research objects.",
+      details: "Esencial para Ciencia Abierta y FAIR. Permite citar objetos no tradicionales, alineándose con DORA y CoARA." },
+
+    { id: 6, name: "OpenAIRE", anillo: "a1", cat: "nucleo", url: "https://www.openaire.eu",
+      protocol: "REST + OAI-PMH + Research Graph (volcado)",
+      endpoint: "api.openaire.eu",
+      licMeta: "Abierta (CC BY)", licCont: "Enlace OA", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3, OE5",
+      summary: "Agregación europea de outputs; vincula publicaciones con proyectos financiados.",
+      details: "Base compartida con RECOLECTA (mismo software D-Net). Permite recuperar producción asociada a grants aunque la afiliación no esté bien declarada." },
+
+    { id: 7, name: "CORDIS", anillo: "a1", cat: "proy", url: "https://cordis.europa.eu",
+      protocol: "API de datos abiertos + volcado", endpoint: "data.europa.eu · cordis.europa.eu",
+      licMeta: "CC BY 4.0", licCont: "Enlace", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3",
+      summary: "Metadatos de proyectos europeos (H2020 / Horizon Europe) y de sus resultados.",
+      details: "Ancla de atribución europea: muchas contribuciones se generan en consorcios aunque la afiliación aparezca como hospital o universidad." },
+
+    { id: 8, name: "Zenodo", anillo: "a1", cat: "robj", url: "https://zenodo.org",
+      protocol: "REST + OAI-PMH", endpoint: "zenodo.org/api",
+      licMeta: "CC0", licCont: "Según licencia del depósito", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3, OE5",
+      summary: "Repositorio multidisciplinar para datasets, software, preprints, pósters e informes técnicos.",
+      details: "Integración directa con ORCID, DataCite y proyectos europeos. Reconocimiento de contribuciones no tradicionales." },
+
+    { id: 9, name: "Figshare", anillo: "a1", cat: "robj", url: "https://figshare.com",
+      protocol: "REST (token) + OAI-PMH", endpoint: "api.figshare.com",
+      licMeta: "CC0", licCont: "Según licencia del depósito", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo/medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Plataforma para compartir y citar research objects, complementaria a Zenodo.",
+      details: "Metadatos estructurados y exportables. Facilita la importación a CRIS como Fundanet." },
+
+    { id: 10, name: "Software Heritage", anillo: "a1", cat: "robj", url: "https://www.softwareheritage.org",
+      protocol: "REST + OAI-PMH", endpoint: "archive.softwareheritage.org/api",
+      licMeta: "Abierta", licCont: "Según licencia del repositorio", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3, OE5",
+      summary: "Archivo universal de código fuente: preservación a largo plazo de software científico.",
+      details: "Clave para la evaluación responsable de software. Captura producción en bioinformática, IA sanitaria, estadística y salud digital." },
+
+    { id: 11, name: "bioRxiv / medRxiv", anillo: "a1", cat: "robj", url: "https://www.medrxiv.org",
+      protocol: "REST + OAI-PMH", endpoint: "api.biorxiv.org",
+      licMeta: "Abierta", licCont: "CC BY / CC0 según preprint", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3",
+      summary: "Preprints biomédicos. Reconocen prácticas de Ciencia Abierta y difusión temprana.",
+      details: "Modelar como versiones vinculadas al VoR para evitar doble conteo. Alineado con DORA al valorar apertura y velocidad." },
+
+    { id: 12, name: "OSF (Open Science Framework)", anillo: "a1", cat: "robj", url: "https://osf.io",
+      protocol: "REST", endpoint: "api.osf.io",
+      licMeta: "CC0", licCont: "CC0 / CC BY según proyecto", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo/medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Plataforma de gestión y difusión de proyectos abiertos (datos, materiales, preprints).",
+      details: "Útil para capturar prácticas de apertura (preregistros, materiales) asociadas a grupos de FISABIO." },
+
+    { id: 13, name: "RECOLECTA (FECYT)", anillo: "a1", cat: "local", url: "https://www.recolecta.fecyt.es",
+      protocol: "REST + OAI-PMH (software D-Net)", endpoint: "buscador.recolecta.fecyt.es/api/rest (verificar rutas)",
+      licMeta: "Abierta", licCont: "Enlace OA", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3, OE5",
+      summary: "Agregador nacional de repositorios OA de FECYT. AUSENTE EN v1 — debe ser pieza central.",
+      details: "Agrupa repositorios institucionales, temáticos y revistas diamante españolas. Mismo software que OpenAIRE, con API REST pública y OAI-PMH. Su inclusión es coherente con la misión FECYT (María de Guzmán)." },
+
+    { id: 14, name: "BASE (Bielefeld)", anillo: "a1", cat: "nucleo", url: "https://www.base-search.net",
+      protocol: "OAI-PMH (interfaz web)", endpoint: "base-search.net (verificar OAI)",
+      licMeta: "Abierta", licCont: "Enlace OA", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Uno de los mayores agregadores académicos de acceso abierto.",
+      details: "Cobertura internacional complementaria. El acceso programático puede requerir solicitud; verificar condiciones de cosecha." },
+
+    { id: 15, name: "CORE", anillo: "a1", cat: "nucleo", url: "https://core.ac.uk",
+      protocol: "REST + OAI-PMH", endpoint: "api.core.ac.uk (API key)",
+      licMeta: "Abierta", licCont: "Enlace OA", coste: "Freemium", costeLvl: "medio",
+      riesgo: "Bajo/medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Agregador de repositorios OA con texto completo y API.",
+      details: "Buena cobertura de repositorios institucionales. La API requiere key; verificar límites de uso académico." },
+
+    { id: 16, name: "Semantic Scholar", anillo: "a1", cat: "nucleo", url: "https://www.semanticscholar.org",
+      protocol: "REST (API key)", endpoint: "api.semanticscholar.org",
+      licMeta: "Abierta", licCont: "Enlace", coste: "Freemium", costeLvl: "medio",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE2, OE3",
+      summary: "Grafo académico con resúmenes, citas y contextos de cita.",
+      details: "Útil para desambiguación y enriquecimiento de citas. Verificar términos de uso de la API (key y cuotas)." },
+
+    { id: 17, name: "DOAJ", anillo: "a1", cat: "nucleo", url: "https://doaj.org",
+      protocol: "REST", endpoint: "doaj.org/api",
+      licMeta: "CC0", licCont: "Enlace OA", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE2, OE3",
+      summary: "Directorio de revistas de acceso abierto (incluye diamante).",
+      details: "Metadatos de revista: útil para clasificar venues, detectar revistas diamante y enlazar con CoARA (reconocimiento de publicación OA)." },
+
+    { id: 18, name: "Hispana", anillo: "a1", cat: "local", url: "https://hispana.mcu.es",
+      protocol: "OAI-PMH", endpoint: "hispana.mcu.es (verificar)",
+      licMeta: "Abierta", licCont: "Enlace", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Agregador de colecciones digitales de patrimonio bibliográfico y repositorios hispanos.",
+      details: "Cobertura de fondos históricos y documentales; complementaria para investigación patrimonial." },
+
+    // ---------------------- ANILLO 2 ----------------------
+    { id: 19, name: "Dialnet", anillo: "a2", cat: "local", url: "https://dialnet.unirioja.es",
+      protocol: "Sin API (scraping)", endpoint: "—",
+      licMeta: "Propietaria", licCont: "Enlace", coste: "Gratis (acceso)", costeLvl: "bajo",
+      riesgo: "Alto", riesgoLvl: "alto", oe: "OE3, OE5",
+      summary: "Base referencial clave para la ciencia española: artículos, libros, capítulos, congresos y tesis.",
+      details: "Recupera producción en castellano/catalán/valenciano infra-representada internacionalmente. RIESGO: sin API oficial, bloqueos 503 y condiciones de uso restrictivas. Preferir convenio o vías OAI alternativas." },
+
+    { id: 20, name: "RACO", anillo: "a2", cat: "local", url: "https://www.raco.cat",
+      protocol: "OAI-PMH (verificar)", endpoint: "raco.cat (verificar)",
+      licMeta: "Abierta (según revista)", licCont: "OA (licencia por revista)", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Agrega revistas catalanas/valencianas en acceso abierto.",
+      details: "Cubre salud pública, ciencias sociales de la salud y producción en lenguas cooficiales. Verificar endpoint OAI por revista." },
+
+    { id: 21, name: "SciELO España", anillo: "a2", cat: "local", url: "https://scielo.isciii.es",
+      protocol: "OAI-PMH (por colección)", endpoint: "scielo.isciii.es (verificar)",
+      licMeta: "Abierta", licCont: "CC (por artículo)", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3",
+      summary: "Revistas científicas españolas de salud en acceso abierto. URL CORREGIDA (v1 ponía scielo.es).",
+      details: "Operado por el ISCIII (BNC Salud) — mismo ecosistema institucional que FISABIO. Alineación sectorial clara." },
+
+    { id: 22, name: "TESEO", anillo: "a2", cat: "local", url: "https://www.educacion.gob.es/teseo",
+      protocol: "Sin API (scraping)", endpoint: "—",
+      licMeta: "Datos públicos", licCont: "Enlace", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio/alto", riesgoLvl: "alto", oe: "OE3",
+      summary: "Registro oficial de tesis doctorales españolas.",
+      details: "Tesis como output y semilla de artículos, capítulos y datasets. Sin API: cosecha frágil; considerar TDX y repositorios institucionales." },
+
+    { id: 23, name: "TDX (Tesis Doctorals en Xarxa)", anillo: "a2", cat: "local", url: "https://www.tdx.cat",
+      protocol: "OAI-PMH (verificar)", endpoint: "tdx.cat (verificar)",
+      licMeta: "Abierta", licCont: "OA", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Repositorio cooperativo de tesis doctorales de universidades catalanas y valencianas.",
+      details: "Complementa a TESEO con enlaces a texto completo y metadatos normalizados." },
+
+    { id: 24, name: "Repositorios GVA / Universidades", anillo: "a2", cat: "local", url: "https://roderic.uv.es",
+      protocol: "OAI-PMH (RODERIC, Riunet, RUA, UJI)", endpoint: "varios repositorios institucionales",
+      licMeta: "Abierta", licCont: "OA", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Literatura gris institucional: informes, memorias y documentos técnicos de universidades valencianas.",
+      details: "Mejor vía de acceso: RECOLECTA (agrega todos por OAI). Cosechar repos individuales solo si se necesita granularidad." },
+
+    { id: 25, name: "Repositorio ISCIII (Repisalud)", anillo: "a2", cat: "local", url: "https://repositorio.isciii.es",
+      protocol: "OAI-PMH", endpoint: "repositorio.isciii.es (verificar)",
+      licMeta: "Abierta", licCont: "OA", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3",
+      summary: "Producción científica del ISCIII. AUSENTE EN v1.",
+      details: "Afinidad institucional directa (ISCIII es el principal financiador sanitario estatal y socio natural de FISABIO)." },
+
+    { id: 26, name: "Dades Obertes GVA", anillo: "a2", cat: "policy", url: "https://dadesobertes.gva.es",
+      protocol: "API CKAN / volcado", endpoint: "dadesobertes.gva.es (verificar)",
+      licMeta: "CC (según dataset)", licCont: "Según dataset", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE6",
+      summary: "Portal de datos abiertos de la Generalitat Valenciana. AUSENTE EN v1.",
+      details: "Datos institucionales y sanitarios valencianos para trazabilidad de gobernanza y transferencia." },
+
+    // ---------------------- ANILLO 3 ----------------------
+    { id: 27, name: "Overton", anillo: "a3", cat: "policy", url: "https://www.overton.io",
+      protocol: "REST (API key)", endpoint: "api.overton.io (key)",
+      licMeta: "Licencia", licCont: "No incluye texto completo (solo pdf_url)", coste: "Licencia", costeLvl: "alto",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE2",
+      summary: "Base de citas de investigación en documentos de política pública (policy citations).",
+      details: "Gratuita a solicitud para uso académico; de pago en organizaciones. La API NO incluye el PDF: hay que descargarlo aparte (a veces el documento solo está en HTML). No sustituye al inventario bibliográfico." },
+
+    { id: 28, name: "Dimensions", anillo: "a3", cat: "policy", url: "https://www.dimensions.ai",
+      protocol: "API/aplicación (licencia)", endpoint: "app.dimensions.ai",
+      licMeta: "Propietaria", licCont: "Enlace", coste: "Pago", costeLvl: "alto",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE2",
+      summary: "Plataforma integral: publicaciones, patentes, financiación y políticas.",
+      details: "Potente si existe acceso institucional, pero dependiente de licencia. Conector opcional, nunca backbone de OSIRIS." },
+
+    { id: 29, name: "Lens.org", anillo: "a3", cat: "policy", url: "https://www.lens.org",
+      protocol: "REST + volcado masivo", endpoint: "api.lens.org",
+      licMeta: "Propietaria", licCont: "Enlace", coste: "Pago", costeLvl: "alto",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE2",
+      summary: "Búsqueda y análisis de literatura y patentes con API.",
+      details: "La API solo ofrece 14 días de prueba gratuita; el uso continuado es de pago (o volcados contratados). Reclasificado: NO es un backbone abierto." },
+
+    { id: 30, name: "Scopus / Web of Science", anillo: "a3", cat: "nucleo", url: "https://www.scopus.com",
+      protocol: "API licenciada", endpoint: "api.elsevier.com · clarivate.com",
+      licMeta: "Propietaria", licCont: "Enlace", coste: "Pago", costeLvl: "alto",
+      riesgo: "Alto", riesgoLvl: "alto", oe: "OE2, OE3",
+      summary: "Bases propietarias de referencia. Declaradas como FRONTERA: son justamente lo que OSIRIS complementa.",
+      details: "Se incluyen solo para validación cruzada cuando exista acceso; no deben ser dependencia estructural del sistema abierto." },
+
+    { id: 31, name: "Altmetric / PlumX", anillo: "a3", cat: "policy", url: "https://www.altmetric.com",
+      protocol: "API licenciada", endpoint: "—",
+      licMeta: "Propietaria", licCont: "—", coste: "Pago", costeLvl: "alto",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE2",
+      summary: "Métricas de atención (altmetrics). AUSENTE EN v1 (o declarar su exclusión).",
+      details: "Incluidas como capa de impacto social opcional; requieren licencia. Alternativa abierta: métricas propias sobre CC, redes y policy citations." },
+
+    // ---------------------- IDENTIDAD Y ESTÁNDARES ----------------------
+    { id: 32, name: "ORCID", anillo: "a0", cat: "idstd", url: "https://orcid.org",
+      protocol: "REST (API pública)", endpoint: "pub.orcid.org",
+      licMeta: "Abierta", licCont: "—", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE4",
+      summary: "Identificador único de investigadores. NO es una fuente de contenido.",
+      details: "Desambigua autores y vincula producción a personas. Reduce homonimias y valida afiliaciones por período de empleo." },
+
+    { id: 33, name: "ROR", anillo: "a0", cat: "idstd", url: "https://ror.org",
+      protocol: "REST + volcado", endpoint: "api.ror.org",
+      licMeta: "CC0", licCont: "—", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE4",
+      summary: "Identificador institucional abierto. Sustituye a GRID (en desuso).",
+      details: "Unifica variantes de FISABIO, hospitales, universidades y centros. Permite filtrar por lineage institucional y mapear jerarquías internas." },
+
+    { id: 34, name: "Fundanet (CRIS)", anillo: "a0", cat: "idstd", url: "https://www.semicrol.es",
+      protocol: "REST (endpoint institucional)", endpoint: "según despliegue FISABIO/Semicrol",
+      licMeta: "Privada", licCont: "—", coste: "Licencia institucional", costeLvl: "alto",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE1, OE4, OE5",
+      summary: "CRIS propietario de partida. DESTINO y validación de la ingesta, no fuente externa.",
+      details: "La memoria declara un endpoint REST para validación por identificadores normalizados. Debe figurar como actor del sistema, no como fuente cosechable." },
+
+    { id: 35, name: "CVN / CVA (FECYT)", anillo: "a0", cat: "idstd", url: "https://cvn.fecyt.es",
+      protocol: "Exportación / estándar", endpoint: "cvn.fecyt.es",
+      licMeta: "Abierta", licCont: "—", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE5",
+      summary: "Formato de currículo normalizado FECYT. Consumidor/estándar de exportación.",
+      details: "Relevante para alinear la salida de OSIRIS con la evaluación curricular (sexenios, acreditaciones)." },
+
+    { id: 36, name: "CERIF / Dublin Core / OAI-PMH", anillo: "a0", cat: "idstd", url: "https://www.eurocris.org/cerif",
+      protocol: "Estándares de metadatos / protocolo", endpoint: "—",
+      licMeta: "Abierta", licCont: "—", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE5",
+      summary: "Estándares de interoperabilidad. La memoria exige crosstwaks a Dublin Core Qualified y BibTeX; el CRIS expone CERIF-XML por OAI-PMH.",
+      details: "No son fuentes, sino el vocabulario de transformación/exportación. DEBEN estar explícitos en el diseño técnico (E2/E4)." },
+
+    // ---------------------- POLÍTICA / OFICIAL ----------------------
+    { id: 37, name: "BOE (datos abiertos)", anillo: "a2", cat: "policy", url: "https://www.boe.es/datosabiertos",
+      protocol: "API REST", endpoint: "api.boe.es",
+      licMeta: "Datos públicos", licCont: "Documento público", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE2, OE6",
+      summary: "Boletín Oficial del Estado con API de datos abiertos.",
+      details: "Permite rastrear normativa y su relación con la producción institucional. Reutilización permitida." },
+
+    { id: 38, name: "DOGV / DOCV", anillo: "a2", cat: "policy", url: "https://dogv.gva.es",
+      protocol: "Sin API (PDF/HTML)", endpoint: "—",
+      licMeta: "Datos públicos", licCont: "Documento público", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE2, OE6",
+      summary: "Diario Oficial de la Generalitat Valenciana: planes, normativas y estrategias sanitarias.",
+      details: "Sin API: cosecha por scraping/PDF. Relevante para impacto político y producción institucional de la GVA." },
+
+    // ---------------------- CLÍNICA / GUÍAS ----------------------
+    { id: 39, name: "GuíaSalud / RedETS", anillo: "a2", cat: "clin", url: "https://portal.guiasalud.es",
+      protocol: "Sin API (scraping)", endpoint: "—",
+      licMeta: "Abierta", licCont: "OA", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE2, OE3",
+      summary: "Guías de práctica clínica y evaluaciones de tecnologías sanitarias. URL CORREGIDA (v1: guiasalsalud.isciii.es).",
+      details: "Producción técnica de alto impacto público; encaja en modelos CoARA de reconocimiento de transferencia. Directamente citada en la memoria del proyecto." },
+
+    { id: 40, name: "AEMPS", anillo: "a2", cat: "clin", url: "https://www.aemps.gob.es",
+      protocol: "Sin API (scraping)", endpoint: "—",
+      licMeta: "Datos públicos", licCont: "Documento público", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE2",
+      summary: "Agencia Española de Medicamentos y Productos Sanitarios: documentos regulatorios.",
+      details: "Informes y resoluciones regulatorias; producción técnica institucional de interés para transferencia." },
+
+    { id: 41, name: "ClinicalTrials.gov", anillo: "a2", cat: "clin", url: "https://clinicaltrials.gov",
+      protocol: "API v2", endpoint: "clinicaltrials.gov/api/v2",
+      licMeta: "Público", licCont: "—", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3",
+      summary: "Registro de ensayos clínicos internacionales.",
+      details: "El registro es una contribución científica válida, aunque no equivale a un output. Modelar como entidad vinculada a publicaciones y resultados." },
+
+    { id: 42, name: "CTIS (UE)", anillo: "a2", cat: "clin", url: "https://euclinicaltrials.eu",
+      protocol: "API (verificar)", endpoint: "euclinicaltrials.eu (verificar)",
+      licMeta: "Público", licCont: "—", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Sistema de Información de Ensayos Clínicos de la Unión Europea.",
+      details: "Cobertura europea de ensayos; verificar disponibilidad de API y condiciones de uso." },
+
+    { id: 43, name: "PROSPERO", anillo: "a2", cat: "clin", url: "https://www.crd.york.ac.uk/prospero",
+      protocol: "Sin API (scraping)", endpoint: "—",
+      licMeta: "Público", licCont: "—", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Registro internacional de revisiones sistemáticas.",
+      details: "Los protocolos registrados son contribución metodológica; sin API oficial." },
+
+    // ---------------------- CIENCIA CIUDADANA / TRANSFERENCIA ----------------------
+    { id: 44, name: "EU-Citizen.Science", anillo: "a2", cat: "ciudadana", url: "https://eu-citizen.science",
+      protocol: "REST / portal (verificar)", endpoint: "eu-citizen.science (verificar)",
+      licMeta: "CC", licCont: "OA", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE1, OE3",
+      summary: "Plataforma europea de ciencia ciudadana. AUSENTE EN v1 pese a citarse la ciencia ciudadana en la memoria.",
+      details: "Proyectos, recursos y publicaciones de citizen science; hueco temático real de la versión anterior." },
+
+    { id: 45, name: "Fisterra", anillo: "a3", cat: "clin", url: "https://www.fisterra.com",
+      protocol: "Editorial (suscripción)", endpoint: "—",
+      licMeta: "Propietaria", licCont: "Suscripción", coste: "Pago/suscripción", costeLvl: "medio",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Guías clínicas y material formativo. Directamente citado en la memoria del proyecto.",
+      details: "Recurso editorial de pago; integración sujeta a licencia. Verificar viabilidad de exportación/API antes de automatizar." },
+
+    { id: 46, name: "Sage Policy Profiles", anillo: "a3", cat: "policy", url: "https://policyprofiles.sagepub.com",
+      protocol: "Herramienta web (datos de Overton)", endpoint: "—",
+      licMeta: "Gratuito (individual)", licCont: "—", coste: "Gratis (herramienta)", costeLvl: "bajo",
+      riesgo: "Bajo/medio", riesgoLvl: "medio", oe: "OE2",
+      summary: "CORRECCIÓN v1: no es una base de policy briefs. Es una herramienta gratuita individual alimentada por Overton.",
+      details: "Solapa con Overton. No proporciona cosecha ni datos para organizaciones. Se conserva solo como interfaz de consulta, no como fuente." }
+  ];
+
+  // ---------------------- Render ----------------------
+  const grid = document.getElementById('sources-grid');
+  const searchInput = document.getElementById('search');
+  const filtersContainer = document.getElementById('filters');
+  const emptyState = document.getElementById('empty');
+  const countEl = document.getElementById('count');
+
+  const RING = { a1: "Anillo 1 · Núcleo abierto", a2: "Anillo 2 · Local / OAI", a3: "Anillo 3 · Licenciado", a0: "Identidad y estándares" };
+  const filters = [
+    { key: "todos", label: "Todas" },
+    { key: "a1", label: "Anillo 1" },
+    { key: "a2", label: "Anillo 2" },
+    { key: "a3", label: "Anillo 3" },
+    { key: "a0", label: "Identidad" }
+  ];
+  let activeFilter = "todos";
+
+  filters.forEach(f => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (f.key === activeFilter ? ' active' : '');
+    btn.textContent = f.label;
+    btn.dataset.key = f.key;
+    btn.addEventListener('click', () => {
+      activeFilter = f.key;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    });
+    filtersContainer.appendChild(btn);
+  });
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function render() {
+    grid.innerHTML = '';
+    const q = searchInput.value.toLowerCase().trim();
+    const filtered = sources.filter(s => {
+      const byRing = activeFilter === 'todos' || s.anillo === activeFilter;
+      const hay = [s.name, s.summary, s.details, s.protocol, CAT[s.cat], RING[s.anillo]].join(' ').toLowerCase();
+      return byRing && (!q || hay.includes(q));
+    });
+
+    countEl.textContent = filtered.length + " de " + sources.length + " fuentes";
+
+    if (filtered.length === 0) {
+      emptyState.style.display = 'block';
+      return;
+    }
+    emptyState.style.display = 'none';
+
+    filtered.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'card an-' + s.anillo;
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-expanded', 'false');
+
+      card.innerHTML =
+        '<div class="card-header">' +
+          '<span class="card-title">' + esc(s.name) + '</span>' +
+          '<span class="badges">' +
+            '<span class="badge ' + 'cat-' + s.cat + '">' + esc(CAT[s.cat]) + '</span>' +
+            '<span class="badge lvl-' + s.riesgoLvl + '" title="Riesgo legal/técnico">Riesgo: ' + esc(s.riesgo) + '</span>' +
+          '</span>' +
+        '</div>' +
+        '<p class="summary">' + esc(s.summary) + '</p>' +
+        '<div class="details">' +
+          '<dl>' +
+            '<dt>Anillo</dt><dd>' + esc(RING[s.anillo]) + '</dd>' +
+            '<dt>Protocolo</dt><dd>' + esc(s.protocol) + '</dd>' +
+            '<dt>Endpoint</dt><dd>' + esc(s.endpoint) + '</dd>' +
+            '<dt>Licencia metadatos</dt><dd>' + esc(s.licMeta) + '</dd>' +
+            '<dt>Licencia contenido</dt><dd>' + esc(s.licCont) + '</dd>' +
+            '<dt>Coste</dt><dd>' + esc(s.coste) + '</dd>' +
+            '<dt>Alineación</dt><dd>' + esc(s.oe) + '</dd>' +
+          '</dl>' +
+          '<p class="note">' + esc(s.details) + '</p>' +
+          '<a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer" class="link-btn" onclick="event.stopPropagation();">Visitar fuente</a>' +
+        '</div>';
+
+      card.addEventListener('click', () => {
+        const expanded = card.classList.toggle('expanded');
+        card.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      });
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  searchInput.addEventListener('input', render);
+  render();
+</script>
+
+</body>
+</html>
