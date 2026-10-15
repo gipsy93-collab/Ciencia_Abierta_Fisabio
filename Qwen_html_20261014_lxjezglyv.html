@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSIRIS | Catálogo de Fuentes de Información FISABIO</title>
+  <style>
+    :root {
+      --primary: #005f73;
+      --primary-light: #0a9396;
+      --accent: #ee9b00;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text: #212529;
+      --text-light: #6c757d;
+      --border: #dee2e6;
+      --shadow: 0 2px 6px rgba(0,0,0,0.08);
+      --radius: 8px;
+      --transition: 0.25s ease;
+      --cat-nucleo: #e9ecef;
+      --cat-local: #d4edda;
+      --cat-objects: #cce5ff;
+      --cat-projects: #fff3cd;
+      --cat-impact: #f8d7da;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px;
+    }
+
+    header {
+      max-width: 1200px;
+      margin: 0 auto 24px;
+      padding: 20px;
+      background: var(--primary);
+      color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    header h1 { font-size: 1.8rem; margin-bottom: 6px; }
+    header p { opacity: 0.9; font-size: 0.95rem; }
+
+    .controls {
+      max-width: 1200px;
+      margin: 0 auto 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #search {
+      flex: 1 1 300px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+    #search:focus { outline: 2px solid var(--primary-light); border-color: transparent; }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .filter-btn {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: var(--transition);
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .card-title { font-weight: 600; font-size: 1.05rem; margin-right: 8px; }
+    .badge {
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border-radius: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .cat-nucleo { background: var(--cat-nucleo); }
+    .cat-local { background: var(--cat-local); }
+    .cat-objects { background: var(--cat-objects); }
+    .cat-projects { background: var(--cat-projects); }
+    .cat-impact { background: var(--cat-impact); }
+
+    .summary { color: var(--text-light); font-size: 0.9rem; line-height: 1.4; }
+    .details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      margin-top: 0;
+    }
+    .card.expanded .details { max-height: 300px; margin-top: 10px; }
+    .details p { font-size: 0.9rem; color: var(--text); margin-bottom: 8px; }
+    .link-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      transition: var(--transition);
+    }
+    .link-btn:hover { background: var(--primary-light); }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+    }
+
+    footer {
+      max-width: 1200px;
+      margin: 30px auto 0;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+      .controls { flex-direction: column; align-items: stretch; }
+      #search { flex: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>OSIRIS | Catálogo de Fuentes de Información</h1>
+  <p>Identificación, enlace directo y justificación de inclusión para el mapeo de producción científica de FISABIO.</p>
+</header>
+
+<main>
+  <div class="controls">
+    <input type="text" id="search" placeholder="🔍 Buscar por nombre, categoría o justificación...">
+    <div class="filters" id="filters"></div>
+  </div>
+  <div class="grid" id="sources-grid"></div>
+  <p class="empty-state" id="empty" style="display:none;">No se encontraron fuentes que coincidan con la búsqueda.</p>
+</main>
+
+<footer>
+  OSIRIS Framework v1.0 • Generado para evaluación interna FISABIO • Licencia abierta para reutilización institucional.
+</footer>
+
+<script>
+  // Datos de fuentes
+  const sources = [
+    { id: 1, name: "OpenAlex", url: "https://openalex.org", cat: "Núcleo Abierto", summary: "Catálogo global abierto con API gratuita para obras, autores, instituciones y citas.", details: "Sustituto fiable de WoS/Scopus para sistemas interoperables. Permite filtrar por ROR, ORCID, funding y conceptos. Ideal como backbone principal sin dependencia comercial." },
+    { id: 2, name: "Crossref", url: "https://www.crossref.org", cat: "Núcleo Abierto", summary: "Registro oficial de metadatos con DOI. Normaliza artículos, libros, capítulos, datasets y software.", details: "Vincula versiones, autores, afiliaciones y financiadores. Esencial para deduplicación, clustering de versiones y enriquecimiento estructurado de outputs." },
+    { id: 3, name: "Europe PMC", url: "https://europepmc.org", cat: "Núcleo Abierto", summary: "Base biomédica que integra artículos, preprints, citas, grants y afiliaciones.", details: "Cobertura sanitaria y de salud pública superior a PubMed. Permite búsquedas por proyecto, autor y afiliación. Imprescindible por el perfil investigador de FISABIO." },
+    { id: 4, name: "PubMed", url: "https://pubmed.ncbi.nlm.nih.gov", cat: "Núcleo Abierto", summary: "Indexación biomédica de referencia. Complementa a Europe PMC en cobertura clínica y epidemiológica.", details: "Garantiza fiabilidad en medicina, enfermería, salud pública y metodología clínica. Útil para validación cruzada y recuperación de literatura indexada histórica." },
+    { id: 5, name: "DataCite", url: "https://www.datacite.org", cat: "Núcleo Abierto", summary: "Registro de identificadores persistentes para datasets, software, informes y objetos de investigación.", details: "Esencial para Ciencia Abierta y principios FAIR. Permite registrar y citar research objects no tradicionales, alineándose con DORA y CoARA." },
+    { id: 6, name: "ORCID", url: "https://orcid.org", cat: "Núcleo Abierto", summary: "Identificador único para investigadores. Permite desambiguar autores y vincular producción a personas concretas.", details: "Infraestructura de identidad transversal. Reduce homonimias, valida afiliaciones por período de empleo y permite auto-validación curricular por investigadores." },
+    { id: 7, name: "ROR", url: "https://ror.org", cat: "Núcleo Abierto", summary: "Identificador institucional abierto. Unifica variantes de FISABIO, hospitales, universidades y centros.", details: "Evita duplicidades por cambios de nombre o traducciones. Permite filtrar por lineage institucional y mapear jerarquías internas de FISABIO." },
+    { id: 8, name: "Dialnet", url: "https://dialnet.unirioja.es", cat: "Local / Ibérico", summary: "Base referencial clave para ciencia española. Captura artículos, libros, capítulos, congresos y tesis.", details: "Recupera producción en castellano/catalán/valenciano infra-representada en índices internacionales. Vital para visibilidad territorial y académica local." },
+    { id: 9, name: "RACO", url: "https://www.raco.cat", cat: "Local / Ibérico", summary: "Agrega revistas catalanas/valencianas en acceso abierto. Garantiza visibilidad lingüística y territorial.", details: "Cubre salud pública, ciencias sociales de la salud, educación sanitaria y producción en lenguas cooficiales. Complementa vacíos de bases anglosajonas." },
+    { id: 10, name: "SciELO España", url: "https://scielo.es", cat: "Local / Ibérico", summary: "Revistas científicas españolas OA. Cubre áreas de salud pública, atención primaria y enfermería.", details: "Plataforma abierta con metadatos normalizados. Captura producción de impacto local y regional no indexada en WoS/Scopus." },
+    { id: 11, name: "TESEO / TDX", url: "https://www.educacion.gob.es/teseo", cat: "Local / Ibérico", summary: "Registros oficiales de tesis doctorales. Reconocen formación investigadora y producción derivada.", details: "Tesis como output y semilla de artículos, capítulos y datasets. Alineación con CoARA para reconocimiento de supervisión y capital humano." },
+    { id: 12, name: "Repositorios GVA/Universidades", url: "https://repositoris.gva.es", cat: "Local / Ibérico", summary: "Literatura gris institucional, informes, memorias y documentos técnicos de la Conselleria y UV/UPV/UA/UJI.", details: "Fuente primaria de producción técnica, evaluaciones internas, dashboards y materiales de salud pública. Indispensable para mapeo completo." },
+    { id: 13, name: "DOCV / BOE / BOPs", url: "https://dogv.gva.es", cat: "Política / Impacto", summary: "Documentos oficiales, planes, normativas y estrategias sanitarias valencianas y estatales.", details: "Permiten rastrear impacto político, producción institucional directa de FISABIO/GVA y alineación con políticas públicas sanitarias." },
+    { id: 14, name: "Zenodo", url: "https://zenodo.org", cat: "Research Objects", summary: "Repositorio multidisciplinar para datasets, software, preprints, pósters e informes técnicos.", details: "Reconocimiento de contribuciones no tradicionales bajo licencia abierta. Integración directa con ORCID, DataCite y proyectos europeos." },
+    { id: 15, name: "Figshare", url: "https://figshare.com", cat: "Research Objects", summary: "Plataforma para compartir y citar research objects. Complementa a Zenodo con metadatos estructurados.", details: "Ideal para capturar outputs vinculados a revistas, instituciones o proyectos. Facilita exportación a CRIS como Fundanet." },
+    { id: 16, name: "GitHub / Software Heritage", url: "https://github.com", cat: "Research Objects", summary: "Código fuente, pipelines, dashboards y herramientas sanitarias. Software Heritage garantiza preservación a largo plazo.", details: "Clave para evaluación responsable de software científico. Captura producción en bioinformática, IA sanitaria, estadística y salud digital." },
+    { id: 17, name: "CRAN / Bioconductor / PyPI", url: "https://cran.r-project.org", cat: "Research Objects", summary: "Paquetes y librerías científicas en R y Python. Capturan producción metodológica y bioinformática.", details: "Reconocimiento de herramientas analíticas desarrolladas por investigadores. Permiten vinculación a DOI vía Zenodo o DataCite." },
+    { id: 18, name: "medRxiv / bioRxiv / OSF", url: "https://www.medrxiv.org", cat: "Research Objects", summary: "Preprints biomédicos y multidisciplinarios. Reconocen prácticas de Ciencia Abierta y difusión temprana.", details: "Modelado como versiones vinculadas al VoR para evitar doble conteo. Cumple con DORA al valorar apertura y velocidad de difusión." },
+    { id: 19, name: "CORDIS / OpenAIRE", url: "https://cordis.europa.eu", cat: "Proyectos & Financiación", summary: "Metadatos de proyectos europeos y agregación europea de outputs. Vinculan publicaciones con grants H2020/Horizon Europe.", details: "Permiten recuperar producción asociada a consorcios, incluso cuando la afiliación institucional no está bien declarada en el artículo." },
+    { id: 20, name: "ISCIII / AEI / GVA", url: "https://www.isciii.es", cat: "Proyectos & Financiación", summary: "Financiación estatal y autonómica estructural. Recuperan producción asociada a proyectos PI, PID, Prometeo y redes.", details: "Ancla poderosa para atribución institucional. Muchos outputs se generan en proyectos FISABIO aunque la afiliación aparezca como hospital o universidad." },
+    { id: 21, name: "Overton", url: "https://www.overton.io", cat: "Política / Impacto", summary: "Base de citas de investigación en documentos de política pública. Útil para medir impacto societal.", details: "No sustituye inventarios bibliográficos. Se incluye como capa complementaria para policy citations y evidencia de transferencia a decisiones públicas." },
+    { id: 22, name: "Dimensions / Lens.org", url: "https://www.dimensions.ai", cat: "Política / Impacto", summary: "Plataformas integrales (publicaciones, patentes, financiación, policy citations). Opcionales como enriquecimiento.", details: "Potentes si hay acceso institucional, pero dependientes de licencias. Se usan como conectores opcionales, no como backbone abierto de OSIRIS." },
+    { id: 23, name: "SAGE Policy", url: "https://journals.sagepub.com", cat: "Política / Impacto", summary: "Recursos editoriales y policy briefs. Inclusión condicional: requiere API/export viable y distinción clara de autoría.", details: "No es base bibliográfica general. Se integrará solo si demuestra cobertura valenciana/española relevante y permite ingesta automatizada sostenible." },
+    { id: 24, name: "ClinicalTrials.gov / CTIS / PROSPERO", url: "https://clinicaltrials.gov", cat: "Política / Impacto", summary: "Registros de ensayos clínicos y revisiones sistemáticas. Reconocen actividad investigadora clínica y metodológica.", details: "Output ≠ actividad, pero el registro es contribución científica válida. Se modelan como entidades vinculadas a publicaciones y resultados." },
+    { id: 25, name: "GuíasSalud / RedETS / AEMPS", url: "https://guiasalsalud.isciii.es", cat: "Política / Impacto", summary: "Guías clínicas, evaluaciones HTA y documentos regulatorios. Reflejan transferencia directa al sistema sanitario.", details: "Producción técnica de alto impacto público. Encajan perfectamente en modelos CoARA-friendly de reconocimiento de transferencia y aplicación." }
+  ];
+
+  // Elementos del DOM
+  const grid = document.getElementById('sources-grid');
+  const searchInput = document.getElementById('search');
+  const filtersContainer = document.getElementById('filters');
+  const emptyState = document.getElementById('empty');
+
+  // Obtener categorías únicas
+  const categories = ["Todas", ...new Set(sources.map(s => s.cat))];
+  
+  // Generar botones de filtro
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = `filter-btn ${cat === 'Todas' ? 'active' : ''}`;
+    btn.textContent = cat;
+    btn.dataset.cat = cat;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderSources();
+    });
+    filtersContainer.appendChild(btn);
+  });
+
+  // Función de renderizado
+  function renderSources() {
+    grid.innerHTML = '';
+    const query = searchInput.value.toLowerCase().trim();
+    const activeCat = document.querySelector('.filter-btn.active').dataset.cat;
+
+    const filtered = sources.filter(s => {
+      const matchesCat = activeCat === 'Todas' || s.cat === activeCat;
+      const matchesSearch = !query || 
+        s.name.toLowerCase().includes(query) || 
+        s.cat.toLowerCase().includes(query) || 
+        s.details.toLowerCase().includes(query);
+      return matchesCat && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+      emptyState.style.display = 'block';
+      return;
+    }
+    emptyState.style.display = 'none';
+
+    filtered.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-expanded', 'false');
+      
+      const catClass = `cat-${s.cat.toLowerCase().replace(/ /g, '-').replace(/&/g, '')}`;
+      
+      card.innerHTML = `
+        <div class="card-header">
+          <span class="card-title">${s.name}</span>
+          <span class="badge ${catClass}">${s.cat}</span>
+        </div>
+        <p class="summary">${s.summary}</p>
+        <div class="details">
+          <p>${s.details}</p>
+          <a href="${s.url}" target="_blank" rel="noopener noreferrer" class="link-btn" onclick="event.stopPropagation();">🔗 Visitar fuente</a>
+        </div>
+      `;
+
+      // Toggle expansión
+      card.addEventListener('click', () => {
+        const isExpanded = card.classList.toggle('expanded');
+        card.setAttribute('aria-expanded', isExpanded);
+      });
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.click();
+        }
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  // Event listeners
+  searchInput.addEventListener('input', renderSources);
+
+  // Render inicial
+  renderSources();
+</script>
+
+</body>
+</html>
