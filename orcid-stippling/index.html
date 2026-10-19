@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORCID: Del Caos a la Identidad Digital Unívoca · Margarita Salas</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Fuentes Google: Outfit / Inter para estética científica y moderna -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Cabecera explicativa e institucional -->
+    <header class="app-header">
+      <div class="brand-tag">
+        <span class="orcid-dot"></span>
+        <span>IDENTIDAD DIGITAL CIENTÍFICA · FISABIO / OSIRIS</span>
+      </div>
+      <h1 class="main-title">Del Caos a la Identidad Unívoca</h1>
+      <p class="subtitle">
+        Visualización interactiva basada en <em>Voronoi Stippling</em> (Relajación de Lloyd).
+        Las partículas representan el problema de la homonimia y las citas perdidas; <strong>ORCID</strong> actúa como el principio ordenador que revela el retrato de la científica <strong>Margarita Salas</strong>.
+      </p>
+    </header>
+
+    <!-- Barra de Estado y Controles Principales -->
+    <section class="control-panel">
+      <div class="control-actions">
+        <button id="btnOrder" class="btn btn-primary" title="Activar convergencia hacia el identificador único">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 7v10M8 12l4 4 4-4"/>
+          </svg>
+          <span class="btn-text">Generar ORCID</span>
+        </button>
+
+        <button id="btnChaos" class="btn btn-secondary" title="Devolver las partículas al movimiento browniano aleatorio">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 12a8 8 0 0 1 14.93-4M20 12a8 8 0 0 1-14.93 4"/>
+            <polyline points="18 4 20 8 16 8"/>
+            <polyline points="6 20 4 16 8 16"/>
+          </svg>
+          <span>Restablecer Caos</span>
+        </button>
+
+        <label class="btn btn-outline" for="imageFileInput" title="Cargar otra foto o recortar de 600x600 px">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+          </svg>
+          <span>Cambiar Imagen</span>
+        </label>
+        <input type="file" id="imageFileInput" accept="image/*" style="display:none;">
+
+        <div class="toggle-container" title="Muestra u oculta los círculos guía de los nodos de información">
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleGuides" checked>
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label">Guías de Nodos</span>
+        </div>
+      </div>
+
+      <div class="status-indicator">
+        <span class="status-pill status-chaos" id="statusPill">Estado: Caos inicial</span>
+        <span class="status-desc" id="statusDesc">5.000 partículas en movimiento browniano (atribución dispersa).</span>
+      </div>
+    </section>
+
+    <!-- Escenario Principal: Lienzo de Stippling + Superposición de Nodos -->
+    <main class="canvas-viewport">
+      <div class="canvas-card">
+        <!-- Canvas de alta resolución -->
+        <canvas id="stippleCanvas" width="600" height="600"></canvas>
+
+        <!-- Indicador de cálculo / preproceso -->
+        <div id="loaderOverlay" class="loader-overlay hidden">
+          <div class="spinner"></div>
+          <p id="loaderMessage">Calculando centroides ponderados de Voronoi...</p>
+        </div>
+
+        <!-- Capa SVG para las guías de los 4 nodos (opcionales visualmente) -->
+        <svg id="nodeOverlay" class="node-overlay" viewBox="0 0 600 600"></svg>
+      </div>
+
+      <!-- Barra lateral de navegación rápida entre nodos -->
+      <aside class="node-selector-sidebar">
+        <div class="sidebar-header">
+          <h3>Nodos Interactivos</h3>
+          <p class="sidebar-help">Haz clic sobre las zonas del retrato o selecciona aquí:</p>
+        </div>
+
+        <nav class="node-list">
+          <button class="node-pill" data-node="node-1">
+            <span class="node-num">01</span>
+            <div class="node-pill-info">
+              <strong>Zona Superior</strong>
+              <small>La Identidad Digital</small>
+            </div>
+          </button>
+
+          <button class="node-pill" data-node="node-2">
+            <span class="node-num">02</span>
+            <div class="node-pill-info">
+              <strong>Zona Central / Ojos</strong>
+              <small>Control de Visibilidad</small>
+            </div>
+          </button>
+
+          <button class="node-pill" data-node="node-3">
+            <span class="node-num">03</span>
+            <div class="node-pill-info">
+              <strong>Zona Inferior / Manos</strong>
+              <small>Construcción del Perfil</small>
+            </div>
+          </button>
+
+          <button class="node-pill" data-node="node-4">
+            <span class="node-num">04</span>
+            <div class="node-pill-info">
+              <strong>Zona Periférica</strong>
+              <small>Conectividad</small>
+            </div>
+          </button>
+        </nav>
+
+        <div class="callout-box">
+          <div class="callout-title">
+            <span class="bulb-icon">💡</span>
+            <span>Efecto Háptico</span>
+          </div>
+          <p>
+            Al pasar el cursor sobre los nodos o hacer clic, las partículas experimentan una <strong>dispersión elástica</strong> local antes de retornar a su posición.
+          </p>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Modales Flotantes de Información (Fase 2) -->
+    <div id="modalOverlay" class="modal-overlay hidden" aria-hidden="true">
+      <div class="modal-card" id="modalCard" role="dialog" aria-modal="true">
+        <div class="modal-header">
+          <div class="modal-badge-row">
+            <span class="modal-badge" id="modalBadge">NODO 1 · ZONA SUPERIOR</span>
+            <span class="modal-zone-tag" id="modalZoneTag">La Identidad Digital</span>
+          </div>
+          <button class="modal-close" id="modalClose" aria-label="Cerrar modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h2 class="modal-title" id="modalTitle">De la confusión a la identidad unívoca.</h2>
+          <div class="modal-divider"></div>
+          <p class="modal-text" id="modalText">
+            La duplicidad de nombres provoca que trabajos ajenos se nos atribuyan o que perdamos citas propias. ORCID soluciona esto proporcionando un identificador universal, único y persistente, compatible con otras plataformas. Para empezar, define una firma única e incluye tu filiación institucional.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <span class="modal-tip">💡 Haz clic fuera o presiona Esc para volver al lienzo</span>
+          <button class="btn btn-sm btn-outline" id="modalUnderstoodBtn">Entendido</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pie de página con créditos e instrucciones de calibración -->
+    <footer class="app-footer">
+      <div class="footer-col">
+        <strong>Fisabio · Unidad de Ciencia Abierta</strong>
+        <span>Proyecto OSIRIS (MDG-25-11900)</span>
+      </div>
+      <div class="footer-col footer-center">
+        <span>Técnica: <em>Weighted Voronoi Stippling</em> (Adrian Secord / Mike Bostock)</span>
+      </div>
+      <div class="footer-col footer-right">
+        <span>Retrato: Margarita Salas (1938–2019)</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Librerías Externas: D3.js v7 y d3-delaunay v6 -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-delaunay@6"></script>
+  
+  <!-- Script de la aplicación -->
+  <script src="script.js"></script>
+</body>
+</html>
