@@ -1,4 +1,4 @@
-import os, io, re, json, base64, shutil
+﻿import os, io, re, json, base64, shutil
 from PIL import Image
 
 base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -54,7 +54,7 @@ tpl = tpl.replace("@@OVERRIDES@@", json.dumps(over, ensure_ascii=False))
 
 left = re.findall(r"@@[A-Za-z_]+@@", tpl)
 print("unresolved:", left)
-out = os.path.join(base, "Infografia-Neurociencia.html")
+out = os.path.join(base, "Taller-Ciencia-Participativa.html")
 open(out, "w", encoding="utf-8").write(tpl)
 print("wrote", out, round(os.path.getsize(out)/1024), "KB")
 
@@ -82,6 +82,6 @@ if os.path.isdir(fotos_src):
             copied += 1
     print("fotos:", len(os.listdir(fotos_dst)), "en dist/assets/fotos/", f"({copied} copiadas)")
 
-out2 = os.path.join(dist, "Infografia-Neurociencia.html")
+out2 = os.path.join(dist, "Taller-Ciencia-Participativa.html")
 open(out2, "w", encoding="utf-8").write(public)
 print("wrote", out2, round(os.path.getsize(out2)/1024), "KB")

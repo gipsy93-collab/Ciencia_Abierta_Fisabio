@@ -1,4 +1,4 @@
-# Infografía interactiva — «Estamos pensando la ciencia abierta»
+﻿# Infografía interactiva — «Estamos pensando la ciencia abierta»
 
 Pieza divulgativa del taller de diagnóstico de necesidades del proyecto **OpenScience4Health** (FCT-25-22602), coordinado por Fisabio con la UPV y la UV y financiado por FECYT (convocatoria I+P).
 
@@ -9,15 +9,15 @@ Pieza divulgativa del taller de diagnóstico de necesidades del proyecto **OpenS
 
 ## Cómo abrirla
 
-Doble clic en `Infografia-Neurociencia.html` (requiere la carpeta `assets/fotos/` a su lado para la galería). Las imágenes del arte y la tipografía van embebidas; las fotografías del taller son **referenciadas**, no incrustadas.
+Doble clic en `Taller-Ciencia-Participativa.html` (requiere la carpeta `assets/fotos/` a su lado para la galería). Las imágenes del arte y la tipografía van embebidas; las fotografías del taller son **referenciadas**, no incrustadas.
 
 Navegación: flechas inferiores o teclado (`←` `→`); las ventanas se cierran con la `X`, `Esc` o el marco azul.
 
 ## Estructura
 
 ```
-infografia-neurociencia/
-├── Infografia-Neurociencia.html   ← pieza publicable (fotos referenciadas)
+Taller-Ciencia-Participativa/
+├── Taller-Ciencia-Participativa.html   ← pieza publicable (fotos referenciadas)
 ├── assets/                        ← arte de los cerebros y tipografía
 │   └── fotos/                     ← fotografías del taller (referenciadas, no incrustadas)
 └── src/
