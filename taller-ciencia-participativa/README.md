@@ -34,5 +34,6 @@ Taller-Ciencia-Participativa/
 
 ## Pendiente
 
-- Confirmar consentimiento de las personas que aparezcan en las fotografías y anotar la autoría de cada imagen (pie "Fotografías del taller · Fisabio" genérico).
+- Comentarios literales del tramo final del taller (`CONTEXTO TALLER PROYECTO_.md.crdownload`, cortado en «Conclusiones/Comentarios»): se añadirán cuando coordinación disponga del texto (así lo indica Gipsy).
+- Crédito genérico de fotos en pie de galería; fotos sin personas identificables (no requiere consentimiento).
 - Los comentarios literales del tramo final del documento del taller (`CONTEXTO TALLER PROYECTO_.md.crdownload`, cortado en «Conclusiones/Comentarios») siguen sin fuente.
