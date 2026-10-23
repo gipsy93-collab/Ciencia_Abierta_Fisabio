@@ -188,9 +188,19 @@ body{font-family:'Outfit',system-ui,sans-serif}
 .photo{position:absolute;z-index:3;width:275px;height:244px;border-radius:9px;object-fit:cover;
   box-shadow:0 2px 10px rgba(20,10,70,.10);}
 
-/* resources */
-.res{position:absolute;user-select:none;pointer-events:none}
-.page[data-page="3"] .res{opacity:.22}
+/* gallery page 3 */
+.gtitle{position:absolute;left:103px;top:76px;font-size:44px;line-height:1.05;font-weight:700;color:var(--navy);letter-spacing:-.4px}
+.gsub{position:absolute;left:103px;top:132px;font-size:18px;line-height:1.3;font-weight:400;color:var(--navy);opacity:.56;max-width:950px}
+.shot{position:absolute;border-radius:9px;overflow:hidden;background:#fff;box-shadow:0 2px 10px rgba(20,10,70,.12)}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot figcaption{
+  position:absolute;left:0;right:0;bottom:0;padding:20px 14px 9px;font-size:13.5px;
+  font-weight:600;color:#fff;background:linear-gradient(transparent,rgba(26,13,114,.74));
+}
+.gfoot{position:absolute;left:103px;right:190px;bottom:20px;display:flex;align-items:baseline;justify-content:space-between;color:#fff;z-index:5;text-shadow:0 1px 10px rgba(26,13,114,.55)}
+.gfoot .gthx{font-size:21px;font-weight:700}
+.gfoot .gsub2{font-size:15px;font-weight:500;opacity:.95}
+.gfoot .credits{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;opacity:.9}
 .closing{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#fff;text-align:center;z-index:5;padding:0 90px}
 .closing h2{font-size:76px;font-weight:700;letter-spacing:-2px;line-height:1}
 .closing p{font-size:22px;font-weight:500;opacity:.95}
@@ -202,6 +212,30 @@ body{font-family:'Outfit',system-ui,sans-serif}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .page.active .hot{animation:pop .45s cubic-bezier(.2,.9,.3,1.2) both}
 @keyframes pop{from{opacity:0;transform:translate(-50%,-50%) scale(.5)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+
+/* ---------- editor de textos ---------- */
+/* EDITOR:INICIO */
+.editbar{position:absolute;left:96px;top:16px;z-index:60;display:flex;align-items:center;gap:8px}
+.editpanel{display:none;align-items:center;gap:8px}
+.editbar.on .editpanel{display:flex}
+.editbtn{
+  display:inline-flex;align-items:center;gap:7px;border:0;cursor:pointer;font-family:inherit;
+  background:rgba(36,27,107,.82);color:#fff;font-size:12.5px;font-weight:600;letter-spacing:.02em;
+  padding:7px 13px;border-radius:999px;backdrop-filter:blur(4px);
+  transition:background .2s ease,color .2s ease,opacity .2s ease;white-space:nowrap;
+}
+.editbtn:hover{background:#241B6B}
+.editbtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#edittoggle{opacity:.55}
+#edittoggle:hover,#edittoggle[aria-pressed="true"]{opacity:1}
+#edittoggle[aria-pressed="true"]{background:#fff;color:#241B6B;box-shadow:0 4px 14px rgba(20,10,70,.2)}
+.editbtn.ghost{background:rgba(255,255,255,.9);color:#241B6B}
+.editbtn.ghost:hover{background:#fff}
+body.editing [data-edit]{outline:1px dashed rgba(26,13,114,.3);outline-offset:3px;border-radius:4px;cursor:text}
+body.editing [data-edit]:hover{outline-color:rgba(26,13,114,.55);background:rgba(98,152,241,.06)}
+body.editing [data-edit]:focus{outline:2px solid var(--accent);outline-offset:3px}
+body.editing .plus,body.editing .ibadge{pointer-events:none;opacity:.5}
+/* EDITOR:FIN */
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -225,11 +259,11 @@ body{font-family:'Outfit',system-ui,sans-serif}
       <img class="brain" src="@@brain_cover@@" alt="Cerebro con las cinco áreas destacadas"
            style="left:389px;top:209px;width:516px;height:433px">
 
-      <button class="pill anim" data-open="m2" style="left:101px;top:258px;width:305px;height:44px;--accent:var(--red)">El taller</button>
-      <button class="pill anim" data-open="m1" style="left:75px;top:399px;width:298px;height:44px;--accent:var(--orange)">Contexto</button>
-      <button class="pill anim" data-open="m5" style="left:185px;top:542px;width:270px;height:43px;--accent:var(--green)">Prioridades</button>
-      <button class="pill anim" data-open="m3" style="left:903px;top:266px;width:296px;height:43px;--accent:var(--purple)">Participantes</button>
-      <button class="pill anim" data-open="m4" style="left:921px;top:437px;width:296px;height:44px;--accent:var(--pink)">Necesidades</button>
+      <button class="pill anim" data-open="m2" style="left:101px;top:258px;width:305px;height:44px;--accent:var(--red)"><span>El taller</span></button>
+      <button class="pill anim" data-open="m1" style="left:75px;top:399px;width:298px;height:44px;--accent:var(--orange)"><span>Contexto</span></button>
+      <button class="pill anim" data-open="m5" style="left:185px;top:542px;width:270px;height:43px;--accent:var(--green)"><span>Prioridades</span></button>
+      <button class="pill anim" data-open="m3" style="left:903px;top:266px;width:296px;height:43px;--accent:var(--purple)"><span>Participantes</span></button>
+      <button class="pill anim" data-open="m4" style="left:921px;top:437px;width:296px;height:44px;--accent:var(--pink)"><span>Necesidades</span></button>
 
       <button class="hot pulse" data-open="m1" style="left:473px;top:387px">1</button>
       <button class="hot pulse" data-open="m2" style="left:615px;top:276px">2</button>
@@ -253,8 +287,8 @@ body{font-family:'Outfit',system-ui,sans-serif}
       <img class="brain" src="@@brain_p2@@" alt="Cerebro visto desde arriba"
            style="left:466px;top:216px;width:335px;height:417px">
 
-      <button class="pill" data-open="p2m1" style="left:120px;top:355px;width:305px;height:43px;--accent:var(--orange)">Conclusiones</button>
-      <button class="pill" data-open="p2m2" style="left:857px;top:444px;width:310px;height:43px;--accent:var(--pink)">Pasos siguientes</button>
+      <button class="pill" data-open="p2m1" style="left:120px;top:355px;width:305px;height:43px;--accent:var(--orange)"><span>Conclusiones</span></button>
+      <button class="pill" data-open="p2m2" style="left:857px;top:444px;width:310px;height:43px;--accent:var(--pink)"><span>Pasos siguientes</span></button>
 
       <button class="ibadge sm" data-open="p2m1" style="left:83px;top:356px" aria-label="Más información">i</button>
       <button class="ibadge sm" data-open="p2m2" style="left:1159px;top:445px" aria-label="Más información">i</button>
@@ -266,15 +300,36 @@ body{font-family:'Outfit',system-ui,sans-serif}
 
   <!-- ================= PAGE 3 ================= -->
   <section class="page" data-page="3">
-    <img class="res" src="@@res_A@@" style="left:162px;top:36px;width:391px;height:320px">
-    <img class="res" src="@@res_B@@" style="left:619px;top:53px;width:215px;height:257px">
-    <img class="res" src="@@res_C@@" style="left:884px;top:55px;width:215px;height:257px">
-    <img class="res" src="@@res_D@@" style="left:263px;top:341px;width:462px;height:345px">
-    <img class="res" src="@@res_E@@" style="left:696px;top:363px;width:391px;height:321px">
-    <div class="closing">
-      <h2>Gracias</h2>
-      <p>OpenScience4Health · FCT-25-22602</p>
-      <p class="credits">Fisabio · UPV · UV · FECYT</p>
+    <div class="card">
+      <h2 class="gtitle anim">El taller, en imágenes</h2>
+      <p class="gsub anim">Jornada del 20 de octubre de 2026 · Semana del Acceso Abierto.</p>
+
+      <figure class="shot anim" data-foto="mesa" style="left:60px;top:172px;width:378px;height:238px">
+        <img src="assets/fotos/20261020_111352.jpg" alt="Mesa de trabajo con las tarjetas de necesidades desplegadas" style="object-position:50% 62%">
+        <figcaption>Las tarjetas de necesidades en las mesas</figcaption>
+      </figure>
+      <figure class="shot anim" data-foto="n15" style="left:454px;top:172px;width:378px;height:238px">
+        <img src="assets/fotos/20261020_103441.jpg" alt="Tarjeta N15: reconocimiento de la ciencia abierta en la evaluación investigadora">
+        <figcaption>Tarjeta N15 · incentivos y evaluación</figcaption>
+      </figure>
+      <figure class="shot anim" data-foto="n19" style="left:848px;top:172px;width:372px;height:238px">
+        <img src="assets/fotos/20261020_112202.jpg" alt="Tarjeta N19: estructuras estables de participación ciudadana" style="object-position:50% 45%">
+        <figcaption>Tarjeta N19 · participación ciudadana</figcaption>
+      </figure>
+      <figure class="shot anim" data-foto="pizarra" style="left:60px;top:426px;width:570px;height:180px">
+        <img src="assets/fotos/20261020_112557.jpg" alt="Pizarra con las 25 necesidades y la votación con puntos" style="object-position:50% 55%">
+        <figcaption>Las 25 necesidades y la votación con puntos</figcaption>
+      </figure>
+      <figure class="shot anim" data-foto="votos" style="left:646px;top:426px;width:574px;height:180px">
+        <img src="assets/fotos/20261020_112303.jpg" alt="Participante contrastando la votación en la pizarra" style="object-position:50% 58%">
+        <figcaption>Contrastando prioridades en la pizarra</figcaption>
+      </figure>
+    </div>
+
+    <div class="gfoot">
+      <span class="gthx" data-edit="close.title">Gracias</span>
+      <span class="gsub2" data-edit="close.sub">OpenScience4Health · FCT-25-22602</span>
+      <span class="credits" data-edit="close.credits">Fisabio · UPV · UV · FECYT</span>
     </div>
   </section>
 
@@ -292,6 +347,21 @@ body{font-family:'Outfit',system-ui,sans-serif}
       <div id="mbody"></div>
     </div>
   </div>
+
+  <!-- EDITOR:INICIO -->
+  <div class="editbar" id="editbar">
+    <button class="editbtn" id="edittoggle" aria-pressed="false" title="Editar los textos de la infografía">
+      <svg viewBox="0 0 24 24"><path d="M4 20l3.6-.9L19 7.6a2.2 2.2 0 0 0-3.1-3.1L4.4 16 3.5 20z"/><path d="M14.6 6.6l2.8 2.8"/></svg>
+      <span id="editlabel">Editar textos</span>
+    </button>
+    <div class="editpanel">
+      <button class="editbtn" id="editfinal" title="Descarga el HTML final, sin editor y con los textos fijados">Descargar versión final</button>
+      <button class="editbtn" id="editexport" title="Descarga textos.json para fijar los cambios en el HTML">Exportar textos.json</button>
+      <button class="editbtn" id="editcopy" title="Copia el JSON al portapapeles">Copiar</button>
+      <button class="editbtn ghost" id="editreset" title="Borra los cambios guardados en este navegador">Restablecer</button>
+    </div>
+  </div>
+  <!-- EDITOR:FIN -->
 
   <div class="pager" id="pager">01 / 03</div>
   <nav class="nav">
@@ -417,6 +487,23 @@ const IMG = {
   cardB: '@@card_b@@'
 };
 
+const OVERRIDES = @@OVERRIDES@@;
+
+/* ======================= textos fijos ======================= */
+const store = Object.assign({}, OVERRIDES || {});
+let editing = false;
+let onRender = null;
+
+function T(key, fallback) {
+  return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : fallback;
+}
+
+function textEl(node, key, fallback) {
+  if (!node) return;
+  node.dataset.edit = key;
+  node.innerHTML = T(key, fallback);
+}
+
 /* ======================= navegación ======================= */
 const stage = document.getElementById('stage');
 const pages = [...document.querySelectorAll('.page')];
@@ -436,6 +523,7 @@ function showPage(i) {
   document.getElementById('prev').disabled = current === 0;
   document.getElementById('next').disabled = current === pages.length - 1;
   document.getElementById('pager').textContent = `0${current + 1} / 0${pages.length}`;
+  document.getElementById('pager').style.opacity = current === pages.length - 1 ? 0 : '';
 }
 
 /* ======================= modal ======================= */
@@ -456,8 +544,8 @@ function openModal(key) {
   badge.style.background = s.color;
 
   mCard.style.setProperty('--accent', s.color);
-  document.getElementById('mtitle').textContent = s.title;
-  document.getElementById('mtext').innerHTML = s.text;
+  textEl(document.getElementById('mtitle'), `sec.${key}.title`, s.title);
+  textEl(document.getElementById('mtext'), `sec.${key}.text`, s.text);
 
   const brain = document.getElementById('mbrain');
   brain.src = s.brain;
@@ -470,7 +558,7 @@ function openModal(key) {
   const body = document.getElementById('mbody');
   body.innerHTML = '';
 
-  (s.pills || []).forEach(p => {
+  (s.pills || []).forEach((p, i) => {
     const d = el('div', 'pill small' + (p.num ? ' numbered' : ''), `left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px`);
     if (p.padLeft) d.style.paddingLeft = p.padLeft + 'px';
     if (p.num) {
@@ -481,7 +569,7 @@ function openModal(key) {
       d.appendChild(n);
     }
     const t = el('span', p.num ? 'two' : '');
-    t.innerHTML = p.text;
+    textEl(t, `sec.${key}.pill.${i}`, p.text);
     t.style.fontSize = (p.fs || 18.3) + 'px';
     d.appendChild(t);
     body.appendChild(d);
@@ -508,10 +596,10 @@ function openModal(key) {
     body.appendChild(p);
 
     const co = s.callouts || [{ x: s.plus.x + 60, y: s.plus.y - 46, w: 300, text: TXT.calloutSmall }];
-    const boxes = co.map(c => {
+    const boxes = co.map((c, i) => {
       const d = el('div', 'callout' + (c.big ? ' big' : ''),
         `left:${c.x}px;top:${c.y}px;width:${c.w}px;background:${s.color}`);
-      d.innerHTML = c.text;
+      textEl(d, `sec.${key}.callout.${i}`, c.text);
       body.appendChild(d);
       return d;
     });
@@ -540,6 +628,7 @@ function openModal(key) {
   });
 
   modal.classList.add('open');
+  if (onRender) onRender(mCard);
 }
 function closeModal() {
   modal.classList.remove('open');
@@ -551,7 +640,9 @@ modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 /* ======================= eventos ======================= */
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-open]');
-  if (t) openModal(t.dataset.open);
+  if (!t) return;
+  if (editing && !t.classList.contains('hot')) return;
+  openModal(t.dataset.open);
 });
 
 document.getElementById('prev').addEventListener('click', () => showPage(current - 1));
@@ -559,10 +650,180 @@ document.getElementById('next').addEventListener('click', () => showPage(current
 
 addEventListener('keydown', e => {
   if (e.key === 'Escape' && openKey) return closeModal();
+  if (editing) return;
   if (openKey) return;
   if (e.key === 'ArrowRight') showPage(current + 1);
   if (e.key === 'ArrowLeft') showPage(current - 1);
 });
+
+/* ======================= editor de textos ======================= */
+/* EDITOR:INICIO */
+const STORE_KEY = 'fisabio-infografia-textos-v1';
+const editbar = document.getElementById('editbar');
+const edittoggle = document.getElementById('edittoggle');
+
+function readStore() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY) || 'null') || {}; }
+  catch (err) { return {}; }
+}
+Object.assign(store, readStore());
+onRender = setEditable;
+
+function saveStore() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (err) {}
+}
+
+function setEditable(root) {
+  (root || document).querySelectorAll('[data-edit]').forEach(n => {
+    if (editing) n.setAttribute('contenteditable', 'true');
+    else n.removeAttribute('contenteditable');
+  });
+}
+
+function setEditing(on) {
+  editing = on;
+  document.body.classList.toggle('editing', on);
+  editbar.classList.toggle('on', on);
+  edittoggle.setAttribute('aria-pressed', String(on));
+  document.getElementById('editlabel').textContent = on ? 'Terminar edición' : 'Editar textos';
+  setEditable();
+  document.getElementById('editexport').disabled = !on;
+  document.getElementById('editcopy').disabled = !on;
+  document.getElementById('editfinal').disabled = !on;
+  document.getElementById('editreset').disabled = !on;
+  if (on) {
+    const first = document.querySelector('.page.active [data-edit]');
+    if (first) first.focus({ preventScroll: true });
+  }
+}
+
+function exportStore() {
+  const blob = new Blob([JSON.stringify(store, null, 2) + '\n'], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'textos.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+async function copyStore() {
+  const txt = JSON.stringify(store, null, 2);
+  try {
+    await navigator.clipboard.writeText(txt);
+    document.getElementById('editcopy').textContent = 'Copiado';
+  } catch (err) {
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    ta.remove();
+    document.getElementById('editcopy').textContent = 'Copiado';
+  }
+  setTimeout(() => { document.getElementById('editcopy').textContent = 'Copiar'; }, 1600);
+}
+
+/* Versión final: mismo HTML sin editor, con los textos fijados dentro */
+const MARK = /(?:\/\*\s*EDITOR:INICIO\s*\*\/|<!--\s*EDITOR:INICIO\s*-->)[\s\S]*?(?:\/\*\s*EDITOR:FIN\s*\*\/|<!--\s*EDITOR:FIN\s*-->)/g;
+
+function exportFinal() {
+  if (editing) setEditing(false);
+  closeModal();
+  const texts = JSON.stringify(store);
+  const clone = document.documentElement.cloneNode(true);
+
+  clone.querySelector('#editbar')?.remove();
+  clone.querySelectorAll('[contenteditable]').forEach(n => n.removeAttribute('contenteditable'));
+  clone.querySelectorAll('[data-edit]').forEach(n => n.removeAttribute('data-edit'));
+  clone.querySelectorAll('.hot, .plus, .callout').forEach(n => n.classList.remove('rot', 'show'));
+  clone.querySelectorAll('.page').forEach((p, i) => p.classList.toggle('active', i === 0));
+
+  const clear = (id, fn) => { const n = clone.querySelector('#' + id); if (n) fn(n); };
+  clear('mbody', n => { n.innerHTML = ''; });
+  clear('mtitle', n => { n.innerHTML = ''; });
+  clear('mtext', n => { n.innerHTML = ''; });
+  clear('mwires', n => { n.innerHTML = ''; });
+  clear('mbadge', n => { n.textContent = ''; n.removeAttribute('style'); });
+  clear('mbrain', n => { n.removeAttribute('src'); n.removeAttribute('style'); });
+  clear('modalCard', n => n.removeAttribute('style'));
+  clear('modal', n => n.classList.remove('open'));
+  clear('stage', n => n.removeAttribute('style'));
+  clear('pager', n => { n.textContent = '01 / 03'; });
+  clear('prev', n => n.setAttribute('disabled', ''));
+  clear('next', n => n.removeAttribute('disabled'));
+
+  let html = '<!doctype html>\n' + clone.outerHTML;
+  html = html.replace(MARK, '');
+  html = html.replace(/const OVERRIDES = .*;/, () => 'const OVERRIDES = ' + texts + ';');
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Infografia-Neurociencia-final.html';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* claves estables de los textos fijos */
+document.querySelectorAll('.page .title').forEach(n => textEl(n, 'head.title', n.innerHTML));
+document.querySelectorAll('.page .subtitle').forEach(n => textEl(n, 'head.subtitle', n.innerHTML));
+document.querySelectorAll('.page button.pill[data-open] > span').forEach(n => {
+  textEl(n, 'cover.' + n.parentElement.dataset.open, n.innerHTML);
+});
+document.querySelectorAll('.page .gtitle').forEach(n => textEl(n, 'gallery.title', n.innerHTML));
+document.querySelectorAll('.page .gsub').forEach(n => textEl(n, 'gallery.sub', n.innerHTML));
+document.querySelectorAll('.shot figcaption').forEach(n => {
+  textEl(n, 'foto.' + n.parentElement.dataset.foto + '.cap', n.innerHTML);
+});
+
+edittoggle.addEventListener('click', () => setEditing(!editing));
+document.getElementById('editexport').addEventListener('click', exportStore);
+document.getElementById('editfinal').addEventListener('click', exportFinal);
+document.getElementById('editcopy').addEventListener('click', copyStore);
+document.getElementById('editreset').addEventListener('click', () => {
+  if (!confirm('¿Descartar los cambios guardados en este navegador y volver a los textos del archivo?')) return;
+  try { localStorage.removeItem(STORE_KEY); } catch (err) {}
+  location.reload();
+});
+
+document.addEventListener('input', e => {
+  const t = e.target.closest && e.target.closest('[data-edit]');
+  if (!editing || !t) return;
+  const key = t.dataset.edit;
+  const html = t.innerHTML;
+  store[key] = html;
+  saveStore();
+  document.querySelectorAll(`[data-edit="${key}"]`).forEach(n => {
+    if (n !== t) n.innerHTML = html;
+  });
+});
+
+document.addEventListener('paste', e => {
+  const t = e.target.closest && e.target.closest('[data-edit]');
+  if (!editing || !t) return;
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData('text/plain').replace(/\r?\n/g, ' ');
+  document.execCommand('insertText', false, text);
+});
+
+document.addEventListener('keydown', e => {
+  if (!editing) return;
+  const t = e.target.closest && e.target.closest('[data-edit]');
+  if (!t) return;
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.execCommand('insertHTML', false, '<br>');
+  }
+});
+
+if (new URLSearchParams(location.search).get('editar') === 'off') editbar.remove();
+/* EDITOR:FIN */
 
 showPage(0);
 </script>
