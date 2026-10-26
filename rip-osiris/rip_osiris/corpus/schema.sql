@@ -82,6 +82,27 @@ CREATE INDEX IF NOT EXISTS idx_edges_dst ON edges(dst_kind, dst_id);
 CREATE INDEX IF NOT EXISTS idx_documents_doi ON documents(doi);
 
 -- ---------------------------------------------------------------------------
+-- Capa 2: menciones institucionales (no atribuibles a una salida concreta)
+-- ---------------------------------------------------------------------------
+-- En normativa y planes lo normal no es citar el artículo: se nombra la
+-- institución. Sin `output_id` no hay arista de impacto (N1-N6 por salida),
+-- pero sí un rastro documentado y literal que se declara como N6.
+CREATE TABLE IF NOT EXISTS mentions (
+  id INTEGER PRIMARY KEY,
+  doc_id INTEGER REFERENCES documents(id) ON DELETE CASCADE,
+  entidad TEXT NOT NULL,
+  tipo TEXT NOT NULL,
+  literal TEXT NOT NULL,
+  offset INTEGER,
+  page INTEGER,
+  method TEXT,
+  provenance_id TEXT,
+  UNIQUE(doc_id, entidad, literal)
+);
+
+CREATE INDEX IF NOT EXISTS idx_mentions_doc ON mentions(doc_id);
+
+-- ---------------------------------------------------------------------------
 -- P1: mapeo de producción y fuentes (roster del portal + obras + presencia)
 -- ---------------------------------------------------------------------------
 

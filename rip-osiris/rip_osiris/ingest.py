@@ -150,6 +150,19 @@ def _ya_ingerido(store, source: str, source_id: str) -> dict | None:
     return None
 
 
+def source_id_de(url: str) -> str:
+    """Identidad del documento dentro del host: ruta **y** query.
+
+    Hay portales que sirven documentos distintos por query (`boe.es/diario_boe/
+    txt.php?id=…`). Si se descarta la query, documentos diferentes colisionan.
+    """
+    partes = urllib.parse.urlsplit(url)
+    ruta = partes.path.strip("/")
+    if partes.query:
+        return f"{ruta}?{partes.query}" if ruta else f"?{partes.query}"
+    return ruta or url
+
+
 def ingerir_urls(
     store,
     cfg,
@@ -165,7 +178,7 @@ def ingerir_urls(
 
     for url in urls:
         source = host_de(url) or "desconocido"
-        source_id = urllib.parse.urlsplit(url).path.strip("/") or url
+        source_id = source_id_de(url)
         try:
             existente = _ya_ingerido(store, source, source_id)
             if existente is not None:

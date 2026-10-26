@@ -6,7 +6,13 @@ import unittest
 from rip_osiris.config import Config
 from rip_osiris.corpus.pages import cargar_mapa, pagina_de
 from rip_osiris.corpus.store import Store
-from rip_osiris.ingest import inferir_doc_type, ingerir_urls, leer_urls, titulo_probable
+from rip_osiris.ingest import (
+    inferir_doc_type,
+    ingerir_urls,
+    leer_urls,
+    source_id_de,
+    titulo_probable,
+)
 
 HTML = b"""<html><head><title>x</title><style>.a{}</style></head>
 <body><h1>Plan de Salud de la Comunitat Valenciana 2024</h1>
@@ -99,6 +105,26 @@ class TestIngesta(unittest.TestCase):
         self.assertEqual(
             titulo_probable("Página 1\n\nPlan de Salud 2024 de la Comunitat"), "Plan de Salud 2024 de la Comunitat"
         )
+
+    def test_source_id_conserva_la_query(self):
+        # Dos documentos distintos del BOE comparten ruta y solo cambian en ?id=
+        a = source_id_de("https://www.boe.es/diario_boe/txt.php?id=BOE-A-2020-7237")
+        b = source_id_de("https://www.boe.es/diario_boe/txt.php?id=BOE-A-2020-8742")
+        self.assertNotEqual(a, b)
+        self.assertIn("id=BOE-A-2020-7237", a)
+        self.assertEqual(
+            source_id_de("https://www.boe.es/boe/dias/2018/12/20/pdfs/BOE-A-2018-17503.pdf"),
+            "boe/dias/2018/12/20/pdfs/BOE-A-2018-17503.pdf",
+        )
+
+    def test_dos_documentos_misma_ruta_distinta_query(self):
+        falso = _FetcherFalso()
+        urls = [
+            "https://www.boe.es/diario_boe/txt.php?id=A-1",
+            "https://www.boe.es/diario_boe/txt.php?id=A-2",
+        ]
+        resumen = ingerir_urls(self.store, self.cfg, urls, fetcher=falso)
+        self.assertEqual(len(resumen.documentos), 2)
 
 
 if __name__ == "__main__":

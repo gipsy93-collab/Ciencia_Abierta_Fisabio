@@ -234,6 +234,36 @@ class Store:
         self.conn.commit()
         return cur.rowcount > 0
 
+    # --------------------------------------------------------------- mentions
+    def insert_mention(
+        self,
+        doc_id: int,
+        entidad: str,
+        tipo: str,
+        literal: str,
+        *,
+        offset: int | None = None,
+        page: int | None = None,
+        method: str | None = None,
+        texto_fuente: str | None = None,
+        acta: dict | None = None,
+    ) -> bool:
+        """Mención institucional literal. Sin `output_id`: no es arista de impacto."""
+        if not literal or not literal.strip():
+            raise ValueError("una mención sin literal no se registra")
+        if texto_fuente is not None:
+            exigir_literal(texto_fuente, literal)
+
+        pid = self._guardar_acta(acta)
+        cur = self.conn.execute(
+            """INSERT OR IGNORE INTO mentions
+                 (doc_id, entidad, tipo, literal, offset, page, method, provenance_id)
+               VALUES(?,?,?,?,?,?,?,?)""",
+            (doc_id, entidad, tipo, literal, offset, page, method, pid),
+        )
+        self.conn.commit()
+        return cur.rowcount > 0
+
     # ---------------------------------------------------------------- coverage
     def set_coverage(
         self,

@@ -69,6 +69,42 @@ def _pagina(payload_json: str | None) -> int | None:
         return None
 
 
+def _menciones(store) -> list[dict]:
+    """Menciones institucionales agrupadas por documento (Capa 2, N6)."""
+    filas = store.conn.execute(
+        """
+        SELECT m.doc_id, m.entidad, m.tipo, m.literal, m.page,
+               d.title AS doc_title, d.url, d.doc_type
+        FROM mentions m
+        JOIN documents d ON d.id = m.doc_id
+        ORDER BY m.doc_id, m.page, m.id
+        """
+    ).fetchall()
+
+    grupos: dict[int, dict] = {}
+    orden: list[int] = []
+    for f in filas:
+        did = int(f["doc_id"])
+        if did not in grupos:
+            grupos[did] = {
+                "doc_id": did,
+                "titulo": f["doc_title"],
+                "url": f["url"],
+                "doc_type": f["doc_type"],
+                "menciones": [],
+            }
+            orden.append(did)
+        grupos[did]["menciones"].append(
+            {
+                "entidad": f["entidad"],
+                "tipo": f["tipo"],
+                "literal": f["literal"],
+                "page": f["page"],
+            }
+        )
+    return [grupos[i] for i in orden]
+
+
 def _documentos(store) -> list[dict]:
     filas = store.conn.execute(
         """
@@ -136,6 +172,8 @@ def _hallazgos(store, doc_id: int) -> list[dict]:
 
 def generar(store, salida: str | pathlib.Path, titulo: str | None = None) -> dict:
     documentos = _documentos(store)
+    menciones_inst = _menciones(store)
+    total_menciones_inst = sum(len(m["menciones"]) for m in menciones_inst)
     total = sum(d["hits"] for d in documentos)
     menciones = sum(d["menciones"] for d in documentos)
     con_hallazgos = sum(1 for d in documentos if d["hits"])
@@ -158,6 +196,7 @@ def generar(store, salida: str | pathlib.Path, titulo: str | None = None) -> dic
         f'<div class="card"><b>{con_hallazgos}</b><span>con al menos un hallazgo</span></div>',
         f'<div class="card"><b>{total}</b><span>salidas citadas</span></div>',
         f'<div class="card"><b>{menciones}</b><span>evidencias literales</span></div>',
+        f'<div class="card"><b>{total_menciones_inst}</b><span>menciones institucionales (N6)</span></div>',
         "</div>",
         '<div class="note">0 hallazgos no significa «sin impacto»: significa que en '
         "este corpus no aparece. La cobertura se declara por fuente más abajo. "
@@ -249,6 +288,36 @@ def generar(store, salida: str | pathlib.Path, titulo: str | None = None) -> dic
                 ]
             partes.append("</section>")
 
+    if menciones_inst:
+        partes += [
+            "<h2>Menciones institucionales (N6)</h2>",
+            '<div class="note">La institución nombrada no se atribuye a una salida concreta: '
+            "se declara aparte como N6 y <b>no</b> se suma al recuento de salidas citadas.</div>",
+        ]
+        for grupo in menciones_inst:
+            nivel = classify.nivel(grupo["doc_type"])
+            partes += [
+                '<section class="doc">',
+                "<header><h3>"
+                + _esc(grupo["titulo"] or f"Documento {grupo['doc_id']}")
+                + "</h3>"
+                f'<span class="chip n">{nivel}</span>'
+                "</header>",
+            ]
+            for m in grupo["menciones"]:
+                pagina = (
+                    f'<span class="chip">pág. {m["page"]}</span>' if m["page"] else ""
+                )
+                partes += [
+                    '<div class="hit"><div class="top">',
+                    f"<div><b>{_esc(m['entidad'])}</b></div>",
+                    f"<div><span class=\"chip p\">{_esc(m['tipo'])}</span>{pagina}</div>",
+                    "</div>",
+                    f"<blockquote>{_esc(m['literal'])}</blockquote>",
+                    "</div>",
+                ]
+            partes.append("</section>")
+
     cobertura = store.coverage()
     if cobertura:
         partes += ["<h2>Cobertura declarada</h2>", "<table>",
@@ -282,5 +351,6 @@ def generar(store, salida: str | pathlib.Path, titulo: str | None = None) -> dic
         "con_hallazgos": con_hallazgos,
         "hallazgos": total,
         "menciones": menciones,
+        "menciones_institucionales": total_menciones_inst,
         "salidas_con_impacto": int(salidas_con_impacto),
     }

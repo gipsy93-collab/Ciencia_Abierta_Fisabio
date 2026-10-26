@@ -9,7 +9,10 @@ from __future__ import annotations
 import bisect
 import json
 import pathlib
+import re
 import tempfile
+
+_RE_TITULO = re.compile(r"(?is)<title[^>]*>(.*?)</title>")
 
 
 def _ruta(cfg, doc_id: int) -> pathlib.Path:
@@ -75,4 +78,12 @@ def extraer_con_paginas(datos: bytes, content_type: str = "") -> tuple[str, list
 
     from .fulltext import extraer_texto_bytes
 
-    return extraer_texto_bytes(datos, content_type), [0], None
+    titulo = None
+    try:
+        crudo = datos.decode("utf-8", errors="replace")
+        encontrado = _RE_TITULO.search(crudo)
+        if encontrado:
+            titulo = " ".join(encontrado.group(1).split()) or None
+    except Exception:  # pragma: no cover - decodificación defensiva
+        titulo = None
+    return extraer_texto_bytes(datos, content_type), [0], titulo

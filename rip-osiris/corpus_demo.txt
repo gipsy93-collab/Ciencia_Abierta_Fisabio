@@ -19,6 +19,16 @@ https://www.sanidad.gob.es/areas/promocionPrevencion/vacunaciones/gripe_covid19/
 # Generalitat Valenciana — hospital General Universitario de València
 https://chguv.san.gva.es/documents/138129/1312271/20211104+gripe+y+dosis+recuerdo.pdf/833fa77f-3b98-4a31-9afd-8ce5fb81c3fc
 #
+# BOE — resoluciones que publican convenios con FISABIO (N1 + mención N6)
+https://www.boe.es/diario_boe/txt.php?id=BOE-A-2020-7237
+https://www.boe.es/diario_boe/txt.php?id=BOE-A-2020-8742
+https://www.boe.es/boe/dias/2018/12/20/pdfs/BOE-A-2018-17503.pdf
+#
+# DOGV: /datos/ está prohibido por robots.txt (mismo caso que sp.san.gva.es).
+# https://dogv.gva.es/datos/2019/01/08/pdf/2019_12222.pdf
+# https://dogv.gva.es/datos/2025/06/12/pdf/2025_21563_es.pdf
+# https://dogv.gva.es/datos/2016/12/23/pdf/2016_10266.pdf
+#
 # BLOQUEADOS POR robots.txt (sp.san.gva.es/DgspPortal/docs/: Disallow).
 # Se conservan aquí como constancia: estos documentos deben obtenerse por la
 # vía prevista (descarga manual o solicitud RISP), no rastreando.

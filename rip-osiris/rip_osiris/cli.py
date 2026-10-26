@@ -287,6 +287,7 @@ def cmd_demo(cfg: Config, args) -> int:
     from .dossier import html as dossier_html
     from .harvest.crossref import CrossrefClient, CrossrefNulo
     from .ingest import ingerir_urls, leer_urls
+    from .probe import mentions as menciones_mod
     from .probe import titles as titulos
     from .seed.openalex import OpenAlexClient, OpenAlexError, guardar_semilla
 
@@ -325,11 +326,12 @@ def cmd_demo(cfg: Config, args) -> int:
         docs = [int(f["id"]) for f in store.conn.execute("SELECT id FROM documents ORDER BY id")]
         rastreo = {"documentos": 0, "referencias": 0, "impactos_doi": 0,
                    "impactos_cuerpo": 0, "impactos_titulo": 0, "titulos": 0,
-                   "descartadas": 0, "errores": []}
+                   "menciones_institucionales": 0, "descartadas": 0, "errores": []}
         for doc_id in docs:
             try:
                 r = pipeline.procesar_documento(store, doc_id, cfg, crossref=crossref)
                 t = titulos.procesar_documento_titulos(store, doc_id, cfg)
+                mi = menciones_mod.procesar_documento_menciones(store, doc_id, cfg)
             except (KeyError, ValueError) as exc:
                 rastreo["errores"].append({"doc_id": doc_id, "error": f"{type(exc).__name__}: {exc}"})
                 continue
@@ -339,7 +341,8 @@ def cmd_demo(cfg: Config, args) -> int:
             rastreo["impactos_cuerpo"] += r.impactos_por_mencion
             rastreo["titulos"] += t["coincidencias"]
             rastreo["impactos_titulo"] += t["aristas_nuevas"]
-            rastreo["descartadas"] += r.aristas_descartadas + t["descartadas"]
+            rastreo["menciones_institucionales"] += mi["nuevas"]
+            rastreo["descartadas"] += r.aristas_descartadas + t["descartadas"] + mi["descartadas"]
         resumen["rastreo"] = rastreo
 
         resumen["informe"] = dossier_html.generar(store, args.out, args.titulo)
