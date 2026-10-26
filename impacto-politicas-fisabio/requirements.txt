@@ -1,0 +1,8 @@
+PyMuPDF
+duckdb
+gliner
+sentence-transformers
+requests
+fuzzywuzzy
+python-Levenshtein
+duckduckgo-search
