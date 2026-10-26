@@ -20,6 +20,7 @@ _TIPOS_POR_HOST = (
     ("eur-lex.europa.eu", "normativa"),
     ("guiasalud.es", "gpc"),
     ("inahta.org", "hta"),
+    ("sanidad.gob.es", "estrategia"),
     ("who.int", "informe_agencia"),
     ("paho.org", "informe_agencia"),
     ("ecdc.europa.eu", "informe_agencia"),

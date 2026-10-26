@@ -10,6 +10,11 @@ https://www.ecdc.europa.eu/sites/default/files/media/en/publications/Publication
 # OMS / IRIS — guía clínica y política de programas de vacunación
 https://iris.who.int/server/api/core/bitstreams/f572acf9-8767-406d-9eee-5ed010ebba08/content
 https://iris.who.int/server/api/core/bitstreams/473f8d41-d8a1-4ed0-9ad6-baaf777700fb/content
+https://iris.who.int/bitstream/handle/10665/378872/9789240097759-eng.pdf?sequence=1
+#
+# Ministerio de Sanidad — recomendaciones anuales de vacunación (decisión, N3)
+https://www.sanidad.gob.es/areas/promocionPrevencion/vacunaciones/gripe_covid19/docs/recomendacionesVacunacionGripe_2025_2026.pdf
+https://www.sanidad.gob.es/areas/promocionPrevencion/vacunaciones/gripe_covid19/docs/RecomendacionesVacunacion_Gripe-Covid19_Sep2024.pdf
 #
 # Generalitat Valenciana — hospital General Universitario de València
 https://chguv.san.gva.es/documents/138129/1312271/20211104+gripe+y+dosis+recuerdo.pdf/833fa77f-3b98-4a31-9afd-8ce5fb81c3fc
