@@ -80,3 +80,86 @@ CREATE INDEX IF NOT EXISTS idx_refs_doc ON refs(doc_id);
 CREATE INDEX IF NOT EXISTS idx_edges_src ON edges(src_kind, src_id);
 CREATE INDEX IF NOT EXISTS idx_edges_dst ON edges(dst_kind, dst_id);
 CREATE INDEX IF NOT EXISTS idx_documents_doi ON documents(doi);
+
+-- ---------------------------------------------------------------------------
+-- P1: mapeo de producción y fuentes (roster del portal + obras + presencia)
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS researchers (
+  id INTEGER PRIMARY KEY,
+  portal_id TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  area TEXT,
+  role TEXT,
+  orcid TEXT,
+  orcid_source TEXT,
+  status TEXT DEFAULT 'activo',
+  first_seen TEXT,
+  last_seen TEXT
+);
+
+CREATE TABLE IF NOT EXISTS works (
+  id INTEGER PRIMARY KEY,
+  doi TEXT UNIQUE,
+  title TEXT NOT NULL,
+  year INTEGER,
+  type TEXT,
+  canonical_key TEXT UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS work_ids (
+  id INTEGER PRIMARY KEY,
+  work_id INTEGER REFERENCES works(id) ON DELETE CASCADE,
+  scheme TEXT NOT NULL,
+  value TEXT NOT NULL,
+  UNIQUE(scheme, value)
+);
+
+CREATE TABLE IF NOT EXISTS author_work (
+  researcher_id INTEGER REFERENCES researchers(id) ON DELETE CASCADE,
+  work_id INTEGER REFERENCES works(id) ON DELETE CASCADE,
+  source TEXT NOT NULL,
+  confidence REAL,
+  PRIMARY KEY (researcher_id, work_id, source)
+);
+
+CREATE TABLE IF NOT EXISTS presence (
+  work_id INTEGER REFERENCES works(id) ON DELETE CASCADE,
+  source TEXT NOT NULL,
+  status TEXT NOT NULL,
+  method TEXT,
+  confidence REAL,
+  matched_id TEXT,
+  checked_at TEXT,
+  http_status INTEGER,
+  note TEXT,
+  PRIMARY KEY (work_id, source)
+);
+
+CREATE TABLE IF NOT EXISTS source_registry (
+  source TEXT PRIMARY KEY,
+  tipo TEXT,
+  acceso TEXT,
+  licencia TEXT,
+  robots TEXT,
+  api TEXT,
+  cobertura_desde INTEGER,
+  cobertura_hasta INTEGER,
+  updated_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS crawl_log (
+  id INTEGER PRIMARY KEY,
+  url TEXT NOT NULL,
+  method TEXT,
+  status INTEGER,
+  bytes INTEGER,
+  sha256 TEXT,
+  cache INTEGER DEFAULT 0,
+  fetched_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_author_work_res ON author_work(researcher_id);
+CREATE INDEX IF NOT EXISTS idx_presence_source ON presence(source);
+CREATE INDEX IF NOT EXISTS idx_works_doi ON works(doi);
+CREATE INDEX IF NOT EXISTS idx_crawl_log_url ON crawl_log(url);

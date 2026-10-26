@@ -22,10 +22,16 @@ class Config:
     db_path: pathlib.Path | None = None
     corpus_dir: pathlib.Path | None = None
     pdf_dir: pathlib.Path | None = None
+    portal_cache_dir: pathlib.Path | None = None
 
     # --- Crossref ---
     crossref_mailto: str = "rip-osiris@localhost"
     user_agent: str = "rip-osiris/0.1 (+mailto:rip-osiris@localhost)"
+
+    # --- portal FISABIO (P1: roster + ORCID) ---
+    portal_base: str = "https://fisabio.portalinvestigacion.com"
+    portal_contacto: str = "rip-osiris@localhost"
+    portal_limite_perfiles: int = 1080
 
     # --- matcher in-corpus (rama c = LA CASCADA) ---
     match_min_score: float = 0.60
@@ -54,6 +60,7 @@ class Config:
         "san.gva.es",
         "who.int",
         "paho.org",
+        "portalinvestigacion.com",
     )
 
     def __post_init__(self) -> None:
@@ -64,6 +71,8 @@ class Config:
             self.corpus_dir = self.root / "data" / "corpus"
         if self.pdf_dir is None:
             self.pdf_dir = self.root / "data" / "pdf"
+        if self.portal_cache_dir is None:
+            self.portal_cache_dir = self.root / "data" / "portal"
 
     @classmethod
     def load(cls, root: pathlib.Path | str | None = None) -> "Config":

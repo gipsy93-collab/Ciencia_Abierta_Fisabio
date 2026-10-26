@@ -258,6 +258,250 @@ class Store:
         cur = self.conn.execute("SELECT * FROM coverage ORDER BY source, query")
         return [dict(r) for r in cur.fetchall()]
 
+    # --------------------------------------------------------------- P1: roster
+    def upsert_researcher(
+        self,
+        *,
+        portal_id: str,
+        name: str,
+        area: str | None = None,
+        role: str | None = None,
+        orcid: str | None = None,
+        orcid_source: str | None = None,
+        status: str = "activo",
+    ) -> int:
+        portal_id = str(portal_id)
+        fila = self.conn.execute(
+            "SELECT id FROM researchers WHERE portal_id = ?", (portal_id,)
+        ).fetchone()
+        if fila is not None:
+            self.conn.execute(
+                """UPDATE researchers
+                   SET name=?, area=COALESCE(?, area), role=COALESCE(?, role),
+                       orcid=COALESCE(?, orcid),
+                       orcid_source=COALESCE(?, orcid_source),
+                       status=?, last_seen=?
+                   WHERE id=?""",
+                (
+                    name,
+                    area,
+                    role,
+                    orcid,
+                    orcid_source,
+                    status,
+                    ahora(),
+                    fila["id"],
+                ),
+            )
+            rid = int(fila["id"])
+        else:
+            cur = self.conn.execute(
+                """INSERT INTO researchers
+                     (portal_id, name, area, role, orcid, orcid_source, status,
+                      first_seen, last_seen)
+                   VALUES(?,?,?,?,?,?,?,?,?)""",
+                (
+                    portal_id,
+                    name,
+                    area,
+                    role,
+                    orcid,
+                    orcid_source,
+                    status,
+                    ahora(),
+                    ahora(),
+                ),
+            )
+            rid = int(cur.lastrowid)
+        self.conn.commit()
+        return rid
+
+    def upsert_work(
+        self,
+        *,
+        title: str,
+        doi: str | None = None,
+        year: int | None = None,
+        type: str | None = None,
+        first_author: str | None = None,
+    ) -> int:
+        from ..cascade.normalize import normalizar_doi, normalizar_texto
+
+        doi_n = normalizar_doi(doi)
+        canonico = doi_n or "|".join(
+            (
+                normalizar_texto(title),
+                str(year) if year else "",
+                normalizar_texto(first_author or ""),
+            )
+        )
+        fila = None
+        if doi_n:
+            fila = self.conn.execute(
+                "SELECT id FROM works WHERE doi = ?", (doi_n,)
+            ).fetchone()
+        if fila is None:
+            fila = self.conn.execute(
+                "SELECT id FROM works WHERE canonical_key = ?", (canonico,)
+            ).fetchone()
+
+        if fila is not None:
+            self.conn.execute(
+                """UPDATE works
+                   SET doi=COALESCE(?, doi), title=?, year=COALESCE(?, year),
+                       type=COALESCE(?, type), canonical_key=?
+                   WHERE id=?""",
+                (doi_n, title, year, type, canonico, fila["id"]),
+            )
+            wid = int(fila["id"])
+        else:
+            cur = self.conn.execute(
+                """INSERT INTO works(doi, title, year, type, canonical_key)
+                   VALUES(?,?,?,?,?)""",
+                (doi_n, title, year, type, canonico),
+            )
+            wid = int(cur.lastrowid)
+        self.conn.commit()
+        return wid
+
+    def upsert_work_id(self, work_id: int, scheme: str, value: str) -> None:
+        self.conn.execute(
+            "INSERT OR IGNORE INTO work_ids(work_id, scheme, value) VALUES(?,?,?)",
+            (work_id, scheme, value),
+        )
+        self.conn.commit()
+
+    def link_author_work(
+        self,
+        researcher_id: int,
+        work_id: int,
+        *,
+        source: str,
+        confidence: float = 1.0,
+    ) -> bool:
+        cur = self.conn.execute(
+            """INSERT OR IGNORE INTO author_work
+                 (researcher_id, work_id, source, confidence)
+               VALUES(?,?,?,?)""",
+            (researcher_id, work_id, source, confidence),
+        )
+        self.conn.commit()
+        return cur.rowcount > 0
+
+    def upsert_presence(
+        self,
+        work_id: int,
+        source: str,
+        status: str,
+        *,
+        method: str | None = None,
+        confidence: float | None = None,
+        matched_id: str | None = None,
+        http_status: int | None = None,
+        note: str | None = None,
+    ) -> None:
+        self.conn.execute(
+            """INSERT INTO presence
+                 (work_id, source, status, method, confidence, matched_id,
+                  checked_at, http_status, note)
+               VALUES(?,?,?,?,?,?,?,?,?)
+               ON CONFLICT(work_id, source) DO UPDATE SET
+                 status=excluded.status, method=excluded.method,
+                 confidence=excluded.confidence, matched_id=excluded.matched_id,
+                 checked_at=excluded.checked_at, http_status=excluded.http_status,
+                 note=excluded.note""",
+            (
+                work_id,
+                source,
+                status,
+                method,
+                confidence,
+                matched_id,
+                ahora(),
+                http_status,
+                note,
+            ),
+        )
+        self.conn.commit()
+
+    def upsert_source(
+        self,
+        source: str,
+        *,
+        tipo: str | None = None,
+        acceso: str | None = None,
+        licencia: str | None = None,
+        robots: str | None = None,
+        api: str | None = None,
+        cobertura_desde: int | None = None,
+        cobertura_hasta: int | None = None,
+    ) -> None:
+        self.conn.execute(
+            """INSERT INTO source_registry
+                 (source, tipo, acceso, licencia, robots, api,
+                  cobertura_desde, cobertura_hasta, updated_at)
+               VALUES(?,?,?,?,?,?,?,?,?)
+               ON CONFLICT(source) DO UPDATE SET
+                 tipo=COALESCE(excluded.tipo, source_registry.tipo),
+                 acceso=COALESCE(excluded.acceso, source_registry.acceso),
+                 licencia=COALESCE(excluded.licencia, source_registry.licencia),
+                 robots=COALESCE(excluded.robots, source_registry.robots),
+                 api=COALESCE(excluded.api, source_registry.api),
+                 cobertura_desde=COALESCE(excluded.cobertura_desde, source_registry.cobertura_desde),
+                 cobertura_hasta=COALESCE(excluded.cobertura_hasta, source_registry.cobertura_hasta),
+                 updated_at=excluded.updated_at""",
+            (
+                source,
+                tipo,
+                acceso,
+                licencia,
+                robots,
+                api,
+                cobertura_desde,
+                cobertura_hasta,
+                ahora(),
+            ),
+        )
+        self.conn.commit()
+
+    def insert_crawl_log(
+        self,
+        *,
+        url: str,
+        method: str | None = None,
+        status: int | None = None,
+        bytes: int | None = None,
+        sha256: str | None = None,
+        cache: bool = False,
+        fetched_at: str | None = None,
+    ) -> None:
+        self.conn.execute(
+            """INSERT INTO crawl_log(url, method, status, bytes, sha256, cache, fetched_at)
+               VALUES(?,?,?,?,?,?,?)""",
+            (url, method, status, bytes, sha256, int(cache), fetched_at or ahora()),
+        )
+        self.conn.commit()
+
+    def roster_coverage(self) -> dict:
+        def uno(sql: str) -> int:
+            return int(self.conn.execute(sql).fetchone()[0])
+
+        return {
+            "investigadores": uno("SELECT COUNT(*) FROM researchers"),
+            "con_orcid": uno(
+                "SELECT COUNT(*) FROM researchers WHERE orcid IS NOT NULL AND orcid != ''"
+            ),
+            "sin_orcid": uno(
+                "SELECT COUNT(*) FROM researchers WHERE orcid IS NULL OR orcid = ''"
+            ),
+            "obras": uno("SELECT COUNT(*) FROM works"),
+            "con_doi": uno("SELECT COUNT(*) FROM works WHERE doi IS NOT NULL"),
+            "vinculos_autor_obra": uno("SELECT COUNT(*) FROM author_work"),
+            "presencia": uno("SELECT COUNT(*) FROM presence"),
+            "fuentes": uno("SELECT COUNT(*) FROM source_registry"),
+            "peticiones": uno("SELECT COUNT(*) FROM crawl_log"),
+        }
+
     # ------------------------------------------------------------------ actas
     def _guardar_acta(self, acta: dict | None) -> str | None:
         if not acta:

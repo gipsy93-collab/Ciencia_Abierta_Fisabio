@@ -192,6 +192,95 @@ def cmd_cascade(cfg: Config, args) -> int:
     return 0
 
 
+def cmd_roster(cfg: Config, args) -> int:
+    from .anchor.cris import PortalCris
+
+    store = _store(cfg)
+    try:
+        portal = PortalCris(cfg, cache_dir=args.cache)
+        perfiles = portal.listar_todos(args.limite)
+        ids: dict[str, int] = {}
+        for perfil in perfiles:
+            ids[perfil.perfil_id] = store.upsert_researcher(
+                portal_id=perfil.perfil_id,
+                name=perfil.nombre,
+                area=perfil.area,
+                role=perfil.rol,
+            )
+
+        errores: list[dict] = []
+        if not args.sin_perfiles:
+            for perfil in perfiles:
+                try:
+                    orcid = portal.leer_orcid(perfil.perfil_id)
+                except Exception as exc:  # red o HTML inesperado
+                    errores.append(
+                        {
+                            "portal_id": perfil.perfil_id,
+                            "error": f"{type(exc).__name__}: {exc}",
+                        }
+                    )
+                    continue
+                if orcid:
+                    store.upsert_researcher(
+                        portal_id=perfil.perfil_id,
+                        name=perfil.nombre,
+                        orcid=orcid,
+                        orcid_source="portal",
+                    )
+
+        obras = 0
+        vinculos = 0
+        if not args.sin_publicaciones:
+            for pub in portal.publicaciones(args.limite_publicaciones):
+                wid = store.upsert_work(
+                    title=pub.titulo, doi=pub.doi, year=pub.anio, type=pub.tipo
+                )
+                obras += 1
+                for portal_id in pub.autores_ids:
+                    rid = ids.get(portal_id)
+                    if rid is None:
+                        continue
+                    if store.link_author_work(rid, wid, source="portal"):
+                        vinculos += 1
+
+        for llamada in portal.llamadas:
+            store.insert_crawl_log(**llamada)
+
+        store.set_coverage(
+            "portal_fisabio", "researchers", hits=len(perfiles), declared="cubierta"
+        )
+        if not args.sin_perfiles:
+            store.set_coverage(
+                "portal_fisabio",
+                "orcid_profiles",
+                hits=store.roster_coverage()["con_orcid"],
+                declared="cubierta",
+            )
+        if not args.sin_publicaciones:
+            store.set_coverage(
+                "portal_fisabio", "publications", hits=obras, declared="cubierta"
+            )
+
+        print(
+            json.dumps(
+                {
+                    "investigadores": len(perfiles),
+                    "obras": obras,
+                    "vinculos_autor_obra": vinculos,
+                    "errores": len(errores),
+                    "muestra_errores": errores[:5],
+                    "cobertura": store.roster_coverage(),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+    finally:
+        store.close()
+    return 0
+
+
 def cmd_no_implementado(cfg: Config, args) -> int:
     raise SystemExit(
         f"'{args.verbo}' es un stub del esqueleto: se implementa en la fase indicada en el diseño."
@@ -204,6 +293,28 @@ def build_parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="verbo", required=True)
 
     sub.add_parser("coverage", help="qué fuentes se consultaron y qué se declara")
+    r = sub.add_parser("roster", help="P1: roster del portal FISABIO + ORCID")
+    r.add_argument("--limite", type=int, default=2000, help="tope de perfiles a pedir")
+    r.add_argument(
+        "--limite-publicaciones",
+        type=int,
+        default=12000,
+        dest="limite_publicaciones",
+        help="tope de publicaciones del portal",
+    )
+    r.add_argument(
+        "--sin-perfiles",
+        action="store_true",
+        dest="sin_perfiles",
+        help="no visita cada perfil individual (más rápido, sin ORCID)",
+    )
+    r.add_argument(
+        "--sin-publicaciones",
+        action="store_true",
+        dest="sin_publicaciones",
+        help="no pide el listado de publicaciones del portal",
+    )
+    r.add_argument("--cache", default=None, help="directorio de caché del portal")
     a = sub.add_parser("anchor", help="Capa 0: ORCID -> obras -> DOI")
     a.add_argument("--orcid", required=True, help="ORCID de la autora/investigador")
     a.add_argument("--ror", default=None, help="ROR de la institución (opcional)")
@@ -244,6 +355,7 @@ def main(argv: list[str] | None = None) -> int:
 
     despacho = {
         "coverage": cmd_coverage,
+        "roster": cmd_roster,
         "anchor": cmd_anchor,
         "fulltext": cmd_fulltext,
         "cascade": cmd_cascade,
