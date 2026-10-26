@@ -46,6 +46,8 @@ def generate_html_report(matches, pdf_filename, output_path):
                         <span class="doi">DOI: {match.get('doi', 'N/A')}</span>
                         <br>
                         <small>{match.get('title', 'Sin título')}</small>
+                        <br>
+                        <small style="color: #7f8c8d;">Documento origen: {match.get('source_pdf', pdf_filename)}</small>
                     </div>
                     <div>
                         <span class="page-badge">Página {match['page_num']}</span>
