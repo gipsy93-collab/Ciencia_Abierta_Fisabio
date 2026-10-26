@@ -33,6 +33,15 @@ class Config:
     portal_contacto: str = "rip-osiris@localhost"
     portal_limite_perfiles: int = 1080
 
+    # --- OpenAlex (semilla y grafo académico) ---
+    openalex_mailto: str = ""
+    ror_fisabio: str = "ror.org/0116vew40"
+    openalex_per_page: int = 200
+
+    # --- muestra rastreable (demo) ---
+    demo_muestra: int = 12
+    demo_min_tokens_titulo: int = 8
+
     # --- matcher in-corpus (rama c = LA CASCADA) ---
     match_min_score: float = 0.60
     match_min_title_tokens: float = 0.70

@@ -37,12 +37,14 @@ class Fetcher:
         *,
         client: httpx.Client | None = None,
         user_agent: str | None = None,
+        max_reintentos: int = 2,
     ):
         self.cfg = cfg
         self.cache_dir = pathlib.Path(cache_dir or cfg.pdf_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self._client = client
         self.user_agent = user_agent or CABECERAS["User-Agent"]
+        self.max_reintentos = max(0, max_reintentos)
         self._robots: dict[str, urllib.robotparser.RobotFileParser | None] = {}
         self._ultima_llamada = 0.0
 
@@ -100,7 +102,10 @@ class Fetcher:
 
     # --------------------------------------------------------------- descarga
     def obtener(self, url: str) -> tuple[bytes, dict]:
-        """Descarga (o sirve de caché) y devuelve `(bytes, metadatos)`."""
+        """Descarga (o sirve de caché) y devuelve `(bytes, metadatos)`.
+
+        Reintenta ante 429/5xx respetando `Retry-After` (sin saltarse robots).
+        """
         if not self.permitido(url):
             raise FetchError(f"robots.txt prohíbe {url}")
 
@@ -115,10 +120,18 @@ class Fetcher:
                 "content_type": self._tipo_por_extension(destino),
             }
 
-        resp = self._http(url)
-        if resp.status_code != 200:
+        resp = None
+        for intento in range(self.max_reintentos + 1):
+            resp = self._http(url)
+            if resp.status_code == 200 and resp.content:
+                break
+            if resp.status_code in (429, 500, 502, 503, 504) and intento < self.max_reintentos:
+                time.sleep(self._espera(resp, intento))
+                continue
             raise FetchError(f"HTTP {resp.status_code} al descargar {url}")
 
+        if resp is None or resp.status_code != 200:  # pragma: no cover
+            raise FetchError(f"sin respuesta al descargar {url}")
         datos = resp.content
         if not datos:
             raise FetchError(f"respuesta vacía al descargar {url}")
@@ -131,6 +144,14 @@ class Fetcher:
             "cache": False,
             "content_type": resp.headers.get("content-type", ""),
         }
+
+    @staticmethod
+    def _espera(resp: httpx.Response, intento: int) -> float:
+        """Espera pedida por el servidor, con tope para no colgar el lote."""
+        cabecera = resp.headers.get("retry-after", "").strip()
+        if cabecera.isdigit():
+            return min(30.0, float(cabecera))
+        return min(30.0, 2.0 ** (intento + 1))
 
     # ---------------------------------------------------------------- caché
     def _ruta_cache(self, url: str) -> pathlib.Path:

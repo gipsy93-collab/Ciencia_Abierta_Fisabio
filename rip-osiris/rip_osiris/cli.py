@@ -281,6 +281,75 @@ def cmd_roster(cfg: Config, args) -> int:
     return 0
 
 
+def cmd_demo(cfg: Config, args) -> int:
+    """Slice vertical: semilla -> ingesta -> rastreo -> informe."""
+    from .cascade import pipeline
+    from .dossier import html as dossier_html
+    from .harvest.crossref import CrossrefClient, CrossrefNulo
+    from .ingest import ingerir_urls, leer_urls
+    from .probe import titles as titulos
+    from .seed.openalex import OpenAlexClient, OpenAlexError, guardar_semilla
+
+    store = _store(cfg)
+    resumen: dict = {}
+    try:
+        if not args.sin_red:
+            cliente = OpenAlexClient.desde_config(cfg, per_page=cfg.openalex_per_page)
+            try:
+                if args.dois:
+                    obras = cliente.por_dois([d for d in args.dois.split(",") if d.strip()])
+                else:
+                    obras = cliente.obras(args.muestra, buscar=args.buscar, orden=args.orden)
+            except OpenAlexError as exc:
+                print(json.dumps({"error": f"OpenAlex: {exc}"}, ensure_ascii=False, indent=2))
+                return 2
+            ids = guardar_semilla(store, obras)
+            resumen["semilla"] = {
+                "obras": len(obras),
+                "outputs": len(ids),
+                "con_doi": sum(1 for o in obras if o.doi),
+                "peticiones": len(cliente.llamadas),
+            }
+
+            urls = leer_urls(args.corpus) if args.corpus else []
+            if args.limite_corpus:
+                urls = urls[: args.limite_corpus]
+            if urls:
+                ingesta = ingerir_urls(store, cfg, urls)
+                resumen["ingesta"] = ingesta.como_dict()
+        else:
+            resumen["semilla"] = {"saltada": True}
+            resumen["ingesta"] = {"saltada": True}
+
+        crossref = CrossrefNulo() if (args.sin_red or not args.crossref) else CrossrefClient.desde_config(cfg)
+        docs = [int(f["id"]) for f in store.conn.execute("SELECT id FROM documents ORDER BY id")]
+        rastreo = {"documentos": 0, "referencias": 0, "impactos_doi": 0,
+                   "impactos_cuerpo": 0, "impactos_titulo": 0, "titulos": 0,
+                   "descartadas": 0, "errores": []}
+        for doc_id in docs:
+            try:
+                r = pipeline.procesar_documento(store, doc_id, cfg, crossref=crossref)
+                t = titulos.procesar_documento_titulos(store, doc_id, cfg)
+            except (KeyError, ValueError) as exc:
+                rastreo["errores"].append({"doc_id": doc_id, "error": f"{type(exc).__name__}: {exc}"})
+                continue
+            rastreo["documentos"] += 1
+            rastreo["referencias"] += r.referencias
+            rastreo["impactos_doi"] += r.aristas_impact
+            rastreo["impactos_cuerpo"] += r.impactos_por_mencion
+            rastreo["titulos"] += t["coincidencias"]
+            rastreo["impactos_titulo"] += t["aristas_nuevas"]
+            rastreo["descartadas"] += r.aristas_descartadas + t["descartadas"]
+        resumen["rastreo"] = rastreo
+
+        resumen["informe"] = dossier_html.generar(store, args.out, args.titulo)
+    finally:
+        store.close()
+
+    print(json.dumps(resumen, ensure_ascii=False, indent=2))
+    return 0
+
+
 def cmd_no_implementado(cfg: Config, args) -> int:
     raise SystemExit(
         f"'{args.verbo}' es un stub del esqueleto: se implementa en la fase indicada en el diseño."
@@ -346,6 +415,18 @@ def build_parser() -> argparse.ArgumentParser:
     e = sub.add_parser("expediente", help="expediente N1-N6 de una salida")
     e.add_argument("--output", type=int, required=True)
     e.add_argument("--hops", type=int, default=3)
+
+    d = sub.add_parser("demo", help="slice: semilla, ingesta, rastreo e informe")
+    d.add_argument("--muestra", type=int, default=None, help="nº de obras FISABIO (por defecto, config)")
+    d.add_argument("--dois", default=None, help="lista de DOI separada por comas (en vez de muestra)")
+    d.add_argument("--buscar", default=None, help="términos de búsqueda en OpenAlex (p. ej. 'influenza|vaccine')")
+    d.add_argument("--orden", default="cited_by_count:desc", help="orden de la muestra (OpenAlex)")
+    d.add_argument("--corpus", default=None, help="fichero con una URL de documento por línea")
+    d.add_argument("--limite-corpus", type=int, default=None, dest="limite_corpus")
+    d.add_argument("--out", default="docs/demo.html", help="ruta del informe HTML")
+    d.add_argument("--titulo", default=None, help="título del informe")
+    d.add_argument("--crossref", action="store_true", help="verificar DOIs contra Crossref (lento)")
+    d.add_argument("--sin-red", action="store_true", dest="sin_red", help="no toca la red: usa la base local")
     return p
 
 
@@ -361,6 +442,7 @@ def main(argv: list[str] | None = None) -> int:
         "cascade": cmd_cascade,
         "graph": cmd_graph,
         "expediente": cmd_expediente,
+        "demo": cmd_demo,
     }
     if args.verbo in despacho:
         return despacho[args.verbo](cfg, args)

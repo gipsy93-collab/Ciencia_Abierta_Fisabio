@@ -46,9 +46,9 @@ class TestFetcher(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def _fetcher(self, respuestas):
+    def _fetcher(self, respuestas, **kw):
         falso = _ClienteFalso(respuestas)
-        return Fetcher(self.cfg, self.tmp.name, client=falso), falso
+        return Fetcher(self.cfg, self.tmp.name, client=falso, **kw), falso
 
     def test_robots_permite(self):
         robots = "User-agent: *\nAllow: /\n"
@@ -105,9 +105,23 @@ class TestFetcher(unittest.TestCase):
 
     def test_obtener_http_error(self):
         robots = "User-agent: *\nAllow: /\n"
-        f, _ = self._fetcher([_resp(200, texto=robots), _resp(500)])
+        f, _ = self._fetcher([_resp(200, texto=robots), _resp(500)], max_reintentos=0)
         with self.assertRaises(FetchError):
             f.obtener("https://example.org/doc.pdf")
+
+    def test_reintenta_429_y_termina_bien(self):
+        robots = "User-agent: *\nAllow: /\n"
+        f, falso = self._fetcher(
+            [
+                _resp(200, texto=robots),
+                _resp(429, cabeceras={"retry-after": "0"}),
+                _resp(200, cuerpo=b"%PDF-1.4 ok", cabeceras={"content-type": "application/pdf"}),
+            ]
+        )
+        datos, meta = f.obtener("https://example.org/doc.pdf")
+        self.assertEqual(datos, b"%PDF-1.4 ok")
+        self.assertFalse(meta["cache"])
+        self.assertEqual(len(falso.llamadas), 3)
 
     def test_obtener_vacio(self):
         robots = "User-agent: *\nAllow: /\n"
