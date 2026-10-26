@@ -23,6 +23,9 @@ def generate_html_report(matches, pdf_filename, output_path):
             .match-type {{ background-color: #ecf0f1; padding: 3px 8px; border-radius: 12px; font-size: 0.85em; color: #7f8c8d; }}
             .snippet {{ background-color: #f9f9f9; padding: 15px; border-left: 3px solid #bdc3c7; font-style: italic; margin-top: 10px; }}
             .page-badge {{ background-color: #2ecc71; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.85em; }}
+            .degree-1 {{ background-color: #3498db; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.85em; margin-right: 5px; }}
+            .degree-2 {{ background-color: #9b59b6; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.85em; margin-right: 5px; }}
+            .relation-info {{ font-size: 0.9em; color: #e67e22; margin-top: 5px; display: inline-block; }}
         </style>
     </head>
     <body>
@@ -39,6 +42,14 @@ def generate_html_report(matches, pdf_filename, output_path):
         html_content += "<p>No se encontraron menciones de los trabajos en este documento.</p>"
     else:
         for match in matches:
+            degree = match.get('degree', 1)
+            degree_class = f"degree-{degree}"
+            degree_text = "Impacto Directo" if degree == 1 else "Impacto 2º Grado (Bola de Nieve)"
+
+            relation_html = ""
+            if degree == 2:
+                relation_html = f"<br><span class='relation-info'>↗ {match.get('relation_type')} de: <b>{match.get('parent_doi')}</b></span>"
+
             html_content += f"""
             <div class="match-card">
                 <div class="match-header">
@@ -46,10 +57,12 @@ def generate_html_report(matches, pdf_filename, output_path):
                         <span class="doi">DOI: {match.get('doi', 'N/A')}</span>
                         <br>
                         <small>{match.get('title', 'Sin título')}</small>
+                        {relation_html}
                         <br>
                         <small style="color: #7f8c8d;">Documento origen: {match.get('source_pdf', pdf_filename)}</small>
                     </div>
                     <div>
+                        <span class="{degree_class}">{degree_text}</span>
                         <span class="page-badge">Página {match['page_num']}</span>
                         <span class="match-type">{match['match_type']}</span>
                     </div>

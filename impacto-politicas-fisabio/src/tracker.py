@@ -13,6 +13,85 @@ class Tracker:
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir)
 
+
+    def expand_catalog(self, catalog, limit=10):
+        """
+        Expande el catálogo original buscando in-links y out-links para cada trabajo
+        usando OpenAlex, para medir el impacto de segundo grado.
+        """
+        expanded_catalog = []
+        seen_dois = set()
+
+        for item in catalog:
+            doi = item.get('doi')
+            # Asegurar que el original se agrega primero
+            if doi and doi not in seen_dois:
+                original_item = item.copy()
+                original_item['degree'] = 1
+                original_item['relation_type'] = 'Original'
+                original_item['parent_doi'] = doi
+                expanded_catalog.append(original_item)
+                seen_dois.add(doi.lower())
+
+            if not doi:
+                continue
+
+            print(f"Expansión de red (Bola de Nieve) para DOI: {doi} ...")
+
+            try:
+                # Obtener info del trabajo original en OpenAlex
+                doi_url = f"https://api.openalex.org/works/https://doi.org/{doi}"
+                response = requests.get(doi_url, timeout=10)
+                if response.status_code == 200:
+                    work_data = response.json()
+                    work_id = work_data.get('id')
+
+                    # 1. OUT-LINKS (Trabajos que este DOI cita)
+                    referenced_works = work_data.get('referenced_works', [])[:limit]
+                    for ref_id in referenced_works:
+                        ref_url = f"https://api.openalex.org/works/{ref_id}"
+                        ref_resp = requests.get(ref_url, timeout=10)
+                        if ref_resp.status_code == 200:
+                            ref_data = ref_resp.json()
+                            ref_doi = ref_data.get('doi')
+                            if ref_doi:
+                                ref_doi = ref_doi.replace('https://doi.org/', '').lower()
+                                if ref_doi not in seen_dois:
+                                    expanded_catalog.append({
+                                        'doi': ref_doi,
+                                        'title': ref_data.get('title'),
+                                        'degree': 2,
+                                        'relation_type': 'Out-link (Referenciado por original)',
+                                        'parent_doi': doi
+                                    })
+                                    seen_dois.add(ref_doi)
+
+                    # 2. IN-LINKS (Trabajos que citan a este DOI)
+                    if work_id:
+                        citations_url = f"https://api.openalex.org/works?filter=cites:{work_id}&per-page={limit}"
+                        c_resp = requests.get(citations_url, timeout=10)
+                        if c_resp.status_code == 200:
+                            c_data = c_resp.json()
+                            for citing_work in c_data.get('results', []):
+                                citing_doi = citing_work.get('doi')
+                                if citing_doi:
+                                    citing_doi = citing_doi.replace('https://doi.org/', '').lower()
+                                    if citing_doi not in seen_dois:
+                                        expanded_catalog.append({
+                                            'doi': citing_doi,
+                                            'title': citing_work.get('title'),
+                                            'degree': 2,
+                                            'relation_type': 'In-link (Cita al original)',
+                                            'parent_doi': doi
+                                        })
+                                        seen_dois.add(citing_doi)
+            except Exception as e:
+                print(f"  Error expandiendo red para {doi}: {e}")
+
+            time.sleep(1)
+
+        return expanded_catalog
+
     def run_tracking(self, catalog):
         """
         Inicia el rastreo para cada trabajo en el catálogo.

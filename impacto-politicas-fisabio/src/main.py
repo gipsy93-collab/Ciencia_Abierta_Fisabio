@@ -22,8 +22,14 @@ def main():
         print(f"Error cargando el catálogo: {e}")
         return
 
-    print("\n2. Rastreando e intentando descargar PDFs reales relacionados a los trabajos...")
+    print("\n2. Expandiendo catálogo (Efecto Bola de Nieve: In-links y Out-links)...")
     tracker = Tracker(data_dir)
+    # Limitamos a 10 links por DOI original como se acordó
+    expanded_catalog = tracker.expand_catalog(catalog, limit=10)
+    print(f"   Catálogo expandido de {len(catalog)} a {len(expanded_catalog)} trabajos.")
+
+    print("\n3. Rastreando e intentando descargar PDFs reales relacionados a los trabajos originales...")
+    # Solo descargamos PDFs usando el catálogo original para no descargar miles de PDFs
     downloaded_pdfs = tracker.run_tracking(catalog)
 
     pdf_list = []
@@ -38,7 +44,7 @@ def main():
 
     all_matches = []
 
-    print("\n3. Extrayendo texto y buscando menciones...")
+    print("\n4. Extrayendo texto y buscando menciones (incluyendo impacto de 2º grado)...")
     for pdf_path in pdf_list:
         if not os.path.exists(pdf_path):
             continue
@@ -49,8 +55,8 @@ def main():
         if not pages:
             continue
 
-        # Umbral ajustado para matches parciales
-        matches = find_matches(catalog, pages, threshold=60)
+        # Buscar en base al catálogo completo expandido
+        matches = find_matches(expanded_catalog, pages, threshold=60)
 
         # Añadir referencia al archivo PDF en el match
         for m in matches:
@@ -60,7 +66,7 @@ def main():
 
     print(f"\n   Total acumulado: Se encontraron {len(all_matches)} coincidencias a través de los documentos.")
 
-    print("\n4. Generando reporte HTML consolidado...")
+    print("\n5. Generando reporte HTML consolidado...")
     report_path = os.path.join(base_dir, 'docs', 'reporte_impacto.html')
     generate_html_report(all_matches, f"Múltiples documentos ({len(pdf_list)} analizados)", report_path)
 

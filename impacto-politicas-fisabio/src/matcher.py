@@ -51,7 +51,10 @@ def find_matches(catalog, extracted_pages, threshold=80):
                     "title": title,
                     "page_num": page_num,
                     "match_type": match_type,
-                    "snippet": snippet
+                    "snippet": snippet,
+                    "degree": item.get('degree', 1),
+                    "relation_type": item.get('relation_type', 'Original'),
+                    "parent_doi": item.get('parent_doi', doi)
                 })
 
     return matches
