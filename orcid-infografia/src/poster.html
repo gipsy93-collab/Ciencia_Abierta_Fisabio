@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cartel · Crea tu ORCID fácil</title>
+<style>
+/*__FUENTES__*/
+:root{
+  --papel:#F7F1E4;--papel-alto:#FCF8EE;--tinta:#1D0F44;--tinta-suave:#5B4B7E;
+  --coral:#FF647D;--rojo:#EB003B;--orcid:#A6CE39;--verde:#63AA16;--verde-texto:#3F7A0C;--indigo:#3B2A6B;
+  --serif:Fraunces,Georgia,serif;--sans:Outfit,system-ui,sans-serif
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden}
+body{background:var(--papel);color:var(--tinta);font-family:var(--sans)}
+#papel{position:absolute;inset:0;width:1080px;height:1920px}
+.aguadas{position:absolute;inset:0;overflow:hidden}
+.aguadas i{position:absolute;border-radius:50%;filter:blur(80px);mix-blend-mode:multiply;opacity:.55}
+.aguadas .a1{width:620px;height:620px;left:-180px;top:-200px;background:radial-gradient(circle,rgba(166,206,57,.55),rgba(166,206,57,0) 68%)}
+.aguadas .a2{width:700px;height:700px;right:-260px;top:120px;background:radial-gradient(circle,rgba(255,100,125,.36),rgba(255,100,125,0) 66%)}
+.aguadas .a3{width:640px;height:640px;left:120px;bottom:-300px;background:radial-gradient(circle,rgba(59,42,107,.3),rgba(59,42,107,0) 68%)}
+main{position:relative;z-index:2;height:100%;padding:84px 88px 64px;display:flex;flex-direction:column;justify-content:space-between}
+header{display:block}
+.kicker{margin:0 0 10px;font-size:19px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--tinta-suave)}
+.kicker b{color:var(--verde-texto);font-weight:600}
+.kicker2{margin:0 0 46px;font-size:15px;letter-spacing:.24em;text-transform:uppercase;color:var(--tinta-suave)}
+h1{margin:0;font-family:var(--serif);font-weight:600;font-size:104px;line-height:.99;letter-spacing:-.025em}
+h1 em{display:inline-block;font-style:italic;font-weight:400;padding-bottom:.1em;
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 24' preserveAspectRatio='none'%3E%3Cpath d='M4 16C56 9 118 19 168 13c36-4 82-2 128-5' fill='none' stroke='%23FF647D' stroke-width='8' stroke-linecap='round' opacity='.4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-size:103% .28em;background-position:-1% 100%}
+.sub{margin:26px 0 0;max-width:720px;font-family:var(--serif);font-style:italic;font-weight:300;font-size:27px;line-height:1.4;color:#3D2D63}
+.medallon{width:296px;aspect-ratio:1;border-radius:50%;display:grid;place-content:center;justify-items:center;gap:6px;
+  background:radial-gradient(circle at 34% 26%,#FFFDF7 0%,#FBF6E9 48%,#F0E4CE 100%);
+  box-shadow:0 0 0 1px rgba(29,15,68,.1),0 30px 60px -34px rgba(29,15,68,.7);position:relative}
+.medallon::before{content:"";position:absolute;inset:-16px;border-radius:50%;border:1px dashed rgba(29,15,68,.24)}
+.medallon svg{width:146px;height:auto}
+.medallon .nombre{font-size:16px;font-weight:600;letter-spacing:.36em;color:var(--tinta)}
+.medallon .pie{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave)}
+
+.emblema{display:grid;place-items:center;gap:22px;padding-block:10px}
+.emblema .lema{margin:0;font-size:14px;letter-spacing:.24em;text-transform:uppercase;color:var(--tinta-suave);text-align:center}
+.emblema .lema b{color:var(--verde-texto);font-weight:600}
+.cuerpo{padding-top:0;display:grid;grid-template-columns:1fr 1fr;gap:8px 46px}
+.item{display:grid;grid-template-columns:54px 1fr;gap:14px;padding:17px 0;border-top:1px solid rgba(29,15,68,.16)}
+.item .n{font-family:var(--serif);font-style:italic;font-size:30px;line-height:1;color:rgba(29,15,68,.4)}
+.item h2{margin:0 0 4px;font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:-.01em}
+.item p{margin:0;font-size:15.5px;line-height:1.35;color:#463668}
+
+footer{margin-top:0;padding-top:26px;border-top:1px solid rgba(29,15,68,.2);display:grid;grid-template-columns:1fr auto;gap:14px 24px;align-items:end}
+footer .url{margin:0;font-family:var(--serif);font-size:34px;letter-spacing:-.01em}
+footer .url b{font-weight:600;font-style:italic}
+footer .mail{margin:8px 0 0;font-size:18px;letter-spacing:.06em;color:#3D2D63}
+footer .credito{margin:0;text-align:right;font-size:12px;line-height:1.6;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-suave);max-width:330px}
+footer .credito b{color:var(--verde-texto)}
+.marca-fisabio{grid-column:1 / -1;display:flex;justify-content:space-between;margin-top:10px;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta-suave)}
+</style>
+</head>
+<body>
+<canvas id="papel"></canvas>
+<div class="aguadas"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+<main>
+  <header>
+    <div>
+      <p class="kicker">Unidad de Ciencia Abierta <b>· Fisabio</b></p>
+      <p class="kicker2">Taller de identidad digital · ORCID</p>
+      <h1>Crea tu<br>ORCID <em>fácil</em></h1>
+      <p class="sub">Guía de supervivencia para gente que investiga: qué es ORCID, cómo se crea sin dolor y cómo dejar de perder citas por llamarte como otra persona.</p>
+    </div>
+  </header>
+
+  <section class="emblema">
+    <div class="medallon">
+      __LOGO__
+      <span class="nombre">ORCID</span>
+      <span class="pie">identificador único</span>
+    </div>
+    <p class="lema">16 dígitos · <b>un identificador para toda la carrera</b></p>
+  </section>
+
+  <section class="cuerpo">
+    <div class="item"><span class="n">01</span><div><h2>Clones</h2><p>Tu nombre no es único: hay homónimos publicando.</p></div></div>
+    <div class="item"><span class="n">02</span><div><h2>Firma y filiación</h2><p>Una firma, siempre la misma, con Fisabio bien escrito.</p></div></div>
+    <div class="item"><span class="n">03</span><div><h2>Qué es ORCID</h2><p>Tu iD de 16 dígitos, persistente y sin ánimo de lucro.</p></div></div>
+    <div class="item"><span class="n">04</span><div><h2>Cuatro pasos</h2><p>Datos, filiación, visibilidad y verificación del correo.</p></div></div>
+    <div class="item"><span class="n">05</span><div><h2>Visibilidad</h2><p>Tú decides qué se ve: todo el mundo, confianza o solo yo.</p></div></div>
+    <div class="item"><span class="n">06</span><div><h2>Gestión</h2><p>El perfil no se queda quieto: añade y edita cada apartado.</p></div></div>
+    <div class="item"><span class="n">07</span><div><h2>Piloto automático</h2><p>Search &amp; Link, DOI y PubMed: no lo escribas a mano.</p></div></div>
+    <div class="item"><span class="n">08</span><div><h2>Duplicados</h2><p>No borres: vincula los registros y quédate con un iD.</p></div></div>
+  </section>
+
+  <footer>
+    <div>
+      <p class="url">Empieza en <b>orcid.org</b></p>
+      <p class="mail">openscience@fisabio.es</p>
+    </div>
+    <p class="credito">Basado en el taller «Identificador único del personal investigador. ORCID»<br><b>12 · 11 · 2025</b></p>
+    <div class="marca-fisabio"><span>Fundación para el Fomento de la Investigación Sanitaria y Biomédica</span><span>Fisabio</span></div>
+  </footer>
+</main>
+<script>
+/*__ARTE__*/
+</script>
+<script>
+/*__PLACAS__*/
+</script>
+<script>
+(function(){
+  var cv = document.getElementById('papel');
+  var p = Arte.preparar(cv);
+  Arte.papel(p.ctx, p.w, p.h, 20261112);
+  Arte.aguada(p.ctx, {x:p.w*.16, y:p.h*.1, r:p.w*.42, color:Arte.PALETA.orcid, alpha:.18, seed:3});
+  Arte.aguada(p.ctx, {x:p.w*.9, y:p.h*.28, r:p.w*.4, color:Arte.PALETA.coral, alpha:.13, seed:4});
+  Arte.aguada(p.ctx, {x:p.w*.2, y:p.h*.95, r:p.w*.45, color:Arte.PALETA.indigo, alpha:.10, seed:5});
+  salpicar();
+  function salpicar(){
+    var r = Arte.prng(9);
+    p.ctx.save();
+    p.ctx.globalCompositeOperation = 'multiply';
+    for (var i = 0; i < 120; i++) {
+      p.ctx.globalAlpha = 0.05 + r() * 0.12;
+      p.ctx.fillStyle = r() > 0.5 ? Arte.PALETA.rojo : Arte.PALETA.tinta;
+      p.ctx.beginPath();
+      p.ctx.arc(r() * p.w, r() * p.h, 0.6 + r() * 1.4, 0, Math.PI * 2);
+      p.ctx.fill();
+    }
+    p.ctx.restore();
+  }
+})();
+</script>
+</body>
+</html>

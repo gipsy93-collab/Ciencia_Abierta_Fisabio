@@ -2,11 +2,128 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Taller de ciencia participativa — Infografía interactiva</title>
-<meta http-equiv="refresh" content="0; url=taller-ciencia-participativa/Taller-Ciencia-Participativa.html">
-<link rel="canonical" href="taller-ciencia-participativa/Taller-Ciencia-Participativa.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unidad de Ciencia Abierta · Fisabio</title>
+<meta name="description" content="Dos guías interactivas de la Unidad de Ciencia Abierta de Fisabio: ciencia participativa y ORCID.">
+<meta property="og:title" content="Ciencia abierta, en piezas · Fisabio">
+<meta property="og:description" content="Dos guías interactivas para investigar mejor: ciencia participativa y ORCID.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="portal/orcid.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23A6CE39'/%3E%3Ccircle cx='11' cy='10' r='2.4' fill='%23FCF8EE'/%3E%3Crect x='9' y='14' width='4' height='10' rx='1.4' fill='%23FCF8EE'/%3E%3Cpath d='M17 5h4.6a7 7 0 0 1 0 14H17z' fill='none' stroke='%23FCF8EE' stroke-width='3.2'/%3E%3C/svg%3E">
+<style>
+@font-face{font-family:Fraunces;font-style:normal;font-weight:300 900;font-display:swap;src:url(orcid-infografia/assets/fonts/fraunces-variable.woff2) format('woff2')}
+@font-face{font-family:Fraunces;font-style:italic;font-weight:300 900;font-display:swap;src:url(orcid-infografia/assets/fonts/fraunces-italic-variable.woff2) format('woff2')}
+@font-face{font-family:Outfit;font-style:normal;font-weight:300 700;font-display:swap;src:url(orcid-infografia/assets/fonts/outfit-variable.woff2) format('woff2')}
+
+:root{
+  --papel:#F7F1E4;--papel-alto:#FCF8EE;--tinta:#1D0F44;--tinta-suave:#5B4B7E;
+  --coral:#FF647D;--rojo:#C4002E;--orcid:#A6CE39;--verde:#63AA16;--verde-texto:#3F7A0C;--indigo:#3B2A6B;
+  --serif:Fraunces,Georgia,serif;--sans:Outfit,system-ui,sans-serif
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--papel);color:var(--tinta);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(50vw 50vw at 4% 0%,rgba(166,206,57,.30),rgba(166,206,57,0) 70%),
+    radial-gradient(52vw 52vw at 98% 18%,rgba(255,100,125,.22),rgba(255,100,125,0) 68%),
+    radial-gradient(60vw 60vw at 40% 110%,rgba(59,42,107,.16),rgba(59,42,107,0) 70%)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;box-shadow:inset 0 0 18vw rgba(29,15,68,.08)}
+::selection{background:var(--rojo);color:var(--papel-alto)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--tinta);outline-offset:4px;border-radius:2px}
+.wrap{width:100%;max-width:1080px;margin:0 auto;padding:0 clamp(20px,5vw,48px)}
+
+header.barra{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-top:clamp(18px,3vw,30px);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-suave)}
+header.barra b{font-weight:500}
+header.barra .punto{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--rojo);margin-right:8px}
+
+.portada{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.65fr);gap:clamp(20px,4vw,48px);align-items:end;padding:clamp(38px,7vw,74px) 0 clamp(26px,4vw,44px)}
+.kicker{margin:0 0 14px;font-size:11.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--verde-texto)}
+h1{margin:0;font-family:var(--serif);font-weight:600;font-size:clamp(2.4rem,6.2vw,4.6rem);line-height:.98;letter-spacing:-.028em;text-wrap:balance}
+h1 em{font-style:italic;font-weight:400}
+.lede{margin:18px 0 0;max-width:46ch;font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(1rem,1.5vw,1.18rem);line-height:1.5;color:#3D2D63}
+.nota{margin:0 0 6px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-suave);text-align:right}
+.nota b{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:26px;letter-spacing:0;text-transform:none;color:var(--tinta);margin-top:6px}
+
+.piezas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,3vw,28px);padding-bottom:clamp(30px,5vw,52px)}
+.pieza{position:relative;display:flex;flex-direction:column;text-decoration:none;background:var(--papel-alto);
+  border:1px solid rgba(29,15,68,.18);border-radius:4px 22px 5px 18px;overflow:hidden;
+  box-shadow:0 30px 60px -46px rgba(29,15,68,.8);transition:transform .35s ease,box-shadow .35s ease,border-color .35s}
+.pieza:hover,.pieza:focus-visible{transform:translateY(-4px);box-shadow:0 40px 70px -44px rgba(29,15,68,.75);border-color:rgba(196,0,46,.45)}
+.pieza .foto{position:relative;aspect-ratio:16/10;overflow:hidden;background:#E8E2D2}
+.pieza .foto img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease}
+.pieza:hover .foto img{transform:scale(1.03)}
+.pieza .foto::after{content:"";position:absolute;inset:0;box-shadow:inset 0 -1px 0 rgba(29,15,68,.12)}
+.pieza .cuerpo{padding:clamp(18px,2.6vw,28px);display:flex;flex-direction:column;gap:10px;flex:1}
+.pieza .rotulo{font-size:10.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--verde-texto)}
+.pieza h2{margin:0;font-family:var(--serif);font-weight:600;font-size:clamp(1.35rem,2.4vw,1.85rem);line-height:1.06;letter-spacing:-.015em}
+.pieza p{margin:0;font-size:15px;line-height:1.5;color:#3A2C63}
+.pieza .entrar{margin-top:auto;padding-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta)}
+.pieza .entrar span{font-size:17px;transition:transform .3s}
+.pieza:hover .entrar span{transform:translateX(5px)}
+.pieza .cinta{position:absolute;top:14px;left:14px;padding:5px 10px;background:rgba(252,248,238,.92);border:1px solid rgba(29,15,68,.22);
+  border-radius:2px 8px 2px 8px;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave)}
+
+footer{border-top:1px solid rgba(29,15,68,.18);padding:22px 0 44px;display:flex;flex-wrap:wrap;gap:8px 26px;justify-content:space-between;
+  font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-suave)}
+footer a{text-decoration:none;border-bottom:1px solid rgba(29,15,68,.3)}
+footer a:hover{color:var(--rojo);border-color:var(--rojo)}
+
+@media (max-width:760px){
+  .portada{grid-template-columns:1fr;align-items:start}
+  .nota{text-align:left;margin-top:8px}
+  .piezas{grid-template-columns:1fr}
+  header.barra .version{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
 </head>
 <body>
-<p>Redirigiendo a la infografía interactiva… Si no ocurre, <a href="taller-ciencia-participativa/Taller-Ciencia-Participativa.html">ábre aquí</a>.</p>
+<div class="wrap">
+  <header class="barra">
+    <b>Unidad de Ciencia Abierta · Fisabio</b>
+    <span class="version"><span class="punto"></span>Piezas interactivas</span>
+  </header>
+
+  <section class="portada">
+    <div>
+      <p class="kicker">Dos guías para investigar mejor</p>
+      <h1>Ciencia abierta, <em>en piezas</em></h1>
+      <p class="lede">Materiales del taller de la Unidad de Ciencia Abierta: una guía sobre ciencia participativa y otra para crear tu ORCID sin dolor. Se leen en el móvil, sin registro y sin instalar nada.</p>
+    </div>
+    <p class="nota">Actualizado<b>noviembre 2025</b></p>
+  </section>
+
+  <main class="piezas">
+    <a class="pieza" href="taller-ciencia-participativa/Taller-Ciencia-Participativa.html" aria-labelledby="p-taller">
+      <div class="foto"><img src="portal/taller.jpg" alt="Portada de la infografía: un cerebro con cinco secciones numeradas y etiquetas de taller, contexto, participantes, necesidades y prioridades." loading="lazy" width="1280" height="800"></div>
+      <div class="cuerpo">
+        <span class="rotulo">Taller · Ciencia participativa</span>
+        <h2 id="p-taller">Estamos pensando la ciencia abierta</h2>
+        <p>Diagnóstico de necesidades, participantes y prioridades para impulsar la ciencia participativa en la investigación sanitaria.</p>
+        <span class="entrar">Entrar <span aria-hidden="true">→</span></span>
+      </div>
+      <span class="cinta">Guía interactiva</span>
+    </a>
+
+    <a class="pieza" href="orcid-infografia/" aria-labelledby="p-orcid">
+      <div class="foto"><img src="portal/orcid.jpg" alt="Portada de la infografía: el identificador ORCID en el centro, rodeado de ocho nodos numerados conectados con líneas de puntos." loading="lazy" width="1280" height="800"></div>
+      <div class="cuerpo">
+        <span class="rotulo">Taller · Identidad digital</span>
+        <h2 id="p-orcid">Crea tu ORCID fácil</h2>
+        <p>Ocho conexiones y cuatro pruebas: firma, perfil, visibilidad, automatización y duplicados. La guía de supervivencia del investigador.</p>
+        <span class="entrar">Entrar <span aria-hidden="true">→</span></span>
+      </div>
+      <span class="cinta">Guía interactiva</span>
+    </a>
+  </main>
+
+  <footer>
+    <span>© 2025 Fundación Fisabio · Unidad de Ciencia Abierta</span>
+    <span><a href="mailto:openscience@fisabio.es">openscience@fisabio.es</a></span>
+  </footer>
+</div>
 </body>
 </html>
