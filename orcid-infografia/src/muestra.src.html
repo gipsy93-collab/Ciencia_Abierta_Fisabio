@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Muestra · Crea tu ORCID fácil</title>
+<style>
+/*__FUENTES__*/
+
+:root{
+  --papel:#F7F1E4;
+  --papel-alto:#FCF8EE;
+  --tinta:#1D0F44;
+  --tinta-suave:#5B4B7E;
+  --coral:#FF647D;
+  --rojo:#EB003B;
+  --orcid:#A6CE39;
+  --verde:#63AA16;
+  --indigo:#3B2A6B;
+  --ocre:#E0B071;
+  --verde-texto:#3F7A0C;
+  --rojo-texto:#C4002E;
+  --serif:Fraunces,Georgia,'Times New Roman',serif;
+  --sans:Outfit,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --max:1180px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;box-shadow:inset 0 0 16vw rgba(29,15,68,.09)}
+body{
+  margin:0;
+  background:var(--papel);
+  color:var(--tinta);
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--rojo);color:var(--papel-alto)}
+:focus-visible{outline:2px solid var(--tinta);outline-offset:3px;border-radius:2px}
+
+/* ---- fondo --------------------------------------------------------- */
+#fondo{position:fixed;inset:0;width:100%;height:100%;z-index:-3}
+.aguadas{position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden}
+.aguadas i{position:absolute;display:block;border-radius:50%;filter:blur(58px);mix-blend-mode:multiply;opacity:.5}
+.aguadas .a1{width:52vw;height:52vw;left:-14vw;top:-16vw;background:radial-gradient(circle,rgba(166,206,57,.5),rgba(166,206,57,0) 68%)}
+.aguadas .a2{width:60vw;height:60vw;right:-22vw;top:6vw;background:radial-gradient(circle,rgba(255,100,125,.34),rgba(255,100,125,0) 66%)}
+.aguadas .a3{width:54vw;height:54vw;left:18vw;bottom:-30vw;background:radial-gradient(circle,rgba(59,42,107,.28),rgba(59,42,107,0) 68%)}
+.aguadas .a4{width:34vw;height:34vw;right:6vw;bottom:-6vw;background:radial-gradient(circle,rgba(224,176,113,.3),rgba(224,176,113,0) 66%)}
+
+/* ---- estructura ---------------------------------------------------- */
+.wrap{width:100%;max-width:var(--max);margin-inline:auto;padding-inline:clamp(20px,5vw,56px)}
+.barra{
+  display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  padding-top:clamp(18px,3vw,32px);
+  font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-suave)
+}
+.barra b{font-weight:500;letter-spacing:.16em}
+.barra .version{display:inline-flex;align-items:center;gap:8px;letter-spacing:.12em}
+.barra .version::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--rojo)}
+
+/* ---- portada ------------------------------------------------------- */
+.portada{
+  display:grid;
+  grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);
+  gap:clamp(22px,4vw,58px);
+  align-items:center;
+  text-align:left;
+  padding-block:clamp(14px,2.4vw,30px) clamp(18px,3vw,34px)
+}
+.portada-texto{max-width:348px}
+.kicker{
+  margin:0 0 clamp(12px,1.8vw,18px);
+  font-size:11.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--tinta-suave)
+}
+.kicker span{color:var(--verde)}
+h1{
+  margin:0;
+  font-family:var(--serif);font-weight:600;
+  font-size:clamp(2.05rem,3.5vw,3.15rem);
+  line-height:1.03;letter-spacing:-.022em;
+  font-variation-settings:"SOFT" 34,"WONK" 1,"opsz" 110;
+  text-wrap:balance
+}
+h1 em{
+  display:inline-block;font-style:italic;font-weight:400;
+  font-variation-settings:"SOFT" 84,"WONK" 1,"opsz" 144;
+  padding-inline:.04em .08em;padding-bottom:.08em;
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 24' preserveAspectRatio='none'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='.6'/%3E%3C/filter%3E%3Cg filter='url(%23b)'%3E%3Cpath d='M4 16C56 9 118 19 168 13c36-4 82-2 128-5' fill='none' stroke='%23FF647D' stroke-width='7' stroke-linecap='round' opacity='.38'/%3E%3Cpath d='M10 20C64 13 126 22 176 16c32-4 76-2 118-6' fill='none' stroke='%23EB003B' stroke-width='2.2' stroke-linecap='round' opacity='.20'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-size:102% .30em;background-position:-1% 100%
+}
+.lede{
+  margin:clamp(12px,1.8vw,18px) 0 0;
+  max-width:34ch;
+  font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(.98rem,1.15vw,1.08rem);
+  line-height:1.5;color:#3D2D63;text-wrap:pretty
+}
+.datos{
+  display:flex;flex-wrap:wrap;gap:9px 20px;
+  margin:clamp(16px,2.4vw,26px) 0 0;
+  font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--tinta-suave)
+}
+.datos span{display:inline-flex;align-items:center;gap:8px}
+.datos span::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--verde);opacity:.85}
+.pista{
+  margin:clamp(18px,3vw,30px) 0 0;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta-suave)
+}
+.pista i{display:inline-block;margin-right:8px;font-style:normal;animation:flota 2.6s ease-in-out infinite}
+@keyframes flota{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+/* ---- arte de portada ----------------------------------------------- */
+.portada-arte{position:relative;display:grid;place-items:center;min-width:0}
+#fondo-huella{
+  position:absolute;inset:2% 3%;width:94%;height:96%;
+  pointer-events:none;opacity:.62;z-index:0
+}
+.orbita{
+  position:relative;z-index:1;
+  width:100%;aspect-ratio:1.12/1;max-height:600px;
+  margin:0
+}
+.hilos{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.hilos path{fill:none;stroke:rgba(29,15,68,.66);stroke-width:1.7;stroke-linecap:round;stroke-dasharray:2.6 4.4}
+.hilos path.eco{stroke:rgba(235,0,59,.24);stroke-width:1.2;stroke-dasharray:1.2 5.4;transform:translate(1.7px,1.7px)}
+.hilos .anillo{fill:none;stroke:rgba(29,15,68,.15);stroke-width:1.1;stroke-dasharray:1.2 9}
+.hilos .graduacion{stroke:rgba(29,15,68,.2);stroke-width:.9;stroke-linecap:round}
+
+.medallon{
+  position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);
+  width:clamp(196px,17.2vw,282px);aspect-ratio:1;border-radius:50%;
+  display:grid;align-content:center;align-items:center;justify-items:center;grid-auto-rows:max-content;gap:5px;
+  background:radial-gradient(circle at 34% 26%,#FFFDF7 0%,#FBF6E9 48%,#F0E4CE 100%);
+  box-shadow:0 0 0 1px rgba(29,15,68,.10),0 26px 54px -30px rgba(29,15,68,.6);
+  z-index:2
+}
+.medallon::before{
+  content:"";position:absolute;inset:-15px;border-radius:50%;
+  border:1px dashed rgba(29,15,68,.22)
+}
+.medallon::after{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 30% 22%,rgba(166,206,57,.22),rgba(166,206,57,0) 58%);
+  mix-blend-mode:multiply;pointer-events:none
+}
+.medallon svg{width:clamp(70px,7.4vw,102px);height:auto;display:block}
+.medallon .nombre{
+  font-size:12.5px;font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:var(--tinta);margin-top:4px
+}
+.medallon .pie{font-size:10.5px;line-height:1.2;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave)}
+
+.halo{
+  position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);
+  width:clamp(286px,31vw,404px);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,rgba(166,206,57,.28),rgba(166,206,57,0) 68%);
+  filter:blur(4px);pointer-events:none
+}
+
+.nodo{
+  position:absolute;left:var(--x);top:var(--y);width:0;height:0;
+  color:inherit;text-decoration:none
+}
+.nodo .punto{
+  position:absolute;left:-27px;top:-27px;width:54px;height:54px;border-radius:50%;
+  display:grid;place-items:center;
+  background:rgba(252,248,238,.95);
+  border:1px solid rgba(29,15,68,.32);
+  font-family:var(--serif);font-style:italic;font-size:17px;letter-spacing:.02em;
+  box-shadow:0 8px 20px -16px rgba(29,15,68,.7);
+  transition:border-color .25s,box-shadow .25s,transform .25s,color .25s
+}
+.nodo .etiqueta{
+  position:absolute;left:34px;top:-10px;width:138px;text-align:left;
+  font-size:12px;font-weight:500;line-height:1.3;letter-spacing:.07em;text-transform:uppercase;
+  color:#3D2D63;transition:color .25s
+}
+.nodo.lado-izq .etiqueta{left:auto;right:34px;text-align:right}
+.nodo.arriba .etiqueta{left:-69px;right:auto;top:auto;bottom:36px;width:138px;text-align:center}
+.nodo.abajo .etiqueta{left:-69px;right:auto;top:36px;width:138px;text-align:center}
+.nodo:hover .punto{border-color:var(--rojo);color:var(--rojo);box-shadow:0 10px 24px -14px rgba(235,0,59,.75);transform:scale(1.06)}
+.nodo:hover .etiqueta{color:var(--rojo)}
+
+/* ---- espina (móvil) ------------------------------------------------ */
+.espina{display:none}
+
+/* ---- lámina -------------------------------------------------------- */
+.pliego{
+  position:relative;margin-top:clamp(10px,3vw,30px);
+  padding-top:clamp(22px,4vw,44px)
+}
+.pliego::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:1px;
+  background:linear-gradient(90deg,rgba(29,15,68,.22),rgba(29,15,68,0) 70%)
+}
+.lamina{
+  display:grid;gap:clamp(22px,4vw,52px);
+  grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);
+  align-items:center
+}
+.marco{
+  position:relative;padding:11px;
+  background:#FCF8EE;
+  border:1px solid rgba(29,15,68,.16);
+  border-radius:4px 20px 5px 24px;
+  box-shadow:0 34px 64px -46px rgba(29,15,68,.7);
+  transform:rotate(-.5deg)
+}
+.marco::before{
+  content:"";position:absolute;inset:5px;pointer-events:none;
+  border:1px solid rgba(29,15,68,.09);border-radius:2px 16px 3px 18px
+}
+.marco canvas{display:block;width:100%;aspect-ratio:4/3;border-radius:2px 12px 3px 14px}
+.marco .semilla{
+  position:absolute;right:16px;bottom:12px;
+  font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave);
+  background:rgba(252,248,238,.72);padding:2px 7px;border-radius:2px
+}
+.marca{
+  margin:0 0 10px;font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--verde-texto)
+}
+h2{
+  margin:0 0 .35em;
+  font-family:var(--serif);font-weight:600;font-size:clamp(1.9rem,3.6vw,2.9rem);
+  line-height:1.02;letter-spacing:-.02em;
+  font-variation-settings:"SOFT" 40,"WONK" 1,"opsz" 96
+}
+h2 em{font-style:italic;font-weight:400}
+.entradilla{max-width:52ch;margin:0 0 18px;font-size:16.5px;line-height:1.66;color:#33265A}
+blockquote{
+  position:relative;margin:0 0 20px;padding:2px 0 2px 20px;
+  font-family:var(--serif);font-style:italic;font-weight:300;font-size:15.5px;line-height:1.55;
+  color:#4A3A73;max-width:54ch
+}
+blockquote::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:2px;background:var(--coral);opacity:.75}
+blockquote footer{margin-top:6px;font-family:var(--sans);font-style:normal;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave)}
+
+.problemas{list-style:none;margin:0 0 26px;padding:0;display:grid;gap:9px;max-width:54ch}
+.problemas li{position:relative;padding-left:20px;font-size:15.2px;line-height:1.5;color:#3A2C63}
+.problemas li::before{
+  content:"";position:absolute;left:2px;top:.62em;width:6px;height:6px;border-radius:50%;
+  background:var(--rojo);opacity:.8
+}
+
+.boton{
+  position:relative;display:inline-flex;align-items:center;gap:14px;
+  padding:14px 24px;border:1px solid rgba(29,15,68,.5);border-radius:3px 14px 4px 12px;
+  background:rgba(252,248,238,.65);
+  font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tinta);cursor:pointer;overflow:hidden;
+  transition:border-color .25s,color .25s
+}
+.boton span{font-size:15px;transition:transform .25s}
+.boton::before{
+  content:"";position:absolute;inset:0;z-index:-1;opacity:0;
+  background:radial-gradient(120% 140% at 20% 120%,rgba(255,100,125,.55),rgba(255,100,125,0) 70%);
+  transition:opacity .3s
+}
+.boton:hover{border-color:var(--rojo)}
+.boton:hover::before{opacity:1}
+.boton:hover span{transform:translateX(4px)}
+
+.nota{margin:14px 0 0;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-suave)}
+
+/* ---- sistema ------------------------------------------------------- */
+.sistema{margin-top:clamp(46px,8vw,84px)}
+.sistema h2{font-size:clamp(1.5rem,2.6vw,2.1rem)}
+.pigmentos{list-style:none;margin:26px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
+.pigmentos li{text-align:center}
+.gota{
+  display:block;width:100%;aspect-ratio:1;max-width:104px;margin:0 auto 10px;
+  filter:drop-shadow(0 8px 14px rgba(29,15,68,.16))
+}
+.pigmentos b{display:block;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.pigmentos small{font-size:10.5px;letter-spacing:.1em;color:var(--tinta-suave)}
+
+.letras{display:grid;gap:clamp(20px,3vw,34px);grid-template-columns:1fr 1fr;margin-top:clamp(34px,5vw,54px)}
+.letras > div{border-top:1px solid rgba(29,15,68,.18);padding-top:14px}
+.letras .aa{font-size:clamp(3.4rem,6vw,4.8rem);line-height:1;margin:0 0 8px;display:flex;align-items:baseline;gap:.22em;min-height:1.05em}
+.letras .aa.serif{font-family:var(--serif);font-weight:600;font-variation-settings:"SOFT" 60,"WONK" 1,"opsz" 144}
+.letras .aa.sans{font-family:var(--sans);font-weight:300;letter-spacing:-.02em}
+.letras p{margin:0;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave)}
+
+.muestra-nota{
+  margin-top:clamp(34px,5vw,54px);padding:22px 0 0;border-top:1px solid rgba(29,15,68,.18);
+  font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-suave)
+}
+
+/* ---- pie ----------------------------------------------------------- */
+.pie-pagina{margin-top:clamp(40px,7vw,80px);padding-block:26px 40px;border-top:1px solid rgba(29,15,68,.18);display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:space-between;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-suave)}
+.pie-pagina a{color:inherit}
+
+/* ---- modales ------------------------------------------------------- */
+.velo{
+  position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:22px;
+  background:rgba(29,15,68,.42);backdrop-filter:blur(3px)
+}
+.velo[hidden]{display:none}
+.dialogo{
+  position:relative;width:min(560px,100%);max-height:88vh;overflow:auto;
+  padding:clamp(26px,4vw,40px);
+  background:
+    radial-gradient(120% 100% at 100% 0%,rgba(166,206,57,.18),rgba(166,206,57,0) 60%),
+    radial-gradient(100% 90% at 0% 100%,rgba(255,100,125,.16),rgba(255,100,125,0) 58%),
+    #FCF8EE;
+  border:1px solid rgba(29,15,68,.2);
+  border-radius:5px 26px 6px 22px;
+  box-shadow:0 50px 90px -50px rgba(10,4,30,.9)
+}
+.cerrar{
+  position:absolute;right:12px;top:10px;width:36px;height:36px;
+  display:grid;place-items:center;border:0;background:transparent;border-radius:50%;
+  font-size:22px;line-height:1;color:var(--tinta-suave);cursor:pointer
+}
+.cerrar:hover{background:rgba(29,15,68,.07);color:var(--tinta)}
+.dialogo h3{
+  margin:0 0 20px;font-family:var(--serif);font-weight:600;font-size:clamp(1.25rem,2.4vw,1.6rem);
+  line-height:1.22;letter-spacing:-.01em
+}
+.opciones{display:grid;gap:10px}
+.opciones button{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:15px 18px;text-align:left;cursor:pointer;
+  background:rgba(255,255,255,.55);border:1px solid rgba(29,15,68,.24);border-radius:3px 16px 4px 14px;
+  font-family:var(--sans);font-size:14.5px;font-weight:500;color:var(--tinta);
+  transition:border-color .2s,background .2s,transform .2s
+}
+.opciones button em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--tinta-suave)}
+.opciones button::after{content:"→";font-size:15px;opacity:.45;transition:transform .2s,opacity .2s}
+.opciones button:hover{border-color:var(--rojo);background:rgba(255,255,255,.85);transform:translateY(-1px)}
+.opciones button:hover::after{opacity:1;transform:translateX(3px)}
+.opciones button[aria-pressed="true"]{border-color:var(--rojo);background:rgba(255,100,125,.14)}
+
+.sello{
+  margin:26px auto 4px;max-width:400px;padding:16px 18px;text-align:center;
+  border:3px double var(--rojo-texto);border-radius:4px;
+  color:var(--rojo-texto);font-family:var(--serif);font-weight:700;
+  font-size:clamp(.95rem,2vw,1.12rem);line-height:1.15;letter-spacing:.06em;text-transform:uppercase;
+  transform:rotate(-2.4deg);
+  mix-blend-mode:multiply;
+  animation:sella .5s cubic-bezier(.2,1.5,.4,1) both
+}
+@keyframes sella{from{opacity:0;transform:rotate(-2.4deg) scale(1.35)}to{opacity:1;transform:rotate(-2.4deg) scale(1)}}
+
+/* ---- responsive ---------------------------------------------------- */
+@media (max-width:1000px){
+  .portada{grid-template-columns:1fr;text-align:center;gap:clamp(18px,4vw,30px)}
+  .portada-texto{max-width:560px;margin-inline:auto}
+  .lede{margin-inline:auto}
+  .datos{justify-content:center}
+  .orbita{max-width:760px;margin-inline:auto;aspect-ratio:1/.86}
+}
+@media (max-width:1000px){
+  .nodo .punto{width:50px;height:50px;left:-25px;top:-25px;font-size:16px}
+  .nodo .etiqueta{width:124px;font-size:11px;left:32px}
+  .nodo.lado-izq .etiqueta{right:32px}
+  .nodo.arriba .etiqueta{left:-62px;width:124px;bottom:34px}
+  .nodo.abajo .etiqueta{left:-62px;width:124px;top:34px}
+}
+@media (max-width:900px){
+  .lamina{grid-template-columns:1fr}
+  .marco{max-width:560px;margin-inline:auto}
+  .pigmentos{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:24px}
+}
+@media (max-width:760px){
+  .orbita{display:none}
+  .espina{display:block;margin-top:clamp(34px,8vw,48px)}
+  .espina .medallon{position:relative;left:auto;top:auto;transform:none;margin:0 auto}
+  .espina .halo{left:50%;top:0;width:min(76vw,300px);transform:translate(-50%,-22%)}
+  .espina-riel{position:relative;margin:0;padding:0;list-style:none}
+  .hilo-baja{display:block;width:1px;height:clamp(26px,5vw,38px);margin:0 auto;background:repeating-linear-gradient(to bottom,rgba(29,15,68,.42) 0 1px,transparent 1px 6px)}
+  .espina-riel::before{
+    content:"";position:absolute;left:23px;top:0;bottom:0;width:1px;
+    background:repeating-linear-gradient(to bottom,rgba(29,15,68,.34) 0 1px,transparent 1px 6px)
+  }
+  .espina-riel li{
+    position:relative;display:flex;align-items:center;gap:16px;
+    padding:9px 0 9px 0;margin-left:0
+  }
+  .espina-riel li::after{
+    content:"";position:absolute;left:23px;top:50%;width:26px;height:1px;
+    background:rgba(29,15,68,.3)
+  }
+  .espina-riel .num{
+    position:relative;z-index:1;flex:0 0 auto;
+    width:46px;height:46px;border-radius:50%;
+    display:grid;place-items:center;
+    background:var(--papel-alto);border:1px solid rgba(29,15,68,.3);
+    font-family:var(--serif);font-style:italic;font-size:15px
+  }
+  .espina-riel .txt{padding-left:16px;font-size:12.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#3D2D63}
+  .letras{grid-template-columns:1fr}
+  .barra{font-size:10px;letter-spacing:.12em}
+  .barra .version{display:none}
+}
+@media (max-width:420px){
+  .pigmentos{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .datos{font-size:10px;letter-spacing:.12em;gap:8px 14px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .viajero{display:none}
+}
+</style>
+</head>
+<body>
+<canvas id="fondo" aria-hidden="true"></canvas>
+<div class="aguadas" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="a4"></i></div>
+
+<div class="wrap">
+  <header class="barra">
+    <b>Unidad de Ciencia Abierta · Fisabio</b>
+    <span class="version">Muestra de diseño v0.3</span>
+  </header>
+
+  <section class="portada">
+    <div class="portada-texto">
+      <p class="kicker">Taller de identidad digital <span>·</span> ORCID</p>
+      <h1>Crea tu ORCID <em>fácil</em></h1>
+      <p class="lede">Guía de supervivencia para gente que investiga: qué es ORCID, cómo se crea en tres minutos y cómo dejar de perder citas por llamarte como otra persona.</p>
+      <div class="datos">
+        <span>16 dígitos</span>
+        <span>persistente</span>
+        <span>sin ánimo de lucro</span>
+      </div>
+      <p class="pista"><i aria-hidden="true">↓</i>Ocho conexiones · cuatro pruebas</p>
+    </div>
+
+    <div class="portada-arte">
+      <canvas id="fondo-huella" aria-hidden="true"></canvas>
+      <div class="orbita" aria-label="Ocho conexiones alrededor del identificador ORCID">
+        <svg class="hilos" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" id="hilos"></svg>
+        <span class="halo" aria-hidden="true"></span>
+        <div class="medallon">
+          __LOGO__
+          <span class="nombre">ORCID</span>
+          <span class="pie">identificador único</span>
+        </div>
+        <div class="nodos" id="nodos"></div>
+      </div>
+
+      <div class="espina">
+        <span class="halo" aria-hidden="true"></span>
+        <div class="medallon">
+          __LOGO__
+          <span class="nombre">ORCID</span>
+          <span class="pie">identificador único</span>
+        </div>
+        <span class="hilo-baja" aria-hidden="true"></span>
+        <ol class="espina-riel">
+          <li><span class="num">01</span><span class="txt">Clones</span></li>
+          <li><span class="num">02</span><span class="txt">Firma y filiación</span></li>
+          <li><span class="num">03</span><span class="txt">Qué es ORCID</span></li>
+          <li><span class="num">04</span><span class="txt">Cuatro pasos</span></li>
+          <li><span class="num">05</span><span class="txt">Visibilidad</span></li>
+          <li><span class="num">06</span><span class="txt">Gestión</span></li>
+          <li><span class="num">07</span><span class="txt">Piloto automático</span></li>
+          <li><span class="num">08</span><span class="txt">Duplicados</span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="pliego" aria-labelledby="t1">
+    <article class="lamina">
+      <div class="marco">
+        <canvas id="arte-clones" aria-label="Lámina generada: dos identidades que se solapan" role="img"></canvas>
+        <span class="semilla">semilla 11</span>
+      </div>
+      <div>
+        <p class="marca">01 · Identidad</p>
+        <h2 id="t1">El problema<br><em>no es tu nombre</em></h2>
+        <p class="entradilla">En investigación hay muchos nombres iguales y firmas que cambian con el tiempo. El resultado: trabajos ajenos que se te atribuyen, citas que se pierden y métricas que no te corresponden.</p>
+        <blockquote>
+          «El resultado del esfuerzo consciente que realiza el investigador por y para ser identificado y reconocido en un contexto digital, distinguiéndose del conjunto de investigadores a través de la normalización, con el uso de identificadores y la difusión de resultados».
+          <footer>Díaz-Redondo y Frías-Montoya, 2018, p. 12</footer>
+        </blockquote>
+        <ul class="problemas">
+          <li>Trabajos ajenos atribuidos a ti, y trabajos tuyos atribuidos a un homónimo.</li>
+          <li>Citas que se pierden y no se contabilizan; métricas inexactas.</li>
+          <li>Evaluaciones externas desfavorables por un currículo incompleto.</li>
+          <li>Imposibilidad de seguir tu trayectoria y de ampliar tu bibliografía.</li>
+        </ul>
+        <button class="boton" type="button" data-abrir="quiz">Haz la prueba <span aria-hidden="true">→</span></button>
+        <p class="nota">Interacción 1 de 4 · prueba rápida</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="sistema" aria-labelledby="t2">
+    <p class="marca">Sistema de la pieza</p>
+    <h2 id="t2">Pigmentos y letras</h2>
+    <ul class="pigmentos">
+      <li><canvas class="gota" data-color="#FF647D" data-seed="3"></canvas><b>Coral</b><small>#FF647D</small></li>
+      <li><canvas class="gota" data-color="#EB003B" data-seed="17"></canvas><b>Rojo</b><small>#EB003B</small></li>
+      <li><canvas class="gota" data-color="#A6CE39" data-seed="29"></canvas><b>Verde ORCID</b><small>#A6CE39</small></li>
+      <li><canvas class="gota" data-color="#63AA16" data-seed="41"></canvas><b>Verde Fisabio</b><small>#63AA16</small></li>
+      <li><canvas class="gota" data-color="#3B2A6B" data-seed="57"></canvas><b>Índigo</b><small>#3B2A6B</small></li>
+    </ul>
+
+    <div class="letras">
+      <div>
+        <p class="aa serif">Aa <em>Bb</em></p>
+        <p>Fraunces · titulares</p>
+      </div>
+      <div>
+        <p class="aa sans">Aa Bb 0123</p>
+        <p>Outfit · texto y datos</p>
+      </div>
+    </div>
+
+    <p class="muestra-nota">Acuarela puntillista generada con semilla · papel cálido · conectores dibujados al entrar en cada nodo</p>
+  </section>
+
+  <footer class="pie-pagina">
+    <span>Unidad de Ciencia Abierta · Fisabio</span>
+    <span><a href="mailto:openscience@fisabio.es">openscience@fisabio.es</a></span>
+    <span>Muestra de diseño · no publicar</span>
+  </footer>
+</div>
+
+<div class="velo" id="velo" hidden>
+  <div class="dialogo" role="dialog" aria-modal="true" aria-labelledby="quiz-titulo">
+    <button class="cerrar" type="button" aria-label="Cerrar" data-cerrar>×</button>
+    <p class="marca">Prueba rápida</p>
+    <h3 id="quiz-titulo">¿Te has buscado alguna vez y has visto a otro investigador con tu mismo nombre?</h3>
+    <div class="opciones">
+      <button type="button" data-opcion="si" aria-pressed="false">Sí, tengo clones</button>
+      <button type="button" data-opcion="no" aria-pressed="false">No, mi nombre es único <em>(eso creo)</em></button>
+    </div>
+    <div class="sello" id="sello" aria-live="polite" hidden>¡Por eso necesitas blindar tu identidad digital!</div>
+  </div>
+</div>
+
+<script>
+/*__ARTE__*/
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* --- fondo de papel ------------------------------------------------- */
+  var fondo = document.getElementById('fondo');
+  var tFondo;
+  function pintarFondo() {
+    var p = Arte.preparar(fondo);
+    Arte.papel(p.ctx, p.w, p.h, 20261027);
+  }
+  function reFondo() { clearTimeout(tFondo); tFondo = setTimeout(pintarFondo, 160); }
+  pintarFondo();
+  window.addEventListener('resize', reFondo);
+
+  /* --- órbita --------------------------------------------------------- */
+  var conexiones = [
+    { n: '01', t: 'Clones' },
+    { n: '02', t: 'Firma y filiación' },
+    { n: '03', t: 'Qué es ORCID' },
+    { n: '04', t: 'Cuatro pasos' },
+    { n: '05', t: 'Visibilidad' },
+    { n: '06', t: 'Gestión' },
+    { n: '07', t: 'Piloto automático' },
+    { n: '08', t: 'Duplicados' }
+  ];
+
+  var svg = document.getElementById('hilos');
+  var capa = document.getElementById('nodos');
+  var orbita = document.querySelector('.orbita');
+  var NS = 'http://www.w3.org/2000/svg';
+  var posiciones = [];
+
+  if (svg && capa && orbita) {
+    var RX = 29, RY = 36, OY = 48;
+
+    conexiones.forEach(function (c, i) {
+      var a = -Math.PI / 2 + i * (Math.PI / 4);
+      var cos = Math.cos(a), sin = Math.sin(a);
+      var x = 50 + cos * RX;
+      var y = OY + sin * RY;
+
+      var el = document.createElement('a');
+      el.className = 'nodo';
+      el.href = '#t1';
+      el.style.setProperty('--x', x.toFixed(2) + '%');
+      el.style.setProperty('--y', y.toFixed(2) + '%');
+      if (Math.abs(cos) >= 0.45) {
+        el.classList.add(cos > 0 ? 'lado-der' : 'lado-izq');
+      } else {
+        el.classList.add(sin < 0 ? 'arriba' : 'abajo');
+      }
+      el.setAttribute('aria-label', c.n + ' · ' + c.t);
+      el.innerHTML = '<span class="punto">' + c.n + '</span><span class="etiqueta">' + c.t + '</span>';
+      el.addEventListener('click', function (ev) { ev.preventDefault(); });
+      capa.appendChild(el);
+
+      posiciones.push({ x: x / 100, y: y / 100 });
+    });
+
+    function trazar() {
+      var caja = orbita.getBoundingClientRect();
+      var w = Math.round(caja.width), h = Math.round(caja.height);
+      if (!w || !h) return;
+      svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+      var cx = w / 2, cy = (h * OY) / 100;
+      var rx = (w * RX) / 100, ry = (h * RY) / 100;
+
+      var anillo = document.createElementNS(NS, 'ellipse');
+      anillo.setAttribute('cx', cx);
+      anillo.setAttribute('cy', cy);
+      anillo.setAttribute('rx', rx);
+      anillo.setAttribute('ry', ry);
+      anillo.setAttribute('class', 'anillo');
+      svg.appendChild(anillo);
+
+      var medallon = orbita.querySelector('.medallon');
+      var radio = (medallon ? medallon.getBoundingClientRect().width / 2 : Math.min(w, h) * 0.11) + 14;
+
+      /* anillo graduado: guiño a la investigación y a la medida */
+      var rTicks = (medallon ? medallon.getBoundingClientRect().width / 2 : Math.min(w, h) * 0.11) + 26;
+      for (var t = 0; t < 72; t++) {
+        var ang = (t / 72) * Math.PI * 2;
+        var largo = t % 6 === 0 ? 9 : 4;
+        var tick = document.createElementNS(NS, 'line');
+        tick.setAttribute('x1', (cx + Math.cos(ang) * rTicks).toFixed(1));
+        tick.setAttribute('y1', (cy + Math.sin(ang) * rTicks).toFixed(1));
+        tick.setAttribute('x2', (cx + Math.cos(ang) * (rTicks + largo)).toFixed(1));
+        tick.setAttribute('y2', (cy + Math.sin(ang) * (rTicks + largo)).toFixed(1));
+        tick.setAttribute('class', 'graduacion');
+        svg.appendChild(tick);
+      }
+
+      posiciones.forEach(function (n) {
+        var x = n.x * w, y = n.y * h;
+        var dx = x - cx, dy = y - cy;
+        var len = Math.sqrt(dx * dx + dy * dy) || 1;
+        var ux = dx / len, uy = dy / len;
+        var sx = cx + ux * radio, sy = cy + uy * radio;
+        var mx = (sx + x) / 2 - uy * 14;
+        var my = (sy + y) / 2 + ux * 14;
+
+        var d = 'M ' + sx.toFixed(1) + ' ' + sy.toFixed(1) +
+          ' Q ' + mx.toFixed(1) + ' ' + my.toFixed(1) + ' ' + x.toFixed(1) + ' ' + y.toFixed(1);
+        var eco = document.createElementNS(NS, 'path');
+        eco.setAttribute('d', d);
+        eco.setAttribute('class', 'eco');
+        svg.appendChild(eco);
+        var path = document.createElementNS(NS, 'path');
+        path.setAttribute('d', d);
+        svg.appendChild(path);
+      });
+    }
+
+    trazar();
+    var tOrb;
+    window.addEventListener('resize', function () {
+      clearTimeout(tOrb);
+      tOrb = setTimeout(trazar, 150);
+    });
+  }
+
+  /* --- lámina --------------------------------------------------------- */
+  /* --- gotas de pigmento --------------------------------------------- */
+  document.querySelectorAll('canvas.gota').forEach(function (cv) {
+    var q = Arte.preparar(cv);
+    var color = cv.getAttribute('data-color') || '#1D0F44';
+    var seed = parseInt(cv.getAttribute('data-seed') || '1', 10);
+    Arte.mancha(q.ctx, {
+      x: q.w / 2, y: q.h / 2, r: Math.min(q.w, q.h) * 0.40,
+      color: color, seed: seed
+    });
+  });
+
+  /* --- huella de fondo de la portada --------------------------------- */
+  var fondoHuellaCv = document.getElementById('fondo-huella');
+  if (fondoHuellaCv) {
+    var pintarFondoHuella = function () { Arte.fondoHuella(fondoHuellaCv, 5); };
+    requestAnimationFrame(function () { requestAnimationFrame(pintarFondoHuella); });
+    window.addEventListener('resize', pintarFondoHuella);
+  }
+
+  var arte = document.getElementById('arte-clones');
+  if (arte) {
+    var pintado = false;
+    function pintarArte() {
+      Arte.laminasHuella(arte, 11);
+      pintado = true;
+    }
+    requestAnimationFrame(function () { requestAnimationFrame(pintarArte); });
+    window.addEventListener('resize', function () { if (pintado) pintarArte(); });
+  }
+
+  /* --- modal ---------------------------------------------------------- */
+  var velo = document.getElementById('velo');
+  var dialogo = velo.querySelector('.dialogo');
+  var sello = document.getElementById('sello');
+  var disparador = null;
+
+  function abrir(btn) {
+    disparador = btn;
+    sello.hidden = true;
+    velo.hidden = false;
+    document.body.style.overflow = 'hidden';
+    var primera = dialogo.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (primera) primera.focus();
+  }
+  function cerrar() {
+    velo.hidden = true;
+    document.body.style.overflow = '';
+    if (disparador) disparador.focus();
+  }
+
+  document.querySelectorAll('[data-abrir]').forEach(function (b) {
+    b.addEventListener('click', function () { abrir(b); });
+  });
+  document.querySelectorAll('[data-cerrar]').forEach(function (b) {
+    b.addEventListener('click', cerrar);
+  });
+  velo.addEventListener('click', function (e) { if (e.target === velo) cerrar(); });
+
+  document.addEventListener('keydown', function (e) {
+    if (velo.hidden) return;
+    if (e.key === 'Escape') { cerrar(); return; }
+    if (e.key === 'Tab') {
+      var foco = dialogo.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (!foco.length) return;
+      var primero = foco[0], ultimo = foco[foco.length - 1];
+      if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+    }
+  });
+
+  document.querySelectorAll('[data-opcion]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('[data-opcion]').forEach(function (o) { o.setAttribute('aria-pressed', 'false'); });
+      b.setAttribute('aria-pressed', 'true');
+      sello.hidden = false;
+      sello.textContent = '¡Por eso necesitas blindar tu identidad digital!';
+    });
+  });
+})();
+</script>
+</body>
+</html>

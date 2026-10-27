@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+body{margin:0;background:#F7F1E4;font-family:system-ui;display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px}
+figure{margin:0}
+canvas{display:block;width:100%;aspect-ratio:4/3;background:#FCF8EE;border-radius:4px 18px 5px 20px;box-shadow:0 10px 24px -18px rgba(29,15,68,.5)}
+figcaption{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#5B4B7E;padding:6px 2px}
+</style></head><body>
+<figure><canvas data-p="clones"></canvas><figcaption>01 clones</figcaption></figure>
+<figure><canvas data-p="firma"></canvas><figcaption>02 firma</figcaption></figure>
+<figure><canvas data-p="dieciseis"></canvas><figcaption>03 dieciseis</figcaption></figure>
+<figure><canvas data-p="cuatro"></canvas><figcaption>04 cuatro pasos</figcaption></figure>
+<figure><canvas data-p="visibilidad"></canvas><figcaption>05 visibilidad</figcaption></figure>
+<figure><canvas data-p="archivo"></canvas><figcaption>06 archivo</figcaption></figure>
+<figure><canvas data-p="red"></canvas><figcaption>07 red</figcaption></figure>
+<figure><canvas data-p="fusion"></canvas><figcaption>08 fusion</figcaption></figure>
+<script src="../src/arte/art.js"></script>
+<script src="../src/arte/placas.js"></script>
+<script>
+document.querySelectorAll('canvas[data-p]').forEach(function(c){ Placas.pintar(c.getAttribute('data-p'), c); });
+</script>
+</body></html>
+
