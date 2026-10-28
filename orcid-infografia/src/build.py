@@ -19,9 +19,13 @@ SRC = RAIZ / "src"
 ASSETS = RAIZ / "assets"
 
 FUENTES = [
-    ("Fraunces", "normal", ASSETS / "fonts" / "fraunces-variable.woff2"),
-    ("Fraunces", "italic", ASSETS / "fonts" / "fraunces-italic-variable.woff2"),
-    ("Outfit", "normal", ASSETS / "fonts" / "outfit-variable.woff2"),
+    ("Fraunces", "normal", 600, ASSETS / "fonts" / "estaticas" / "fraunces-600.woff2"),
+    ("Fraunces", "normal", 700, ASSETS / "fonts" / "estaticas" / "fraunces-700.woff2"),
+    ("Fraunces", "italic", 300, ASSETS / "fonts" / "estaticas" / "fraunces-300-italic.woff2"),
+    ("Fraunces", "italic", 400, ASSETS / "fonts" / "estaticas" / "fraunces-400-italic.woff2"),
+    ("Outfit", "normal", 400, ASSETS / "fonts" / "estaticas" / "outfit-400.woff2"),
+    ("Outfit", "normal", 500, ASSETS / "fonts" / "estaticas" / "outfit-500.woff2"),
+    ("Outfit", "normal", 600, ASSETS / "fonts" / "estaticas" / "outfit-600.woff2"),
 ]
 
 RE_CSS_JS = re.compile(r"/\* EDITOR:INICIO \*/.*?/\* EDITOR:FIN \*/", re.S)
@@ -30,12 +34,12 @@ RE_HTML = re.compile(r"<!-- EDITOR:INICIO -->.*?<!-- EDITOR:FIN -->", re.S)
 
 def facades() -> str:
     trozos: list[str] = []
-    for familia, estilo, ruta in FUENTES:
+    for familia, estilo, peso, ruta in FUENTES:
         datos = base64.b64encode(ruta.read_bytes()).decode("ascii")
         trozos.append(
-            "@font-face{font-family:%s;font-style:%s;font-weight:300 900;"
+            "@font-face{font-family:%s;font-style:%s;font-weight:%d;"
             "font-display:block;src:url(data:font/woff2;base64,%s) format('woff2')}"
-            % (familia, estilo, datos)
+            % (familia, estilo, peso, datos)
         )
     return "\n".join(trozos)
 
