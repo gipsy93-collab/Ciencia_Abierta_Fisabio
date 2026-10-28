@@ -8,13 +8,22 @@ Guía interactiva del taller **«Identificador único del personal investigador.
 
 ## Estado
 
-**v1.0 · cerrada y verificada.** Muestra de diseño aprobada (v0.3) y pieza completa construida encima de ella.
+**v2.0 · infografía de una sola lámina.** Rehecha sobre la distribución del ejemplo de Genially que pasó Gipsy (`Infografía Conectores Akihabara`): título arriba, anillo de ocho botones circulares alrededor del identificador y subtítulo abajo; cada botón abre su ventana con el detalle. La v1.0 (página larga de ocho secciones) queda como hito.
 
-- `index.html` — publicable, 327 KB, autocontenida (fuentes, logo y arte incrustados; **cero peticiones externas**).
-- `editor.html` — 333 KB, con editor de textos y descarga de la versión final.
+- `index.html` — publicable, 324 KB, autocontenida (fuentes, logo y arte incrustados; **cero peticiones externas**).
+- `editor.html` — 329 KB, con editor de textos y descarga de la versión final.
 - `poster.html` + `boletin/crea-tu-orcid-facil-1080x1920.png` — cartel estático para el boletín.
-- Verificación: `python src/verificar.py` → **43/43** comprobaciones (consola limpia, 3 anchos sin desbordamiento, 8 láminas pintadas, 4 interacciones, editor y contraste AA).
+- Verificación: `python src/verificar.py` → **117** comprobaciones (consola limpia, 3 anchos sin desbordamiento, 8 nodos, 8 ventanas, 8 láminas pintadas, enlaces directos, las 4 interacciones, teclado y contraste AA).
 - `muestra.html` — muestra de diseño aprobada (v0.3), se conserva como hito.
+
+## Distribución
+
+- **Lámina fija de 1080 × 1620** (2:3) escalada para caber en la ventana, sin scroll.
+- **Ocho botones circulares** repartidos en anillo (radio 35 % de la órbita) con el número en serif itálica y la etiqueta dentro; conectores punteados con el medallón ORCID y anillo graduado de 72 marcas.
+- **Cada botón abre una ventana** (ficha) con cabecera (número, marca, título), lámina a la derecha y el texto, la cita, la lista y su interacción. Cierre con X, `Esc` o clic en el velo; flechas ← → para pasar de una a otra; `#n01`…`#n08` como enlace directo.
+- **En móvil** (< 760 px) el anillo pasa a lista de ocho conexiones con el medallón arriba; la ventana ocupa la pantalla y la X queda fija.
+- Las cuatro interacciones viven dentro de su ventana (ya no hay modal aparte).
+
 
 ## Estructura
 
@@ -33,7 +42,7 @@ orcid-infografia/
     template.html       HTML + CSS + JS de la pieza
     textos.json         overrides de textos incrustados al compilar
     build.py            genera index.html, editor.html y poster.html
-    verificar.py        Playwright: 43 comprobaciones
+    verificar.py        Playwright: 117 comprobaciones
     poster.html         fuente del cartel
     poster.py           render del PNG
     arte/
@@ -103,9 +112,9 @@ Deterministas por semilla: el mismo dibujo en cada carga y en cada dispositivo.
 
 ## Diseño y accesibilidad
 
-- Portada: logo ORCID centrado, anillo graduado de 72 marcas, huella de fondo y ocho nodos con conectores punteados; en móvil pasa a una espina vertical con la lista de conexiones.
+- Lámina: título centrado, medallón ORCID con anillo graduado de 72 marcas y ocho botones circulares en anillo; en móvil pasa a lista de conexiones con el medallón arriba.
 - Contraste AA verificado: texto verde 4.66, sello rojo 5.85, tinta 15.50, tinta suave 6.78.
-- Teclado: foco visible, modal con trampa de foco y `Escape`, enlaces con `aria-label`.
+- Teclado: foco visible, ventana con trampa de foco, `Escape` cierra y ← → cambian de conexión; los nodos llevan `aria-label` y `aria-expanded`.
 - `prefers-reduced-motion` desactiva animaciones; sin scroll horizontal a 390/768/1440.
 - Impresión: oculta la navegación y el fondo animado.
 
