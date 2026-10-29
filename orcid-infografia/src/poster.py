@@ -25,7 +25,7 @@ def main() -> int:
         errores = []
         pg.on("console", lambda m: errores.append(m.text) if m.type == "error" else None)
         pg.on("pageerror", lambda e: errores.append(str(e)))
-        pg.goto(url, wait_until="load")
+        pg.goto(url + "?render=1", wait_until="load")
         pg.evaluate("document.fonts.ready")
         pg.wait_for_timeout(900)
         pg.screenshot(path=str(destino), full_page=True)

@@ -52,6 +52,15 @@ def logo() -> str:
     return svg
 
 
+def logo_fisabio() -> str:
+    """Lockup Fundació Fisabio + GVA (convivència), sin ids duplicados."""
+    svg = (ASSETS / "logo-fisabio-gva.svg").read_text(encoding="utf-8")
+    svg = re.sub(r"<\?xml[^>]*\?>", "", svg).strip()
+    svg = re.sub(r"\sid=\"[^\"]*\"", "", svg)
+    svg = svg.replace("<svg ", '<svg class="logo-fisabio-svg" aria-hidden="true" focusable="false" ')
+    return svg
+
+
 def textos() -> str:
     ruta = SRC / "textos.json"
     if not ruta.exists():
@@ -74,8 +83,9 @@ def montar(con_editor: bool) -> str:
     html = html.replace("/*__PLACAS__*/", (SRC / "arte" / "placas.js").read_text(encoding="utf-8"))
     html = html.replace("__TEXTOS__", textos())
     html = html.replace("__LOGO__", logo())
+    html = html.replace("__LOGO_FISABIO__", logo_fisabio())
 
-    faltan = [m for m in ("__FUENTES__", "__ARTE__", "__PLACAS__", "__TEXTOS__", "__LOGO__") if m in html]
+    faltan = [m for m in ("__FUENTES__", "__ARTE__", "__PLACAS__", "__TEXTOS__", "__LOGO__", "__LOGO_FISABIO__") if m in html]
     if faltan:
         raise SystemExit("ERROR: marcadores sin sustituir: %s" % faltan)
 
@@ -85,13 +95,31 @@ def montar(con_editor: bool) -> str:
     return html
 
 
+def qr() -> str:
+    ruta = ASSETS / "qr-orcid.png"
+    if not ruta.exists():
+        raise SystemExit("ERROR: falta assets/qr-orcid.png (genera con python src/qr.py)")
+    datos = base64.b64encode(ruta.read_bytes()).decode("ascii")
+    return "data:image/png;base64,%s" % datos
+
+
+def html2canvas() -> str:
+    ruta = SRC / "vendor" / "html2canvas.min.js"
+    if not ruta.exists():
+        raise SystemExit("ERROR: falta src/vendor/html2canvas.min.js")
+    return ruta.read_text(encoding="utf-8")
+
+
 def montar_poster() -> str:
     html = (SRC / "poster.html").read_text(encoding="utf-8")
     html = html.replace("/*__FUENTES__*/", facades())
     html = html.replace("/*__ARTE__*/", (SRC / "arte" / "art.js").read_text(encoding="utf-8"))
     html = html.replace("/*__PLACAS__*/", (SRC / "arte" / "placas.js").read_text(encoding="utf-8"))
     html = html.replace("__LOGO__", logo())
-    faltan = [m for m in ("__FUENTES__", "__ARTE__", "__PLACAS__", "__LOGO__") if m in html]
+    html = html.replace("__LOGO_FISABIO__", logo_fisabio())
+    html = html.replace("__QR__", qr())
+    html = html.replace("/*__HTML2CANVAS__*/", html2canvas())
+    faltan = [m for m in ("__FUENTES__", "__ARTE__", "__PLACAS__", "__LOGO__", "__LOGO_FISABIO__", "__QR__", "__HTML2CANVAS__") if m in html]
     if faltan:
         raise SystemExit("ERROR: marcadores sin sustituir en el cartel: %s" % faltan)
     return html
