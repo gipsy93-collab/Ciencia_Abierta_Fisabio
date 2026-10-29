@@ -163,6 +163,13 @@ def main() -> int:
                 # 2 · fórmulas + copiar
                 pg.click('.nodo[data-ficha="n02"]')
                 pg.wait_for_timeout(500)
+                enlace = pg.evaluate("""() => {
+                    const a = document.querySelector('#f-n02 a.boton');
+                    return a ? {href: a.href, target: a.target, rel: a.rel} : null;
+                }""")
+                check(enlace and "fs-pe010-firmas-publicaciones.pdf" in enlace["href"]
+                      and enlace["target"] == "_blank" and "noopener" in (enlace["rel"] or ""),
+                      f"n02: enlace al procedimiento PE010 {enlace}")
                 check(not pg.is_visible("#formulas"), "fórmulas: el panel arranca cerrado")
                 pg.click('#f-n02 [data-toggle="formulas"]')
                 check(pg.is_visible("#formulas"), "fórmulas: despliega el panel")
@@ -269,11 +276,10 @@ def main() -> int:
 
         # ---- contraste -------------------------------------------------
         pares = [
-            ("texto verde sobre papel", "#3F7A0C", "#F7F1E4"),
-            ("sello sobre papel alto", "#C4002E", "#FCF8EE"),
+            ("marca de seccion sobre papel", "#1D0F44", "#F7F1E4"),
+            ("sello sobre papel alto", "#1D0F44", "#FCF8EE"),
             ("tinta sobre papel", "#1D0F44", "#F7F1E4"),
             ("tinta suave sobre papel", "#5B4B7E", "#F7F1E4"),
-            ("rojo de texto sobre papel alto", "#C4002E", "#FCF8EE"),
         ]
         for etiqueta, a, b in pares:
             r = contraste(a, b)

@@ -15,13 +15,15 @@
   --tinta:#1D0F44;
   --tinta-suave:#5B4B7E;
   --coral:#FF647D;
-  --rojo:#EB003B;
-  --rojo-texto:#C4002E;
+  --rojo:#FF647D;
+  --rojo-texto:#1D0F44;
   --orcid:#A6CE39;
-  --verde:#63AA16;
-  --verde-texto:#3F7A0C;
+  --verde:#BFBEE0;
+  --verde-texto:#1D0F44;
   --indigo:#3B2A6B;
   --ocre:#E0B071;
+  /* paleta: manual d'identitat corporativa Fisabio (p. 24) — primario #1d0f44, lila #bfbee0,
+     celeste #c9e1ea, coral #ff647d; el verde ORCID #a6ce39 queda solo en el logo/medallón */
   --serif:Fraunces,Georgia,'Times New Roman',serif;
   --sans:Outfit,system-ui,-apple-system,'Segoe UI',sans-serif;
   --lienzo-w:1080px;
@@ -44,10 +46,10 @@ a{color:inherit}
 #fondo{position:fixed;inset:0;width:100%;height:100%;z-index:-3}
 .aguadas{position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden}
 .aguadas i{position:absolute;display:block;border-radius:50%;filter:blur(58px);mix-blend-mode:multiply;opacity:.5}
-.aguadas .a1{width:52vw;height:52vw;left:-14vw;top:-16vw;background:radial-gradient(circle,rgba(166,206,57,.5),rgba(166,206,57,0) 68%)}
+.aguadas .a1{width:52vw;height:52vw;left:-14vw;top:-16vw;background:radial-gradient(circle,rgba(201,225,234,.55),rgba(166,206,57,0) 68%)}
 .aguadas .a2{width:60vw;height:60vw;right:-22vw;top:6vw;background:radial-gradient(circle,rgba(255,100,125,.34),rgba(255,100,125,0) 66%)}
 .aguadas .a3{width:54vw;height:54vw;left:18vw;bottom:-30vw;background:radial-gradient(circle,rgba(59,42,107,.28),rgba(59,42,107,0) 68%)}
-.aguadas .a4{width:34vw;height:34vw;right:6vw;bottom:-6vw;background:radial-gradient(circle,rgba(224,176,113,.3),rgba(224,176,113,0) 66%)}
+.aguadas .a4{width:34vw;height:34vw;right:6vw;bottom:-6vw;background:radial-gradient(circle,rgba(191,190,224,.35),rgba(224,176,113,0) 66%)}
 
 /* ---- escenario y lámina -------------------------------------------- */
 .escenario{position:fixed;inset:0;overflow:hidden}
@@ -62,9 +64,14 @@ a{color:inherit}
 
 .cabeza{text-align:center}
 .barra{
-  display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0;
   font-size:19px;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-suave)
 }
+.logo-fisabio{flex:0 0 auto;display:inline-flex}
+.logo-fisabio svg{height:40px;width:auto;display:block}
+.barra b{white-space:nowrap}
+.pie-marca{margin-top:16px;opacity:.92}
+.pie-marca svg{height:34px;width:auto;display:block;margin-inline:auto}
 .barra b{font-weight:500;letter-spacing:.16em}
 .barra .version{display:inline-flex;align-items:center;gap:9px;letter-spacing:.12em}
 .barra .version::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--rojo)}
@@ -80,7 +87,7 @@ h1{
 h1 em{
   display:inline-block;font-style:italic;font-weight:400;
   padding-inline:.04em .08em;padding-bottom:.08em;
-  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 24' preserveAspectRatio='none'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='.6'/%3E%3C/filter%3E%3Cg filter='url(%23b)'%3E%3Cpath d='M4 16C56 9 118 19 168 13c36-4 82-2 128-5' fill='none' stroke='%23FF647D' stroke-width='7' stroke-linecap='round' opacity='.38'/%3E%3Cpath d='M10 20C64 13 126 22 176 16c32-4 76-2 118-6' fill='none' stroke='%23EB003B' stroke-width='2.2' stroke-linecap='round' opacity='.20'/%3E%3C/g%3E%3C/svg%3E");
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 24' preserveAspectRatio='none'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='.6'/%3E%3C/filter%3E%3Cg filter='url(%23b)'%3E%3Cpath d='M4 16C56 9 118 19 168 13c36-4 82-2 128-5' fill='none' stroke='%23FF647D' stroke-width='7' stroke-linecap='round' opacity='.38'/%3E%3Cpath d='M10 20C64 13 126 22 176 16c32-4 76-2 118-6' fill='none' stroke='%23EACCCE' stroke-width='2.2' stroke-linecap='round' opacity='.20'/%3E%3C/g%3E%3C/svg%3E");
   background-repeat:no-repeat;background-size:102% .30em;background-position:-1% 100%
 }
 
@@ -88,7 +95,7 @@ h1 em{
 .orbita{position:relative;width:100%;height:100%;min-height:0;margin:0}
 .hilos{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
 .hilos path{fill:none;stroke:rgba(29,15,68,.6);stroke-width:1.7;stroke-linecap:round;stroke-dasharray:2.6 5}
-.hilos path.eco{stroke:rgba(235,0,59,.22);stroke-width:1.2;stroke-dasharray:1.2 6;transform:translate(1.7px,1.7px)}
+.hilos path.eco{stroke:rgba(255,100,125,.25);stroke-width:1.2;stroke-dasharray:1.2 6;transform:translate(1.7px,1.7px)}
 .hilos .anillo{fill:none;stroke:rgba(29,15,68,.13);stroke-width:1.2;stroke-dasharray:1.2 10}
 .hilos .graduacion{stroke:rgba(29,15,68,.2);stroke-width:1;stroke-linecap:round}
 
@@ -128,8 +135,8 @@ h1 em{
   color:rgba(29,15,68,.62);transition:color .24s
 }
 .nodo .etiqueta{
-  font-size:25px;font-weight:600;line-height:1.1;letter-spacing:.06em;text-transform:uppercase;
-  color:#3D2D63;max-width:192px;text-wrap:balance;transition:color .24s
+  font-size:22px;font-weight:600;line-height:1.12;letter-spacing:.05em;text-transform:uppercase;
+  color:#3D2D63;max-width:190px;text-wrap:balance;transition:color .24s
 }
 .nodo:hover,.nodo:focus-visible{
   transform:translate(-50%,-50%) scale(1.055);
@@ -137,7 +144,7 @@ h1 em{
 }
 .nodo:hover .punto,.nodo:focus-visible .punto{color:var(--rojo)}
 .nodo:hover .etiqueta,.nodo:focus-visible .etiqueta{color:var(--rojo-texto)}
-.nodo[aria-expanded="true"]{border-color:var(--verde-texto);background:radial-gradient(circle at 34% 26%,#FFFDF7 0%,#F3EDD6 60%,#E8F0CE 100%)}
+.nodo[aria-expanded="true"]{border-color:var(--verde-texto);background:radial-gradient(circle at 34% 26%,#FFFDF7 0%,#F3EDD6 60%,#E4E2F0 100%)}
 
 /* ---- pie de la lámina ---------------------------------------------- */
 .pie-lienzo{padding-top:6px;text-align:center}
@@ -171,7 +178,7 @@ body.con-velo{overflow:hidden}
   position:relative;width:min(780px,100%);max-height:calc(100dvh - 44px);overflow:auto;overscroll-behavior:contain;
   padding:clamp(24px,4vw,42px);
   background:
-    radial-gradient(120% 100% at 100% 0%,rgba(166,206,57,.16),rgba(166,206,57,0) 60%),
+    radial-gradient(120% 100% at 100% 0%,rgba(201,225,234,.3),rgba(201,225,234,0) 60%),
     radial-gradient(100% 90% at 0% 100%,rgba(255,100,125,.14),rgba(255,100,125,0) 58%),#FCF8EE;
   border:1px solid rgba(29,15,68,.2);border-radius:5px 28px 6px 24px;
   box-shadow:0 50px 90px -50px rgba(10,4,30,.9);
@@ -238,14 +245,14 @@ blockquote footer{margin-top:6px;font-family:var(--sans);font-style:normal;font-
 .boton:hover{border-color:var(--rojo)}
 .boton:hover::before{opacity:1}
 .boton:hover span{transform:translateX(4px)}
-.boton.primario{background:rgba(166,206,57,.22);border-color:var(--verde-texto)}
+.boton.primario{background:rgba(191,190,224,.35);border-color:var(--verde-texto)}
 .nota{margin:14px 0 0;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-suave)}
 
 /* ---- paneles e interacciones --------------------------------------- */
 .panel{
   margin:16px 0 0;padding:18px;border:1px solid rgba(29,15,68,.2);
   border-radius:4px 18px 5px 16px;
-  background:radial-gradient(120% 100% at 100% 0%,rgba(166,206,57,.14),rgba(166,206,57,0) 60%),rgba(255,255,255,.5)
+  background:radial-gradient(120% 100% at 100% 0%,rgba(201,225,234,.35),rgba(166,206,57,0) 60%),rgba(255,255,255,.5)
 }
 .panel[hidden]{display:none}
 .panel .titulo{margin:0 0 12px;font-family:var(--serif);font-weight:600;font-size:1.12rem;letter-spacing:-.01em}
@@ -269,7 +276,7 @@ blockquote footer{margin-top:6px;font-family:var(--sans);font-style:normal;font-
 }
 .opciones button::after{content:"→";font-size:15px;opacity:.45;transition:transform .2s,opacity .2s}
 .opciones button:hover{border-color:var(--rojo);background:rgba(255,255,255,.85);transform:translateY(-1px)}
-.opciones button[aria-pressed="true"]{border-color:var(--verde-texto);background:rgba(166,206,57,.16)}
+.opciones button[aria-pressed="true"]{border-color:var(--verde-texto);background:rgba(191,190,224,.28)}
 .aviso{margin:14px 0 0;font-size:14px;line-height:1.55;color:#33265A;min-height:1.5em}
 .aviso b{font-weight:600}
 
@@ -343,7 +350,10 @@ body.editando [data-edit]:focus{outline:2px solid var(--rojo);background:rgba(25
     display:block;padding:22px 18px 30px
   }
   .barra{font-size:10px;letter-spacing:.1em}
+  .barra b{white-space:normal}
   .barra .version{display:none}
+  .logo-fisabio svg{height:30px}
+  .pie-marca svg{height:26px}
   .kicker{margin-top:18px;font-size:11px}
   h1{font-size:clamp(2rem,8.4vw,2.5rem);line-height:1.04}
   .orbita{margin-top:22px;height:auto;min-height:0}
@@ -405,7 +415,7 @@ body.editando [data-edit]:focus{outline:2px solid var(--rojo);background:rgba(25
 <main class="escenario" id="escenario">
   <div class="lienzo" id="lienzo">
     <header class="cabeza">
-      <p class="barra"><b>Unidad de Ciencia Abierta · Fisabio</b><span class="version">Guía interactiva</span></p>
+      <p class="barra"><span class="logo-fisabio" aria-hidden="true">__LOGO_FISABIO__</span><b>Unidad de Ciencia Abierta · Fisabio</b><span class="version">Guía interactiva</span></p>
       <p class="kicker">Taller de identidad digital <span>·</span> ORCID</p>
       <h1><span data-edit="portada.titulo">Crea tu ORCID</span> <em data-edit="portada.titulo2">fácil</em></h1>
     </header>
@@ -422,7 +432,7 @@ body.editando [data-edit]:focus{outline:2px solid var(--rojo);background:rgba(25
     </div>
 
     <footer class="pie-lienzo">
-      <p class="lede" data-edit="portada.lede">Guía de supervivencia para gente que investiga: qué es ORCID, cómo se crea en tres minutos y cómo dejar de perder citas por llamarte como otra persona.</p>
+      <p class="lede" data-edit="portada.lede">Guía de supervivencia para personal investigador: qué es ORCID, cómo se crea en tres minutos.</p>
       <div class="datos">
         <span data-edit="portada.d1">16 dígitos</span>
         <span data-edit="portada.d2">persistente</span>
@@ -430,6 +440,7 @@ body.editando [data-edit]:focus{outline:2px solid var(--rojo);background:rgba(25
       </div>
       <p class="pista"><b data-edit="portada.pista">Ocho conexiones</b> · cuatro pruebas · <span data-edit="portada.pista2">pulsa un nodo para abrirlo</span></p>
       <p class="credito">Basado en el taller «Identificador único del personal investigador. ORCID» · 12-11-2025</p>
+      <div class="pie-marca" aria-hidden="true">__LOGO_FISABIO__</div>
     </footer>
   </div>
 </main>
@@ -505,6 +516,7 @@ body.editando [data-edit]:focus{outline:2px solid var(--rojo);background:rgba(25
       </ul>
       <p class="nota" data-edit="n02.fnota">El orden importa: primero el servicio o centro, después FISABIO, ciudad y país.</p>
     </div>
+    <p><a class="boton" href="https://fisabio.san.gva.es/media/upload/arxius/servicios/ciencia-abierta/fs-pe010-firmas-publicaciones.pdf" target="_blank" rel="noopener"><span data-edit="n02.proc">Ver el procedimiento de firmas y publicaciones (PE010)</span> <span aria-hidden="true">↗</span></a></p>
     <p class="nota">Interacción 2 de 4 · fórmulas de firma</p>
     <nav class="ficha-nav" aria-label="Otras conexiones"></nav>
   </article>
@@ -532,8 +544,8 @@ body.editando [data-edit]:focus{outline:2px solid var(--rojo);background:rgba(25
     </ul>
     <div class="panel">
       <p class="titulo" data-edit="n03.ej.titulo">Así se ve un identificador</p>
-      <p style="margin:0;font-family:var(--serif);font-size:clamp(1.15rem,2vw,1.45rem);letter-spacing:.04em" data-edit="n03.ej.id">0000-0002-1825-0097</p>
-      <p class="nota" data-edit="n03.ej.nota">Ejemplo con un registro de prueba público.</p>
+      <p style="margin:0;font-family:var(--serif);font-size:clamp(1.15rem,2vw,1.45rem);letter-spacing:.04em" data-edit="n03.ej.id">0000-0002-0463-0101</p>
+      <p class="nota" data-edit="n03.ej.nota">Identificador de Álvaro Chiner, investigador de Fisabio, publicado con su autorización.</p>
     </div>
     <p class="nota">16 dígitos · un identificador para toda la carrera</p>
     <nav class="ficha-nav" aria-label="Otras conexiones"></nav>
@@ -599,7 +611,7 @@ body.editando [data-edit]:focus{outline:2px solid var(--rojo);background:rgba(25
       <span class="ficha-num" aria-hidden="true">06</span>
       <div>
         <p class="marca" data-edit="n06.marca">Gestión</p>
-        <h3 id="t-n06"><span data-edit="n06.t1">El perfil</span><br><em data-edit="n06.t2">no se queda quieto</em></h3>
+        <h3 id="t-n06"><span data-edit="n06.t1">El perfil</span><br><em data-edit="n06.t2">es dinámico</em></h3>
       </div>
     </header>
     <div class="marco">
@@ -613,7 +625,7 @@ body.editando [data-edit]:focus{outline:2px solid var(--rojo);background:rgba(25
       <li data-edit="n06.p3">Proyectos financiados y actividades.</li>
       <li data-edit="n06.p4">Obras: artículos, libros, ponencias, datos y software.</li>
     </ul>
-    <p class="nota" data-edit="n06.nota">Cada apartado se edita por separado y recuerda su propia visibilidad.</p>
+    <p class="nota" data-edit="n06.nota">Recuerda que tiene su propia visibilidad.</p>
     <nav class="ficha-nav" aria-label="Otras conexiones"></nav>
   </article>
 
@@ -767,14 +779,14 @@ window.TEXTOS_INICIALES = __TEXTOS__;
 
   /* ---- ocho conexiones ----------------------------------------------- */
   var conexiones = [
-    { n: '01', t: 'Clones', id: 'n01' },
-    { n: '02', t: 'Firma y filiación', id: 'n02' },
-    { n: '03', t: 'Qué es ORCID', id: 'n03' },
-    { n: '04', t: 'Cuatro pasos', id: 'n04' },
-    { n: '05', t: 'Visibilidad', id: 'n05' },
-    { n: '06', t: 'Gestión', id: 'n06' },
-    { n: '07', t: 'Piloto automático', id: 'n07' },
-    { n: '08', t: 'Duplicados', id: 'n08' }
+    { n: '01', t: 'El problema de los clones y los homónimos', id: 'n01' },
+    { n: '02', t: 'Cómo firmar y filiarte', id: 'n02' },
+    { n: '03', t: 'ORCID: tu iD científico', id: 'n03' },
+    { n: '04', t: 'Crear tu iD en 4 pasos', id: 'n04' },
+    { n: '05', t: 'Quién ve tus datos', id: 'n05' },
+    { n: '06', t: 'Perfil actualizado', id: 'n06' },
+    { n: '07', t: 'Automatizar mi perfil', id: 'n07' },
+    { n: '08', t: 'Fusionar cuentas', id: 'n08' }
   ];
 
   var svg = document.getElementById('hilos');
@@ -799,7 +811,7 @@ window.TEXTOS_INICIALES = __TEXTOS__;
     b.style.setProperty('--x', x.toFixed(2) + '%');
     b.style.setProperty('--y', y.toFixed(2) + '%');
     b.innerHTML = '<span class="punto" aria-hidden="true">' + c.n + '</span>' +
-                  '<span class="etiqueta">' + c.t + '</span>';
+                  '<span class="etiqueta" data-edit="' + c.id + '.chip">' + c.t + '</span>';
     capa.appendChild(b);
 
     posiciones.push({ x: x / 100, y: y / 100 });

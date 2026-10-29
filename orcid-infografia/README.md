@@ -12,8 +12,8 @@ Guía interactiva del taller **«Identificador único del personal investigador.
 
 - `index.html` — publicable, 324 KB, autocontenida (fuentes, logo y arte incrustados; **cero peticiones externas**).
 - `editor.html` — 329 KB, con editor de textos y descarga de la versión final.
-- `poster.html` + `boletin/crea-tu-orcid-facil-1080x1920.png` — cartel estático para el boletín.
-- Verificación: `python src/verificar.py` → **117** comprobaciones (consola limpia, 3 anchos sin desbordamiento, 8 nodos, 8 ventanas, 8 láminas pintadas, enlaces directos, las 4 interacciones, teclado y contraste AA).
+- `poster.html` + `boletin/crea-tu-orcid-facil-1080x1920.png` — cartel del boletín (anillo + QR), **editable en el navegador**.
+- Verificación: `python src/verificar.py` → **120** comprobaciones (consola limpia, 3 anchos sin desbordamiento, 8 nodos, 8 ventanas, 8 láminas pintadas, enlaces directos, las 4 interacciones, teclado y contraste AA).
 - `muestra.html` — muestra de diseño aprobada (v0.3), se conserva como hito.
 
 ## Distribución
@@ -42,8 +42,11 @@ orcid-infografia/
     template.html       HTML + CSS + JS de la pieza
     textos.json         overrides de textos incrustados al compilar
     build.py            genera index.html, editor.html y poster.html
-    verificar.py        Playwright: 117 comprobaciones
-    poster.html         fuente del cartel
+    verificar.py        Playwright: 120 comprobaciones
+    deck_pptx.py        PowerPoint navegable (solo local)
+    vendor/             html2canvas 1.4.1 (MIT) para exportar el cartel a PNG
+    poster.html         fuente del cartel (anillo + QR)
+    qr.py               genera el QR de la pieza (segno) → assets/qr-orcid.png
     poster.py           render del PNG
     arte/
       art.js            motor de acuarela puntillista (papel, aguada, huellas)
@@ -67,6 +70,7 @@ También se puede trabajar directamente sobre `src/template.html` (todo el conte
 
 ```powershell
 python src/build.py      # index.html + editor.html + poster.html
+python src/qr.py         # assets/qr-orcid.png (solo si cambia la URL)
 python src/poster.py     # boletin/crea-tu-orcid-facil-1080x1920.png
 python src/verificar.py  # comprobaciones + capturas
 ```
@@ -75,7 +79,7 @@ Requiere Playwright con el canal `chrome` (`pip install playwright`).
 
 ## Contenido y fidelidad
 
-Ocho nodos, mapeados a las diapositivas del taller:
+Ocho nodos, mapeados a las diapositivas del taller (rótulos del anillo: «El problema de los clones y los homónimos», «Cómo firmar y filiarte», «ORCID: tu iD científico», «Crear tu iD en 4 pasos», «Quién ve tus datos», «Perfil actualizado», «Automatizar mi perfil», «Fusionar cuentas»; editables con `n0X.chip`):
 
 | Nodo | Tema | Fuente | Interacción |
 |---|---|---|---|
@@ -89,7 +93,8 @@ Ocho nodos, mapeados a las diapositivas del taller:
 | 08 | Duplicados y cierre | 20, 25 | Enlaces de cierre |
 
 - Cita: Díaz-Redondo y Frías-Montoya, 2018, p. 12 (diapo 5).
-- Identificador de ejemplo: `0000-0002-1825-0097` (registro de prueba público, no de una persona real).
+- Identificador mostrado: `0000-0002-0463-0101` (Álvaro Chiner, Fisabio, con su autorización).
+- Marca: paleta corporativa del manual Fisabio (p. 24) y lockup GVA + Fundació Fisabio en cabecera y pie (`assets/logo-fisabio-gva.svg`).
 - **No se usa** el dato «87 % elige Todo el mundo»: no está en el taller (viene del guion del vídeo).
 - Las cuatro definiciones de visibilidad (todo el mundo / partes de confianza / solo yo) son la semántica estándar de ORCID; el taller solo enumera las opciones.
 
