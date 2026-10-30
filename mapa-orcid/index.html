@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa ORCID · FISABIO · cobertura y producción</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  :root{
+    --bg:#070b16; --panel:rgba(15,23,42,.72); --line:rgba(148,163,184,.18);
+    --txt:#e2e8f0; --muted:#94a3b8; --cyan:#22d3ee; --violet:#a78bfa; --rose:#fb7185; --amber:#fbbf24;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+    font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;overflow:hidden}
+  #app{display:flex;height:100vh}
+  #panel{width:390px;flex:0 0 390px;padding:22px 20px;overflow-y:auto;
+    background:linear-gradient(180deg,rgba(15,23,42,.92),rgba(7,11,22,.96));
+    border-right:1px solid var(--line);backdrop-filter:blur(14px)}
+  #panel::-webkit-scrollbar{width:6px}
+  #panel::-webkit-scrollbar-thumb{background:#1e293b;border-radius:3px}
+  h1{font-size:1.15rem;font-weight:700;margin:0 0 2px;letter-spacing:-.01em}
+  h1 span{color:var(--cyan)}
+  .sub{font-size:.72rem;color:var(--muted);margin-bottom:18px;line-height:1.45}
+  .block{margin-bottom:18px}
+  .block h2{font-size:.62rem;text-transform:uppercase;letter-spacing:.14em;
+    color:var(--muted);margin:0 0 9px;font-weight:600}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:.68rem;padding:5px 10px;border-radius:999px;cursor:pointer;
+    border:1px solid var(--line);color:var(--muted);background:transparent;
+    transition:all .18s ease;user-select:none}
+  .chip:hover{border-color:#334155;color:var(--txt)}
+  .chip.on{background:linear-gradient(135deg,rgba(34,211,238,.18),rgba(167,139,250,.18));
+    border-color:rgba(34,211,238,.5);color:#e0f2fe;box-shadow:0 0 14px rgba(34,211,238,.12)}
+  .toggle{display:flex;align-items:center;gap:9px;font-size:.74rem;color:var(--muted);
+    padding:5px 0;cursor:pointer}
+  .toggle input{accent-color:var(--cyan);width:14px;height:14px}
+  .legend-row{display:flex;align-items:center;gap:8px;font-size:.64rem;color:var(--muted);margin-top:6px}
+  .bar{height:7px;border-radius:4px;flex:1;background:linear-gradient(90deg,#38bdf8,#818cf8,#c084fc,#fb7185)}
+  .dots{display:flex;align-items:flex-end;gap:8px;margin-top:8px;height:44px}
+  .dot-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.58rem;color:var(--muted)}
+  .dot{border-radius:50%;background:rgba(148,163,184,.35);border:1px solid rgba(148,163,184,.5)}
+  .note{font-size:.68rem;line-height:1.55;color:#cbd5e1;background:rgba(30,41,59,.45);
+    border:1px solid var(--line);border-left:3px solid var(--rose);border-radius:8px;padding:11px 13px}
+  .note b{color:#fda4af}
+  .note .ex{margin-top:7px;font-family:ui-monospace,monospace;font-size:.61rem;
+    color:var(--muted);line-height:1.55}
+  .note.amber{border-left-color:var(--amber)}
+  .note.amber b{color:#fcd34d}
+  .foot{font-size:.58rem;color:#475569;line-height:1.55;margin-top:16px;
+    border-top:1px solid var(--line);padding-top:11px}
+  #map-container{flex:1;position:relative;background:
+    radial-gradient(ellipse at 50% 40%,#0c1526 0%,#070b16 70%)}
+  svg{width:100%;height:100%;display:block;cursor:grab}
+  svg:active{cursor:grabbing}
+  .province{fill:#0e1729;stroke:#1e3355;stroke-width:1.1}
+  .bubble{cursor:pointer;transition:filter .2s}
+  .bubble:hover{filter:brightness(1.35) drop-shadow(0 0 10px currentColor)}
+  .label{font-size:9px;fill:#cbd5e1;pointer-events:none;opacity:0;transition:opacity .2s;
+    paint-order:stroke;stroke:#070b16;stroke-width:3px;stroke-linejoin:round}
+  .label.always{opacity:.7}
+  .bubble-group:hover .label{opacity:1}
+  #tooltip{position:absolute;pointer-events:none;opacity:0;transition:opacity .16s;
+    background:rgba(10,16,30,.97);border:1px solid rgba(34,211,238,.35);
+    border-radius:11px;padding:13px 15px;min-width:260px;max-width:320px;
+    box-shadow:0 18px 44px rgba(0,0,0,.6),0 0 0 1px rgba(34,211,238,.08);backdrop-filter:blur(10px);z-index:10}
+  #tooltip .t-name{font-size:.8rem;font-weight:700;color:#f1f5f9;line-height:1.3;margin-bottom:2px}
+  #tooltip .t-type{font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:10px}
+  #tooltip table{width:100%;border-collapse:collapse;font-size:.66rem}
+  #tooltip td{padding:3px 0;color:var(--muted)}
+  #tooltip td:last-child{text-align:right;color:#f1f5f9;font-weight:600;font-variant-numeric:tabular-nums}
+  #tooltip .sep td{border-top:1px solid rgba(148,163,184,.15);padding-top:7px}
+  #tooltip .warn{margin-top:8px;font-size:.61rem;color:#fda4af;line-height:1.4;
+    border-top:1px solid rgba(251,113,133,.2);padding-top:7px}
+  #tooltip .t-coord{font-size:.55rem;color:#64748b;margin-top:8px;
+    border-top:1px solid rgba(148,163,184,.12);padding-top:6px;line-height:1.4}
+  #hint{position:absolute;bottom:14px;right:16px;font-size:.6rem;color:#334155;letter-spacing:.03em}
+  @media(max-width:860px){#panel{display:none}}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="panel">
+    <h1>Mapa <span>ORCID</span> · FISABIO</h1>
+    <div class="sub">Cobertura del identificador y producción visible.<br>1.087 personas · 31 centros · dos vías: ORCID y portal (CRIS).</div>
+
+    <div class="block">
+      <h2>Relleno = cobertura</h2>
+      <div class="chips" id="color-chips">
+        <div class="chip on" data-k="cobertura_declarada_pct">ORCID declarada</div>
+        <div class="chip" data-k="cobertura_ampliada_pct">ORCID ampliada</div>
+        <div class="chip" data-k="cobertura_produccion_pct">Producción</div>
+      </div>
+      <div class="legend-row"><span id="legend-min">0 %</span><div class="bar" id="legend-bar"></div><span id="legend-max">100 %</span></div>
+    </div>
+
+    <div class="block">
+      <h2>Tamaño = mediana de obras</h2>
+      <div class="chips" id="size-chips">
+        <div class="chip" data-k="mediana_orcid">Mediana ORCID</div>
+        <div class="chip on" data-k="mediana_union">Mediana unión</div>
+      </div>
+      <div class="dots" id="size-legend"></div>
+    </div>
+
+    <div class="block">
+      <h2>Filtros</h2>
+      <label class="toggle"><input type="checkbox" id="f-small" checked> Ocultar centros con &lt; 5 personas con producción</label>
+      <label class="toggle"><input type="checkbox" id="f-limbo" checked> Mostrar «sin centro»</label>
+    </div>
+
+    <div class="block">
+      <h2>El anillo</h2>
+      <div class="legend-row">
+        <span style="width:10px;height:10px;border-radius:50%;border:2px solid var(--cyan);display:inline-block"></span>
+        <span>arco cian = cobertura de producción</span>
+      </div>
+      <div class="legend-row" style="margin-top:4px">
+        <span style="width:10px;height:10px;border-radius:50%;border:1px solid #334155;display:inline-block"></span>
+        <span>el hueco del anillo = lo que el ORCID no ve</span>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>Dos medianas, no una</h2>
+      <div class="note">
+        La mediana ORCID está <b>inflada por selección</b>: solo cuenta a quienes tienen ORCID, que suelen ser los más productivos. En <b>Vinalopó</b> era 53; al incluir las publicaciones del portal, la mediana unión baja a <b>8</b>.
+        <div class="ex">Vinalopó · ORCID: 7 personas · mediana 53<br>Vinalopó · unión: 18 personas · mediana 8</div>
+      </div>
+      <div class="note amber" style="margin-top:9px">
+        <b>La brecha es el hallazgo:</b> Elda tiene 24 % de cobertura ORCID pero <b>70 % de producción</b>; Vinalopó, 32 % y 64 %. El CRIS ve investigadores que el ORCID no identifica.
+      </div>
+    </div>
+
+    <div class="foot">
+      Fuente: fichas del portal FISABIO + ORCID declarado + ORCID inverso (25 confirmados por DOI, 6 por nombre+afiliación) + publicaciones del portal + OpenAlex.<br>
+      Mediana unión = personas con obras por cualquiera de las dos vías · 30-10-2026.<br>
+      El punto cian marca la coordenada exacta; la burbuja solo se separa cuando dos centros coinciden.
+    </div>
+  </aside>
+
+  <main id="map-container">
+    <svg id="map"></svg>
+    <div id="tooltip"></div>
+    <div id="hint">rueda = zoom · arrastrar = mover · clic en burbuja = fijar</div>
+  </main>
+</div>
+
+<script>
+const DATA = {"generado": "2026-10-30", "fuente": "roster portal FISABIO + ORCID declarado + ORCID inverso + publicaciones del portal + OpenAlex", "nota_metodo": "Cobertura declarada = ORCID en la ficha. Ampliada = declarada + recuperada por solape de DOI/nombre+afiliación. Producción = personas con obras por ORCID o por el portal. Mediana ORCID = solo personas con obras vía ORCID. Mediana unión = personas con obras por cualquiera de las dos vías; corrige el sesgo de selección del ORCID.", "centros": [{"centro": "(sin centro)", "tipo": "sin_centro", "total_roster": 188, "orcid_declarado": 91, "orcid_recuperado": 6, "orcid_ampliado": 97, "cobertura_declarada_pct": 48.4, "cobertura_ampliada_pct": 51.6, "con_publicaciones_portal": 143, "con_produccion": 148, "cobertura_produccion_pct": 78.7, "brecha_pct": 30.3, "n_efectivo_orcid": 76, "mediana_orcid": 23.5, "media_orcid": 45.9, "total_obras_orcid": 3122, "n_efectivo_union": 148, "mediana_union": 8.0, "media_union": 28.7, "total_obras_union": 3643, "pares_orcid": 3492, "pares_portal": 2111, "pares_union": 4250, "obras_orcid": 3122, "obras_portal": 1659, "obras_union": 3643, "lat": 39.4699, "lon": -0.3763, "coord_fuente": "simbólico: València (sin adscripción en el portal)"}, {"centro": "HOSPITAL GENERAL UNIVERSITARIO DE ELCHE", "tipo": "hospital", "total_roster": 155, "orcid_declarado": 80, "orcid_recuperado": 5, "orcid_ampliado": 85, "cobertura_declarada_pct": 51.6, "cobertura_ampliada_pct": 54.8, "con_publicaciones_portal": 121, "con_produccion": 123, "cobertura_produccion_pct": 79.4, "brecha_pct": 27.7, "n_efectivo_orcid": 57, "mediana_orcid": 42, "media_orcid": 68, "total_obras_orcid": 2733, "n_efectivo_union": 123, "mediana_union": 16, "media_union": 38.8, "total_obras_union": 3208, "pares_orcid": 3876, "pares_portal": 2361, "pares_union": 4777, "obras_orcid": 2733, "obras_portal": 1331, "obras_union": 3208, "lat": 38.2597839, "lon": -0.6854275, "coord_fuente": "Nominatim: Hospital General Universitari d'Elx"}, {"centro": "FISABIO SALUD PÚBLICA", "tipo": "fisabio", "total_roster": 143, "orcid_declarado": 114, "orcid_recuperado": 8, "orcid_ampliado": 122, "cobertura_declarada_pct": 79.7, "cobertura_ampliada_pct": 85.3, "con_publicaciones_portal": 134, "con_produccion": 135, "cobertura_produccion_pct": 94.4, "brecha_pct": 14.7, "n_efectivo_orcid": 104, "mediana_orcid": 47.5, "media_orcid": 84.8, "total_obras_orcid": 5613, "n_efectivo_union": 135, "mediana_union": 40, "media_union": 76.6, "total_obras_union": 6326, "pares_orcid": 8820, "pares_portal": 6300, "pares_union": 10347, "obras_orcid": 5613, "obras_portal": 3382, "obras_union": 6326, "lat": 39.4813367, "lon": -0.3532412, "coord_fuente": "Nominatim: Av. de Catalunya 21, València (CSISP)"}, {"centro": "HOSPITAL UNIVERSITARIO DR.PESET", "tipo": "hospital", "total_roster": 143, "orcid_declarado": 81, "orcid_recuperado": 2, "orcid_ampliado": 83, "cobertura_declarada_pct": 56.6, "cobertura_ampliada_pct": 58.0, "con_publicaciones_portal": 130, "con_produccion": 132, "cobertura_produccion_pct": 92.3, "brecha_pct": 35.7, "n_efectivo_orcid": 66, "mediana_orcid": 48.0, "media_orcid": 75.3, "total_obras_orcid": 3385, "n_efectivo_union": 132, "mediana_union": 22.0, "media_union": 50.2, "total_obras_union": 4218, "pares_orcid": 4970, "pares_portal": 3896, "pares_union": 6631, "obras_orcid": 3385, "obras_portal": 2032, "obras_union": 4218, "lat": 39.4532779, "lon": -0.3944806, "coord_fuente": "Nominatim: Av. Gaspar Aguilar 90, València"}, {"centro": "HOSPITAL UNIVERSITARIO SAN JUAN DE ALICANTE", "tipo": "hospital", "total_roster": 77, "orcid_declarado": 33, "orcid_recuperado": 3, "orcid_ampliado": 36, "cobertura_declarada_pct": 42.9, "cobertura_ampliada_pct": 46.8, "con_publicaciones_portal": 61, "con_produccion": 61, "cobertura_produccion_pct": 79.2, "brecha_pct": 36.4, "n_efectivo_orcid": 31, "mediana_orcid": 51, "media_orcid": 107.7, "total_obras_orcid": 2489, "n_efectivo_union": 61, "mediana_union": 14, "media_union": 61.6, "total_obras_union": 2731, "pares_orcid": 3340, "pares_portal": 1705, "pares_union": 3760, "obras_orcid": 2489, "obras_portal": 1076, "obras_union": 2731, "lat": 38.3886863, "lon": -0.434406, "coord_fuente": "Nominatim: Hospital Universitari de Sant Joan d'Alacant"}, {"centro": "HOSPITAL GENERAL UNIVERSITARIO DE CASTELLÓN", "tipo": "hospital", "total_roster": 65, "orcid_declarado": 29, "orcid_recuperado": 1, "orcid_ampliado": 30, "cobertura_declarada_pct": 44.6, "cobertura_ampliada_pct": 46.2, "con_publicaciones_portal": 54, "con_produccion": 54, "cobertura_produccion_pct": 83.1, "brecha_pct": 38.5, "n_efectivo_orcid": 21, "mediana_orcid": 31, "media_orcid": 39.4, "total_obras_orcid": 722, "n_efectivo_union": 54, "mediana_union": 9.5, "media_union": 21.6, "total_obras_union": 976, "pares_orcid": 827, "pares_portal": 644, "pares_union": 1169, "obras_orcid": 722, "obras_portal": 496, "obras_union": 976, "lat": 40.0026365, "lon": -0.0416848, "coord_fuente": "Nominatim: Av. de Benicàssim 123, Castelló"}, {"centro": "HOSPITAL ARNAU DE VILANOVA", "tipo": "hospital", "total_roster": 42, "orcid_declarado": 28, "orcid_recuperado": 0, "orcid_ampliado": 28, "cobertura_declarada_pct": 66.7, "cobertura_ampliada_pct": 66.7, "con_publicaciones_portal": 39, "con_produccion": 39, "cobertura_produccion_pct": 92.9, "brecha_pct": 26.2, "n_efectivo_orcid": 23, "mediana_orcid": 25, "media_orcid": 77.4, "total_obras_orcid": 1589, "n_efectivo_union": 39, "mediana_union": 19, "media_union": 54.8, "total_obras_union": 1825, "pares_orcid": 1780, "pares_portal": 1022, "pares_union": 2139, "obras_orcid": 1589, "obras_portal": 788, "obras_union": 1825, "lat": 39.4907859, "lon": -0.4035874, "coord_fuente": "Nominatim: C/ Sant Clement 12, València"}, {"centro": "HOSPITAL GENERAL UNIVERSITARIO DE ELDA (VIRGEN DE LA SALUD)", "tipo": "hospital", "total_roster": 37, "orcid_declarado": 9, "orcid_recuperado": 1, "orcid_ampliado": 10, "cobertura_declarada_pct": 24.3, "cobertura_ampliada_pct": 27.0, "con_publicaciones_portal": 26, "con_produccion": 26, "cobertura_produccion_pct": 70.3, "brecha_pct": 45.9, "n_efectivo_orcid": 3, "mediana_orcid": 17, "media_orcid": 81.3, "total_obras_orcid": 244, "n_efectivo_union": 26, "mediana_union": 5.5, "media_union": 14.9, "total_obras_union": 352, "pares_orcid": 244, "pares_portal": 243, "pares_union": 387, "obras_orcid": 244, "obras_portal": 209, "obras_union": 352, "lat": 38.49364, "lon": -0.8060941, "coord_fuente": "Nominatim: CV-8333, Elda"}, {"centro": "HOSPITAL LA RIBERA DE ALZIRA", "tipo": "hospital", "total_roster": 29, "orcid_declarado": 16, "orcid_recuperado": 0, "orcid_ampliado": 16, "cobertura_declarada_pct": 55.2, "cobertura_ampliada_pct": 55.2, "con_publicaciones_portal": 22, "con_produccion": 22, "cobertura_produccion_pct": 75.9, "brecha_pct": 20.7, "n_efectivo_orcid": 11, "mediana_orcid": 46, "media_orcid": 64.2, "total_obras_orcid": 624, "n_efectivo_union": 22, "mediana_union": 22.5, "media_union": 39.2, "total_obras_union": 724, "pares_orcid": 706, "pares_portal": 388, "pares_union": 863, "obras_orcid": 624, "obras_portal": 275, "obras_union": 724, "lat": 39.1600185, "lon": -0.4171876, "coord_fuente": "Nominatim: Ctra. Corbera, Alzira"}, {"centro": "HOSPITAL VINALOPÓ SALUD", "tipo": "hospital", "total_roster": 28, "orcid_declarado": 9, "orcid_recuperado": 1, "orcid_ampliado": 10, "cobertura_declarada_pct": 32.1, "cobertura_ampliada_pct": 35.7, "con_publicaciones_portal": 18, "con_produccion": 18, "cobertura_produccion_pct": 64.3, "brecha_pct": 32.1, "n_efectivo_orcid": 7, "mediana_orcid": 53, "media_orcid": 62, "total_obras_orcid": 399, "n_efectivo_union": 18, "mediana_union": 7.5, "media_union": 28.8, "total_obras_union": 460, "pares_orcid": 434, "pares_portal": 200, "pares_union": 518, "obras_orcid": 399, "obras_portal": 172, "obras_union": 460, "lat": 38.2554662, "lon": -0.7160517, "coord_fuente": "Nominatim: C/ Tonico Sansano Mora 14, Elx"}, {"centro": "HOSPITAL LLUIS ALCANYIS DE XÁTIVA", "tipo": "hospital", "total_roster": 24, "orcid_declarado": 11, "orcid_recuperado": 1, "orcid_ampliado": 12, "cobertura_declarada_pct": 45.8, "cobertura_ampliada_pct": 50.0, "con_publicaciones_portal": 19, "con_produccion": 20, "cobertura_produccion_pct": 83.3, "brecha_pct": 37.5, "n_efectivo_orcid": 6, "mediana_orcid": 2.5, "media_orcid": 4.2, "total_obras_orcid": 25, "n_efectivo_union": 20, "mediana_union": 4.5, "media_union": 6.8, "total_obras_union": 112, "pares_orcid": 25, "pares_portal": 117, "pares_union": 136, "obras_orcid": 25, "obras_portal": 93, "obras_union": 112, "lat": 39.0067794, "lon": -0.5095724, "coord_fuente": "Nominatim: CV-41, Xàtiva"}, {"centro": "HOSPITAL VEGA BAJA DE ORIHUELA", "tipo": "hospital", "total_roster": 18, "orcid_declarado": 7, "orcid_recuperado": 1, "orcid_ampliado": 8, "cobertura_declarada_pct": 38.9, "cobertura_ampliada_pct": 44.4, "con_publicaciones_portal": 16, "con_produccion": 16, "cobertura_produccion_pct": 88.9, "brecha_pct": 50.0, "n_efectivo_orcid": 6, "mediana_orcid": 39.0, "media_orcid": 34.5, "total_obras_orcid": 206, "n_efectivo_union": 16, "mediana_union": 5.0, "media_union": 16.8, "total_obras_union": 256, "pares_orcid": 207, "pares_portal": 116, "pares_union": 269, "obras_orcid": 206, "obras_portal": 104, "obras_union": 256, "lat": 38.0896663, "lon": -0.8530798, "coord_fuente": "Nominatim: Hospital Vega Baja, Orihuela"}, {"centro": "HOSPITAL LA PLANA", "tipo": "hospital", "total_roster": 15, "orcid_declarado": 10, "orcid_recuperado": 0, "orcid_ampliado": 10, "cobertura_declarada_pct": 66.7, "cobertura_ampliada_pct": 66.7, "con_publicaciones_portal": 14, "con_produccion": 14, "cobertura_produccion_pct": 93.3, "brecha_pct": 26.7, "n_efectivo_orcid": 8, "mediana_orcid": 34.5, "media_orcid": 45.5, "total_obras_orcid": 247, "n_efectivo_union": 14, "mediana_union": 5.0, "media_union": 27.6, "total_obras_union": 263, "pares_orcid": 364, "pares_portal": 144, "pares_union": 387, "obras_orcid": 247, "obras_portal": 86, "obras_union": 263, "lat": 39.9250229, "lon": -0.0971225, "coord_fuente": "Nominatim: Camí vell de Vila-real a Borriana, Vila-real"}, {"centro": "DG DE RECURSOS HUMANOS Y ECONOMICOS", "tipo": "fisabio", "total_roster": 13, "orcid_declarado": 10, "orcid_recuperado": 0, "orcid_ampliado": 10, "cobertura_declarada_pct": 76.9, "cobertura_ampliada_pct": 76.9, "con_publicaciones_portal": 13, "con_produccion": 13, "cobertura_produccion_pct": 100.0, "brecha_pct": 23.1, "n_efectivo_orcid": 6, "mediana_orcid": 9.0, "media_orcid": 20.8, "total_obras_orcid": 123, "n_efectivo_union": 13, "mediana_union": 3, "media_union": 12, "total_obras_union": 132, "pares_orcid": 125, "pares_portal": 82, "pares_union": 156, "obras_orcid": 123, "obras_portal": 58, "obras_union": 132, "lat": 39.4751489, "lon": -0.3606665, "coord_fuente": "Nominatim: Conselleria de Sanitat, C/ Micer Mascó 31, València"}, {"centro": "DG INVESTIGACIÓN SANITARIA, INNOVACION, TECNOLOGIA Y CALIDAD", "tipo": "fisabio", "total_roster": 12, "orcid_declarado": 8, "orcid_recuperado": 1, "orcid_ampliado": 9, "cobertura_declarada_pct": 66.7, "cobertura_ampliada_pct": 75.0, "con_publicaciones_portal": 11, "con_produccion": 11, "cobertura_produccion_pct": 91.7, "brecha_pct": 25.0, "n_efectivo_orcid": 7, "mediana_orcid": 85, "media_orcid": 87.1, "total_obras_orcid": 478, "n_efectivo_union": 11, "mediana_union": 44, "media_union": 58.5, "total_obras_union": 497, "pares_orcid": 610, "pares_portal": 210, "pares_union": 644, "obras_orcid": 478, "obras_portal": 160, "obras_union": 497, "lat": 39.4751489, "lon": -0.3606665, "coord_fuente": "Nominatim: Conselleria de Sanitat, C/ Micer Mascó 31, València"}, {"centro": "HOSPITAL VIRGEN DE LOS LIRIOS DE ALCOI", "tipo": "hospital", "total_roster": 12, "orcid_declarado": 10, "orcid_recuperado": 0, "orcid_ampliado": 10, "cobertura_declarada_pct": 83.3, "cobertura_ampliada_pct": 83.3, "con_publicaciones_portal": 12, "con_produccion": 12, "cobertura_produccion_pct": 100.0, "brecha_pct": 16.7, "n_efectivo_orcid": 10, "mediana_orcid": 16.0, "media_orcid": 28.3, "total_obras_orcid": 247, "n_efectivo_union": 12, "mediana_union": 15.5, "media_union": 27.3, "total_obras_union": 273, "pares_orcid": 283, "pares_portal": 120, "pares_union": 328, "obras_orcid": 247, "obras_portal": 85, "obras_union": 273, "lat": 38.7051649, "lon": -0.465655, "coord_fuente": "Nominatim: Hospital Verge dels Lliris, Alcoi"}, {"centro": "CENTRO DE ATENCIÓN PRIMARIA GANDÍA", "tipo": "primaria", "total_roster": 11, "orcid_declarado": 3, "orcid_recuperado": 0, "orcid_ampliado": 3, "cobertura_declarada_pct": 27.3, "cobertura_ampliada_pct": 27.3, "con_publicaciones_portal": 9, "con_produccion": 9, "cobertura_produccion_pct": 81.8, "brecha_pct": 54.5, "n_efectivo_orcid": 0, "mediana_orcid": null, "media_orcid": null, "total_obras_orcid": 0, "n_efectivo_union": 9, "mediana_union": 5, "media_union": 5.7, "total_obras_union": 20, "pares_orcid": 0, "pares_portal": 51, "pares_union": 51, "obras_orcid": 0, "obras_portal": 20, "obras_union": 20, "lat": 38.9749536, "lon": -0.1778415, "coord_fuente": "Nominatim: Centre de Salut Gandia-Corea"}, {"centro": "HOSPITAL DE SAGUNTO", "tipo": "hospital", "total_roster": 10, "orcid_declarado": 5, "orcid_recuperado": 0, "orcid_ampliado": 5, "cobertura_declarada_pct": 50.0, "cobertura_ampliada_pct": 50.0, "con_publicaciones_portal": 10, "con_produccion": 10, "cobertura_produccion_pct": 100.0, "brecha_pct": 50.0, "n_efectivo_orcid": 5, "mediana_orcid": 48, "media_orcid": 88.8, "total_obras_orcid": 379, "n_efectivo_union": 10, "mediana_union": 24.5, "media_union": 51.1, "total_obras_union": 424, "pares_orcid": 444, "pares_portal": 265, "pares_union": 511, "obras_orcid": 379, "obras_portal": 186, "obras_union": 424, "lat": 39.6744133, "lon": -0.2311084, "coord_fuente": "Nominatim: C/ José Doñate Franch, Port de Sagunt"}, {"centro": "HOSPITAL LA PEDRERA DE DENIA", "tipo": "hospital", "total_roster": 8, "orcid_declarado": 3, "orcid_recuperado": 0, "orcid_ampliado": 3, "cobertura_declarada_pct": 37.5, "cobertura_ampliada_pct": 37.5, "con_publicaciones_portal": 7, "con_produccion": 7, "cobertura_produccion_pct": 87.5, "brecha_pct": 50.0, "n_efectivo_orcid": 3, "mediana_orcid": 5, "media_orcid": 11, "total_obras_orcid": 27, "n_efectivo_union": 7, "mediana_union": 8, "media_union": 12.1, "total_obras_union": 59, "pares_orcid": 33, "pares_portal": 76, "pares_union": 85, "obras_orcid": 27, "obras_portal": 51, "obras_union": 59, "lat": 38.8282333, "lon": 0.0962536, "coord_fuente": "Nominatim: Partida Plana Est 4, Dénia"}, {"centro": "CENTRO DE ATENCIÓN PRIMARIA LA RIBERA", "tipo": "primaria", "total_roster": 7, "orcid_declarado": 3, "orcid_recuperado": 1, "orcid_ampliado": 4, "cobertura_declarada_pct": 42.9, "cobertura_ampliada_pct": 57.1, "con_publicaciones_portal": 6, "con_produccion": 6, "cobertura_produccion_pct": 85.7, "brecha_pct": 42.9, "n_efectivo_orcid": 1, "mediana_orcid": 14, "media_orcid": 14, "total_obras_orcid": 14, "n_efectivo_union": 6, "mediana_union": 5.0, "media_union": 6.7, "total_obras_union": 36, "pares_orcid": 14, "pares_portal": 27, "pares_union": 40, "obras_orcid": 14, "obras_portal": 24, "obras_union": 36, "lat": 39.145681, "lon": -0.438886, "coord_fuente": "Nominatim: Centre de Salut d'Alzira"}, {"centro": "CENTRO DE TRANSFUSIONES DE VALENCIA", "tipo": "otros", "total_roster": 7, "orcid_declarado": 6, "orcid_recuperado": 0, "orcid_ampliado": 6, "cobertura_declarada_pct": 85.7, "cobertura_ampliada_pct": 85.7, "con_publicaciones_portal": 7, "con_produccion": 7, "cobertura_produccion_pct": 100.0, "brecha_pct": 14.3, "n_efectivo_orcid": 6, "mediana_orcid": 96.0, "media_orcid": 77.5, "total_obras_orcid": 359, "n_efectivo_union": 7, "mediana_union": 95, "media_union": 74.3, "total_obras_union": 385, "pares_orcid": 465, "pares_portal": 194, "pares_union": 520, "obras_orcid": 359, "obras_portal": 120, "obras_union": 385, "lat": 39.4694343, "lon": -0.4091956, "coord_fuente": "GVA: Av. del Cid 65, València"}, {"centro": "HOSPITAL LA MAGDALENA", "tipo": "hospital", "total_roster": 6, "orcid_declarado": 5, "orcid_recuperado": 0, "orcid_ampliado": 5, "cobertura_declarada_pct": 83.3, "cobertura_ampliada_pct": 83.3, "con_publicaciones_portal": 6, "con_produccion": 6, "cobertura_produccion_pct": 100.0, "brecha_pct": 16.7, "n_efectivo_orcid": 4, "mediana_orcid": 125.0, "media_orcid": 113.5, "total_obras_orcid": 454, "n_efectivo_union": 6, "mediana_union": 42.5, "media_union": 77.8, "total_obras_union": 465, "pares_orcid": 454, "pares_portal": 74, "pares_union": 467, "obras_orcid": 454, "obras_portal": 72, "obras_union": 465, "lat": 40.0043222, "lon": -0.0724757, "coord_fuente": "Nominatim: Camí del Collet, Castelló"}, {"centro": "DG SALUD PÚBLICA", "tipo": "fisabio", "total_roster": 6, "orcid_declarado": 5, "orcid_recuperado": 0, "orcid_ampliado": 5, "cobertura_declarada_pct": 83.3, "cobertura_ampliada_pct": 83.3, "con_publicaciones_portal": 6, "con_produccion": 6, "cobertura_produccion_pct": 100.0, "brecha_pct": 16.7, "n_efectivo_orcid": 4, "mediana_orcid": 30.0, "media_orcid": 54, "total_obras_orcid": 201, "n_efectivo_union": 6, "mediana_union": 21.5, "media_union": 50, "total_obras_union": 249, "pares_orcid": 216, "pares_portal": 171, "pares_union": 300, "obras_orcid": 201, "obras_portal": 125, "obras_union": 249, "lat": 39.4751489, "lon": -0.3606665, "coord_fuente": "Nominatim: Conselleria de Sanitat, C/ Micer Mascó 31, València"}, {"centro": "CENTRO DE ATENCIÓN PRIMARIA ELDA", "tipo": "primaria", "total_roster": 5, "orcid_declarado": 1, "orcid_recuperado": 0, "orcid_ampliado": 1, "cobertura_declarada_pct": 20.0, "cobertura_ampliada_pct": 20.0, "con_publicaciones_portal": 1, "con_produccion": 1, "cobertura_produccion_pct": 20.0, "brecha_pct": 0.0, "n_efectivo_orcid": 0, "mediana_orcid": null, "media_orcid": null, "total_obras_orcid": 0, "n_efectivo_union": 1, "mediana_union": 10, "media_union": 10, "total_obras_union": 10, "pares_orcid": 0, "pares_portal": 10, "pares_union": 10, "obras_orcid": 0, "obras_portal": 10, "obras_union": 10, "lat": 38.4755349, "lon": -0.8001239, "coord_fuente": "Nominatim: Centro de Salud Marina Española, Elda"}, {"centro": "HOSPITAL SAN VICENTE DEL RASPEIG", "tipo": "hospital", "total_roster": 5, "orcid_declarado": 2, "orcid_recuperado": 0, "orcid_ampliado": 2, "cobertura_declarada_pct": 40.0, "cobertura_ampliada_pct": 40.0, "con_publicaciones_portal": 3, "con_produccion": 3, "cobertura_produccion_pct": 60.0, "brecha_pct": 20.0, "n_efectivo_orcid": 2, "mediana_orcid": 22.5, "media_orcid": 22.5, "total_obras_orcid": 37, "n_efectivo_union": 3, "mediana_union": 18, "media_union": 16.3, "total_obras_union": 41, "pares_orcid": 45, "pares_portal": 7, "pares_union": 49, "obras_orcid": 37, "obras_portal": 7, "obras_union": 41, "lat": 38.4032433, "lon": -0.5307063, "coord_fuente": "Nominatim: C/ Lillo Juan 137, Sant Vicent del Raspeig"}, {"centro": "CENTRO DE ATENCIÓN PRIMARIA ORIHUELA", "tipo": "primaria", "total_roster": 5, "orcid_declarado": 1, "orcid_recuperado": 0, "orcid_ampliado": 1, "cobertura_declarada_pct": 20.0, "cobertura_ampliada_pct": 20.0, "con_publicaciones_portal": 2, "con_produccion": 2, "cobertura_produccion_pct": 40.0, "brecha_pct": 20.0, "n_efectivo_orcid": 1, "mediana_orcid": 14, "media_orcid": 14, "total_obras_orcid": 14, "n_efectivo_union": 2, "mediana_union": 12.5, "media_union": 12.5, "total_obras_union": 25, "pares_orcid": 14, "pares_portal": 12, "pares_union": 25, "obras_orcid": 14, "obras_portal": 12, "obras_union": 25, "lat": 38.0865038, "lon": -0.9511433, "coord_fuente": "Nominatim: Centro de Salud Orihuela 1, Orihuela"}, {"centro": "HOSPITAL DE DENIA", "tipo": "hospital", "total_roster": 5, "orcid_declarado": 4, "orcid_recuperado": 0, "orcid_ampliado": 4, "cobertura_declarada_pct": 80.0, "cobertura_ampliada_pct": 80.0, "con_publicaciones_portal": 5, "con_produccion": 5, "cobertura_produccion_pct": 100.0, "brecha_pct": 20.0, "n_efectivo_orcid": 4, "mediana_orcid": 4.5, "media_orcid": 4.5, "total_obras_orcid": 7, "n_efectivo_union": 5, "mediana_union": 8, "media_union": 6.2, "total_obras_union": 13, "pares_orcid": 18, "pares_portal": 21, "pares_union": 31, "obras_orcid": 7, "obras_portal": 9, "obras_union": 13, "lat": 38.8338396, "lon": 0.059858, "coord_fuente": "Nominatim: Hospital de Dénia"}, {"centro": "HOSPITAL COMARCAL DE VINARÒS", "tipo": "hospital", "total_roster": 3, "orcid_declarado": 1, "orcid_recuperado": 0, "orcid_ampliado": 1, "cobertura_declarada_pct": 33.3, "cobertura_ampliada_pct": 33.3, "con_publicaciones_portal": 3, "con_produccion": 3, "cobertura_produccion_pct": 100.0, "brecha_pct": 66.7, "n_efectivo_orcid": 1, "mediana_orcid": 12, "media_orcid": 12, "total_obras_orcid": 12, "n_efectivo_union": 3, "mediana_union": 2, "media_union": 6.7, "total_obras_union": 19, "pares_orcid": 12, "pares_portal": 17, "pares_union": 20, "obras_orcid": 12, "obras_portal": 16, "obras_union": 19, "lat": 40.464099, "lon": 0.4500938, "coord_fuente": "Nominatim: Av. Gil d'Atrosillo, Vinaròs"}, {"centro": "HOSPITAL FRANCESC DE BORJA DE GANDÍA", "tipo": "hospital", "total_roster": 3, "orcid_declarado": 2, "orcid_recuperado": 0, "orcid_ampliado": 2, "cobertura_declarada_pct": 66.7, "cobertura_ampliada_pct": 66.7, "con_publicaciones_portal": 3, "con_produccion": 3, "cobertura_produccion_pct": 100.0, "brecha_pct": 33.3, "n_efectivo_orcid": 2, "mediana_orcid": 22.5, "media_orcid": 22.5, "total_obras_orcid": 45, "n_efectivo_union": 3, "mediana_union": 6, "media_union": 18.3, "total_obras_union": 52, "pares_orcid": 45, "pares_portal": 23, "pares_union": 55, "obras_orcid": 45, "obras_portal": 20, "obras_union": 52, "lat": 38.9634339, "lon": -0.1698449, "coord_fuente": "Nominatim: Av. de la Medicina, Gandia"}, {"centro": "CENTRO DE ATENCIÓN PRIMARIA VINARÒS", "tipo": "primaria", "total_roster": 3, "orcid_declarado": 1, "orcid_recuperado": 0, "orcid_ampliado": 1, "cobertura_declarada_pct": 33.3, "cobertura_ampliada_pct": 33.3, "con_publicaciones_portal": 2, "con_produccion": 2, "cobertura_produccion_pct": 66.7, "brecha_pct": 33.3, "n_efectivo_orcid": 0, "mediana_orcid": null, "media_orcid": null, "total_obras_orcid": 0, "n_efectivo_union": 2, "mediana_union": 1.5, "media_union": 1.5, "total_obras_union": 2, "pares_orcid": 0, "pares_portal": 3, "pares_union": 3, "obras_orcid": 0, "obras_portal": 2, "obras_union": 2, "lat": 40.4682, "lon": 0.47495, "coord_fuente": "Sede GVA: C/ Arxipreste Bono 22, Vinaròs"}, {"centro": "CENTRO DE ATENCIÓN PRIMARIA XÀTIVA-ONTINYENT", "tipo": "primaria", "total_roster": 2, "orcid_declarado": 1, "orcid_recuperado": 0, "orcid_ampliado": 1, "cobertura_declarada_pct": 50.0, "cobertura_ampliada_pct": 50.0, "con_publicaciones_portal": 0, "con_produccion": 0, "cobertura_produccion_pct": 0.0, "brecha_pct": -50.0, "n_efectivo_orcid": 0, "mediana_orcid": null, "media_orcid": null, "total_obras_orcid": 0, "n_efectivo_union": 0, "mediana_union": null, "media_union": null, "total_obras_union": 0, "pares_orcid": 0, "pares_portal": 0, "pares_union": 0, "obras_orcid": 0, "obras_portal": 0, "obras_union": 0, "lat": 38.9901463, "lon": -0.5283086, "coord_fuente": "Nominatim: C/ Ausiàs March (Centre de Salut), Xàtiva"}]};
+const GEO = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "MultiPolygon", "coordinates": [[[[-0.159684, 38.883508], [-0.148077, 38.858431], [-0.070616, 38.885721], [-0.034678, 38.856893], [-0.024796, 38.872552], [-0.037515, 38.886932], [0.015272, 38.863793], [0.1258, 38.848596], [0.109504, 38.845527], [0.197524, 38.80405], [0.182058, 38.793852], [0.190243, 38.773467], [0.224766, 38.764284], [0.221653, 38.758253], [0.223996, 38.748964], [0.233921, 38.736933], [0.182412, 38.720781], [0.148607, 38.679257], [0.098461, 38.672841], [0.073594, 38.644696], [0.083863, 38.631029], [0.051371, 38.641305], [0.030551, 38.625919], [-0.015885, 38.626663], [-0.06174, 38.582048], [-0.049584, 38.562192], [-0.097558, 38.523471], [-0.151979, 38.535044], [-0.375013, 38.443044], [-0.404572, 38.401455], [-0.40384, 38.352477], [-0.444264, 38.36325], [-0.510627, 38.325899], [-0.513711, 38.197459], [-0.595266, 38.187877], [-0.630846, 38.148935], [-0.64764, 37.999989], [-0.665976, 37.976223], [-0.696742, 37.969468], [-0.719825, 37.911381], [-0.749058, 37.899733], [-0.762393, 37.846951], [-0.831909, 37.865127], [-0.921188, 37.944238], [-1.022599, 38.07569], [-1.036762, 38.13772], [-0.988546, 38.199531], [-0.967677, 38.27564], [-0.989153, 38.320877], [-1.084384, 38.346216], [-1.088062, 38.367768], [-1.077206, 38.43147], [-1.094162, 38.437929], [-1.013645, 38.49673], [-1.026062, 38.522819], [-1.001569, 38.572675], [-1.026933, 38.655517], [-0.962466, 38.656925], [-0.915793, 38.695965], [-0.961429, 38.774792], [-0.928938, 38.783834], [-0.904989, 38.76708], [-0.861693, 38.77089], [-0.834622, 38.732431], [-0.734931, 38.759445], [-0.707189, 38.733819], [-0.644026, 38.728138], [-0.642469, 38.70414], [-0.618051, 38.686653], [-0.507115, 38.742975], [-0.529627, 38.767095], [-0.565642, 38.755427], [-0.59129, 38.796818], [-0.461877, 38.807645], [-0.40339, 38.839714], [-0.381436, 38.834899], [-0.310809, 38.881511], [-0.23054, 38.85349], [-0.159684, 38.883508]], [[-0.721108, 37.92103], [-0.72107, 37.921497], [-0.721342, 37.921539], [-0.721554, 37.920957], [-0.721108, 37.92103]], [[0.086456, 38.659564], [0.086537, 38.659859], [0.086076, 38.659547], [0.086268, 38.659488], [0.086456, 38.659564]], [[-0.720814, 37.92024], [-0.720743, 37.920492], [-0.721101, 37.92027], [-0.721011, 37.920052], [-0.720814, 37.92024]], [[0.2319, 38.736502], [0.231759, 38.736687], [0.231645, 38.736708], [0.23162, 38.736663], [0.2319, 38.736502]], [[0.155892, 38.691754], [0.155944, 38.691896], [0.155888, 38.691916], [0.155768, 38.691811], [0.155892, 38.691754]]], [[[-0.4802, 38.166964], [-0.472034, 38.166473], [-0.464887, 38.163228], [-0.484339, 38.166422], [-0.4802, 38.166964]], [[-0.476419, 38.166081], [-0.476469, 38.166262], [-0.476769, 38.166179], [-0.476614, 38.166031], [-0.476419, 38.166081]]], [[[0.230722, 38.756921], [0.23046, 38.753608], [0.228202, 38.753856], [0.228885, 38.756845], [0.230722, 38.756921]]], [[[-0.129633, 38.503342], [-0.12903, 38.501201], [-0.133016, 38.502155], [-0.13122, 38.504075], [-0.129633, 38.503342]]], [[[0.218626, 38.72623], [0.218131, 38.726216], [0.215068, 38.727409], [0.216277, 38.7277], [0.218626, 38.72623]]], [[[-0.485836, 38.166707], [-0.485117, 38.1667], [-0.484581, 38.166364], [-0.486594, 38.166885], [-0.485836, 38.166707]]], [[[-0.071788, 38.537316], [-0.072585, 38.536336], [-0.073445, 38.536619], [-0.072954, 38.537138], [-0.071788, 38.537316]]], [[[-0.473527, 38.161252], [-0.47456, 38.161067], [-0.474744, 38.161684], [-0.474388, 38.161757], [-0.473527, 38.161252]]], [[[-0.019344, 38.616634], [-0.019966, 38.616587], [-0.019685, 38.617282], [-0.019184, 38.617161], [-0.019344, 38.616634]]], [[[-0.459277, 38.161467], [-0.459611, 38.161357], [-0.459858, 38.161813], [-0.459192, 38.161943], [-0.459277, 38.161467]]], [[[-0.538875, 38.185627], [-0.538458, 38.186474], [-0.538253, 38.18647], [-0.538296, 38.186201], [-0.538875, 38.185627]]], [[[-0.484459, 38.164578], [-0.484758, 38.164512], [-0.484965, 38.164805], [-0.484574, 38.164896], [-0.484459, 38.164578]]], [[[0.234171, 38.742466], [0.233826, 38.742476], [0.233866, 38.742853], [0.234175, 38.742809], [0.234171, 38.742466]]], [[[0.224468, 38.76123], [0.224126, 38.761311], [0.224121, 38.761455], [0.224495, 38.761571], [0.224468, 38.76123]]], [[[-0.464225, 38.162908], [-0.464446, 38.162804], [-0.464664, 38.163097], [-0.464411, 38.163146], [-0.464225, 38.162908]]], [[[-0.454652, 38.16188], [-0.454947, 38.161905], [-0.454938, 38.162166], [-0.454632, 38.162114], [-0.454652, 38.16188]]], [[[0.231503, 38.75217], [0.231203, 38.752265], [0.231693, 38.752486], [0.231688, 38.752369], [0.231503, 38.75217]]], [[[-0.753428, 37.871657], [-0.753547, 37.871791], [-0.753469, 37.872141], [-0.753303, 37.872123], [-0.753428, 37.871657]]], [[[-0.456676, 38.161744], [-0.45696, 38.161786], [-0.456897, 38.161956], [-0.456656, 38.161987], [-0.456676, 38.161744]]], [[[-0.014024, 38.623904], [-0.014218, 38.623945], [-0.014212, 38.624071], [-0.013878, 38.624107], [-0.014024, 38.623904]]], [[[-0.455923, 38.161746], [-0.456041, 38.161631], [-0.456241, 38.161798], [-0.456158, 38.161886], [-0.455923, 38.161746]]], [[[0.197752, 38.800194], [0.197713, 38.800005], [0.19747, 38.800026], [0.19751, 38.800225], [0.197752, 38.800194]]], [[[-0.761119, 37.849235], [-0.761188, 37.849193], [-0.761303, 37.849244], [-0.761152, 37.849363], [-0.761119, 37.849235]]], [[[-0.761041, 37.84793], [-0.761151, 37.847952], [-0.761136, 37.848059], [-0.761061, 37.848087], [-0.761041, 37.84793]]], [[[-0.760976, 37.848862], [-0.761021, 37.848794], [-0.761123, 37.848889], [-0.761047, 37.848946], [-0.760976, 37.848862]]], [[[-0.761131, 37.848606], [-0.76122, 37.848529], [-0.761259, 37.848667], [-0.761197, 37.84869], [-0.761131, 37.848606]]]]}, "properties": {"cod_prov": "03", "name": "Alacant/Alicante", "cod_ccaa": "19", "cartodb_id": 3, "created_at": "2014-09-30T00:00:00Z", "updated_at": "2014-12-25T01:56:10Z"}}, {"type": "Feature", "geometry": {"type": "MultiPolygon", "coordinates": [[[[-0.164957, 40.788631], [-0.144533, 40.785443], [-0.126841, 40.753317], [-0.064699, 40.727407], [0.015738, 40.72843], [0.026438, 40.694951], [0.042175, 40.691006], [0.112501, 40.727137], [0.143917, 40.718252], [0.226115, 40.733164], [0.236523, 40.701683], [0.262431, 40.705852], [0.29184, 40.688553], [0.267831, 40.659001], [0.27883, 40.630058], [0.401962, 40.602381], [0.443944, 40.578223], [0.437964, 40.54706], [0.513165, 40.516011], [0.417827, 40.400591], [0.408446, 40.357348], [0.278363, 40.244149], [0.264005, 40.208554], [0.190507, 40.170433], [0.147554, 40.082915], [0.049673, 40.035439], [-0.005156, 39.91517], [-0.06699, 39.857356], [-0.088872, 39.85398], [-0.188272, 39.721908], [-0.264177, 39.745497], [-0.276528, 39.770542], [-0.328259, 39.801482], [-0.377919, 39.799877], [-0.396095, 39.758614], [-0.456176, 39.714698], [-0.530586, 39.795977], [-0.577049, 39.773202], [-0.588224, 39.741688], [-0.652347, 39.754084], [-0.656151, 39.835961], [-0.691111, 39.852463], [-0.71255, 39.816845], [-0.730456, 39.814828], [-0.773562, 39.869796], [-0.832895, 39.911], [-0.846297, 39.947698], [-0.837944, 39.97655], [-0.777646, 39.998407], [-0.753621, 40.046608], [-0.68294, 40.044225], [-0.627222, 40.076202], [-0.613589, 40.070013], [-0.628533, 40.102578], [-0.57864, 40.137335], [-0.544187, 40.251659], [-0.494515, 40.228732], [-0.428072, 40.243803], [-0.383626, 40.264848], [-0.400408, 40.294853], [-0.388637, 40.306937], [-0.366273, 40.305052], [-0.340617, 40.339991], [-0.282026, 40.36529], [-0.285244, 40.386317], [-0.347355, 40.44394], [-0.27264, 40.473762], [-0.277638, 40.501532], [-0.301837, 40.515404], [-0.293286, 40.611041], [-0.370483, 40.613592], [-0.381126, 40.66423], [-0.328818, 40.680279], [-0.306998, 40.659497], [-0.235991, 40.691108], [-0.224034, 40.754158], [-0.197176, 40.784456], [-0.164957, 40.788631]]], [[[0.687624, 39.900631], [0.684474, 39.89684], [0.686174, 39.893444], [0.683726, 39.897287], [0.687624, 39.900631]]], [[[0.671245, 39.875977], [0.67244, 39.875372], [0.671807, 39.874248], [0.670528, 39.874802], [0.671245, 39.875977]]], [[[0.669508, 39.890524], [0.668192, 39.891277], [0.668066, 39.891984], [0.669013, 39.891972], [0.669508, 39.890524]]], [[[0.690537, 39.895467], [0.690527, 39.8959], [0.690962, 39.896372], [0.691076, 39.895666], [0.690537, 39.895467]]], [[[0.671979, 39.852294], [0.672448, 39.85209], [0.672206, 39.851494], [0.671844, 39.851938], [0.671979, 39.852294]]], [[[0.689535, 39.894625], [0.689083, 39.894703], [0.689153, 39.895124], [0.689539, 39.89513], [0.689535, 39.894625]]], [[[0.672978, 39.87449], [0.672559, 39.874315], [0.672392, 39.874473], [0.672851, 39.874972], [0.672978, 39.87449]]], [[[0.6708, 39.891942], [0.671108, 39.891788], [0.670664, 39.891361], [0.670278, 39.891797], [0.6708, 39.891942]]], [[[0.667323, 39.88945], [0.667855, 39.889559], [0.667943, 39.889241], [0.667598, 39.889117], [0.667323, 39.88945]]], [[[0.679145, 39.851238], [0.679232, 39.851343], [0.679688, 39.85113], [0.67946, 39.850795], [0.679145, 39.851238]]], [[[0.670601, 39.890192], [0.670265, 39.890032], [0.670106, 39.890334], [0.670322, 39.890435], [0.670601, 39.890192]]], [[[0.679483, 39.850137], [0.679132, 39.850121], [0.679036, 39.850295], [0.679373, 39.850474], [0.679483, 39.850137]]], [[[0.670286, 39.878818], [0.670083, 39.878734], [0.669907, 39.878938], [0.670137, 39.879093], [0.670286, 39.878818]]], [[[0.674122, 39.850839], [0.673899, 39.850828], [0.673906, 39.851179], [0.674071, 39.851201], [0.674122, 39.850839]]], [[[0.673354, 39.850899], [0.673437, 39.85114], [0.673682, 39.851132], [0.673477, 39.850796], [0.673354, 39.850899]]], [[[0.671108, 39.891788], [0.67127, 39.891981], [0.671426, 39.891832], [0.671334, 39.891655], [0.671108, 39.891788]]], [[[0.690185, 39.895397], [0.690537, 39.895467], [0.690325, 39.895177], [0.690185, 39.895397]]], [[[0.673717, 39.851293], [0.673877, 39.851504], [0.674022, 39.851373], [0.673717, 39.851293]]], [[[0.674372, 39.851137], [0.674582, 39.851139], [0.674488, 39.850899], [0.674372, 39.851137]]], [[[0.672587, 39.851851], [0.6728, 39.851898], [0.67274, 39.851657], [0.672587, 39.851851]]], [[[0.674194, 39.851305], [0.674329, 39.851436], [0.674437, 39.851261], [0.674194, 39.851305]]]]}, "properties": {"cod_prov": "12", "name": "Castelló/Castellón", "cod_ccaa": "19", "cartodb_id": 12, "created_at": "2014-09-30T00:00:00Z", "updated_at": "2014-12-25T01:56:10Z"}}, {"type": "Feature", "geometry": {"type": "MultiPolygon", "coordinates": [[[[-0.987142, 39.980725], [-0.918505, 39.962675], [-0.902659, 39.93185], [-0.912788, 39.873053], [-0.888574, 39.852111], [-0.863555, 39.84741], [-0.793766, 39.881434], [-0.730456, 39.814828], [-0.71255, 39.816845], [-0.691111, 39.852463], [-0.656151, 39.835961], [-0.652347, 39.754084], [-0.635858, 39.747867], [-0.588224, 39.741688], [-0.577049, 39.773202], [-0.530586, 39.795977], [-0.456176, 39.714698], [-0.396095, 39.758614], [-0.377919, 39.799877], [-0.328259, 39.801482], [-0.276528, 39.770542], [-0.264177, 39.745497], [-0.188502, 39.721938], [-0.208146, 39.643295], [-0.215735, 39.655116], [-0.254326, 39.620822], [-0.315965, 39.523438], [-0.321261, 39.463399], [-0.301967, 39.449312], [-0.302133, 39.434182], [-0.329757, 39.461586], [-0.316616, 39.443337], [-0.328295, 39.444425], [-0.334426, 39.433659], [-0.310096, 39.428025], [-0.335721, 39.424689], [-0.278519, 39.278478], [-0.216281, 39.186341], [-0.238317, 39.176713], [-0.239482, 39.146921], [-0.203461, 39.065999], [-0.144286, 38.995276], [-0.156294, 38.99811], [-0.161136, 38.992367], [-0.146779, 38.994427], [-0.027396, 38.8616], [-0.042151, 38.856452], [-0.070616, 38.885721], [-0.148077, 38.858431], [-0.160832, 38.887391], [-0.23054, 38.85349], [-0.310809, 38.881511], [-0.381436, 38.834899], [-0.40339, 38.839714], [-0.461877, 38.807645], [-0.595217, 38.795097], [-0.565642, 38.755427], [-0.529627, 38.767095], [-0.507115, 38.742975], [-0.6287, 38.686554], [-0.64344, 38.727766], [-0.707189, 38.733819], [-0.734931, 38.759445], [-0.834622, 38.732431], [-0.861693, 38.77089], [-0.913225, 38.769606], [-0.933848, 38.793976], [-0.924537, 38.891752], [-0.956524, 38.920123], [-0.95941, 38.944582], [-1.146654, 38.929353], [-1.226538, 39.024673], [-1.263903, 39.045094], [-1.25572, 39.10617], [-1.180826, 39.211822], [-1.161889, 39.305418], [-1.207909, 39.326237], [-1.223328, 39.316112], [-1.312744, 39.343166], [-1.336645, 39.333996], [-1.414679, 39.380298], [-1.426033, 39.362757], [-1.432294, 39.377582], [-1.455104, 39.360849], [-1.448789, 39.37819], [-1.468193, 39.383331], [-1.452881, 39.383741], [-1.452737, 39.398669], [-1.473305, 39.391147], [-1.470567, 39.407509], [-1.488813, 39.401648], [-1.483252, 39.42246], [-1.498994, 39.415357], [-1.49665, 39.42932], [-1.52172, 39.432677], [-1.528867, 39.455266], [-1.513391, 39.458268], [-1.512454, 39.496269], [-1.499153, 39.50045], [-1.502602, 39.545616], [-1.520665, 39.549965], [-1.462082, 39.576621], [-1.417932, 39.654936], [-1.368535, 39.689615], [-1.312827, 39.670484], [-1.267904, 39.691148], [-1.275409, 39.738641], [-1.215004, 39.808774], [-1.200044, 39.858706], [-1.203978, 39.949344], [-1.142395, 39.971841], [-1.121748, 39.960851], [-1.105015, 39.974975], [-0.987142, 39.980725]]], [[[-1.293083, 40.206923], [-1.284342, 40.171497], [-1.244296, 40.145969], [-1.244592, 40.115803], [-1.148034, 40.114497], [-1.071772, 40.051109], [-1.134081, 40.015752], [-1.24683, 39.995181], [-1.37686, 40.016499], [-1.420286, 40.093514], [-1.407597, 40.101404], [-1.457235, 40.135057], [-1.448856, 40.145342], [-1.354597, 40.129473], [-1.316589, 40.149656], [-1.32299, 40.184856], [-1.293083, 40.206923]]], [[[-0.230151, 39.159838], [-0.230976, 39.159783], [-0.231051, 39.159916], [-0.230477, 39.160074], [-0.230151, 39.159838]]]]}, "properties": {"cod_prov": "46", "name": "València/Valencia", "cod_ccaa": "19", "cartodb_id": 46, "created_at": "2014-09-30T00:00:00Z", "updated_at": "2014-12-25T01:56:10Z"}}]};
+const centers = DATA.centros.map(d => Object.assign({}, d));
+
+// "sin centro" al mar
+centers.forEach(d => {
+  if (d.tipo === 'sin_centro') { d.lon = d.lon + 0.34; d.lat = d.lat - 0.11; }
+});
+
+const panelW = 390;
+let W = window.innerWidth - panelW;
+let H = window.innerHeight;
+
+const svg = d3.select('#map').attr('viewBox', [0, 0, W, H]);
+const gRoot = svg.append('g');
+const gProv = gRoot.append('g');
+const gLead = gRoot.append('g');
+const gBub = gRoot.append('g');
+const gDots = gRoot.append('g');
+
+const projection = d3.geoMercator().fitExtent([[70, 70], [W - 70, H - 70]], GEO);
+const path = d3.geoPath(projection);
+
+gProv.selectAll('path')
+  .data(GEO.features).join('path')
+  .attr('class', 'province').attr('d', path);
+
+const sinC = centers.find(d => d.tipo === 'sin_centro');
+
+// layout anticolisión radial
+centers.forEach((d, i) => { d._i = i; });
+let anchors = [], layout = [];
+
+function computeLayout() {
+  anchors = centers.map(d => {
+    const p = projection([d.lon, d.lat]);
+    return { x: p[0], y: p[1] };
+  });
+  const CLUSTER_PX = 18;
+  const usados = new Array(centers.length).fill(false);
+  const racimos = [];
+  for (let i = 0; i < centers.length; i++) {
+    if (usados[i]) continue;
+    const grupo = [i]; usados[i] = true;
+    for (let j = i + 1; j < centers.length; j++) {
+      if (usados[j]) continue;
+      if (Math.hypot(anchors[i].x - anchors[j].x, anchors[i].y - anchors[j].y) < CLUSTER_PX) {
+        grupo.push(j); usados[j] = true;
+      }
+    }
+    racimos.push(grupo);
+  }
+  layout = anchors.map(a => ({ x: a.x, y: a.y }));
+  racimos.forEach(grupo => {
+    if (grupo.length === 1) return;
+    const cx = d3.mean(grupo, i => anchors[i].x);
+    const cy = d3.mean(grupo, i => anchors[i].y);
+    const R = 18 + 11 * grupo.length;
+    grupo.forEach((idx, k) => {
+      const ang = -Math.PI / 2 + (2 * Math.PI * k) / grupo.length;
+      layout[idx] = { x: cx + R * Math.cos(ang), y: cy + R * Math.sin(ang) };
+    });
+  });
+}
+function pos(d) { return layout[d._i] || anchors[d._i] || { x: 0, y: 0 }; }
+
+const PALETTE = ['#38bdf8', '#818cf8', '#c084fc', '#fb7185'];
+const PALETTE_PROD = ['#2dd4bf', '#fbbf24', '#fb7185', '#ef4444'];
+function colorScale() {
+  if (colorMetric === 'cobertura_produccion_pct') {
+    return d3.scaleLinear().domain([40, 60, 80, 100]).range(PALETTE_PROD).clamp(true);
+  }
+  return d3.scaleLinear().domain([0, 45, 75, 100]).range(PALETTE).clamp(true);
+}
+
+let colorMetric = 'cobertura_declarada_pct';
+let sizeMetric = 'mediana_union';
+let pinned = null;
+
+const tip = d3.select('#tooltip');
+const container = document.getElementById('map-container');
+
+const tipoLabel = {
+  hospital: 'hospital', fisabio: 'FISABIO / dirección general',
+  primaria: 'atención primaria', otros: 'otro centro',
+  sin_centro: 'sin adscripción en el portal'
+};
+
+function val(d, k) { const v = d[k]; return v == null ? 0 : v; }
+function maxSize() { return d3.max(centers, d => val(d, sizeMetric)) || 1; }
+function sizeScale() {
+  return d3.scaleSqrt().domain([0, maxSize()]).range([4, 38]);
+}
+function visible(d) {
+  if (d.tipo === 'sin_centro' && !document.getElementById('f-limbo').checked) return false;
+  if (document.getElementById('f-small').checked && d.n_efectivo_union < 5) return false;
+  return true;
+}
+
+function shortName(n) {
+  if (n === '(sin centro)') return 'sin centro';
+  return n.replace('HOSPITAL GENERAL UNIVERSITARIO DE ', 'H.G.U. ')
+          .replace('HOSPITAL UNIVERSITARIO ', 'H.U. ')
+          .replace('HOSPITAL ', 'H. ')
+          .replace('CENTRO DE ATENCIÓN PRIMARIA ', 'C.A.P. ')
+          .replace('FISABIO SALUD PÚBLICA', 'FISABIO SP');
+}
+
+// entrada: grupos + anillo + burbuja + etiqueta
+const groups = gBub.selectAll('g.bubble-group')
+  .data(centers).join('g')
+  .attr('class', 'bubble-group')
+  .attr('data-centro', d => d.centro)
+  .attr('transform', d => {
+    const p = pos(d);
+    return `translate(${p.x},${p.y})`;
+  });
+
+groups.append('circle').attr('class', 'ring-bg')
+  .attr('r', 0).attr('fill', 'none')
+  .attr('stroke', '#1e293b').attr('stroke-width', 2.4).attr('opacity', .7);
+
+groups.append('circle').attr('class', 'ring-prod')
+  .attr('r', 0).attr('fill', 'none')
+  .attr('stroke', '#22d3ee').attr('stroke-width', 2.4)
+  .attr('opacity', .85)
+  .attr('transform', 'rotate(-90)')
+  .attr('stroke-linecap', 'round');
+
+groups.append('circle').attr('class', 'bubble')
+  .attr('r', 0)
+  .attr('fill-opacity', d => d.tipo === 'sin_centro' ? .10 : .55)
+  .attr('stroke-width', 1.3)
+  .attr('stroke-dasharray', d => d.tipo === 'sin_centro' ? '3,3' : null);
+
+groups.append('text').attr('class', 'label')
+  .classed('always', d => d.tipo === 'sin_centro')
+  .attr('text-anchor', 'middle').attr('dy', 0)
+  .text(d => shortName(d.centro));
+
+function radius(d) {
+  if (!visible(d)) return 0;
+  if (!d.n_efectivo_union) return 3;
+  return sizeScale()(val(d, sizeMetric));
+}
+
+function ringDash(r, pct) {
+  const circ = 2 * Math.PI * (r + 5);
+  return `${circ * Math.max(0, Math.min(100, pct)) / 100} ${circ}`;
+}
+
+function updateLegend() {
+  const bar = document.getElementById('legend-bar');
+  const min = document.getElementById('legend-min');
+  const max = document.getElementById('legend-max');
+  if (colorMetric === 'cobertura_produccion_pct') {
+    bar.style.background = 'linear-gradient(90deg,#2dd4bf,#fbbf24,#fb7185,#ef4444)';
+    min.textContent = '40 %'; max.textContent = '100 %';
+  } else {
+    bar.style.background = 'linear-gradient(90deg,#38bdf8,#818cf8,#c084fc,#fb7185)';
+    min.textContent = '0 %'; max.textContent = '100 %';
+  }
+}
+
+function paint(animate) {
+  const r = d => radius(d);
+  const dur = animate ? 650 : 0;
+  const ease = d3.easeCubicOut;
+
+  groups.select('circle.bubble')
+    .transition().duration(dur).ease(ease)
+    .attr('r', d => r(d))
+    .attr('fill', d => d.tipo === 'sin_centro' ? 'rgba(148,163,184,.10)' : colorScale()(val(d, colorMetric)))
+    .attr('stroke', d => d.tipo === 'sin_centro' ? '#94a3b8' : colorScale()(val(d, colorMetric)));
+
+  groups.select('circle.ring-bg')
+    .transition().duration(dur).ease(ease)
+    .attr('r', d => r(d) + 5);
+
+  groups.select('circle.ring-prod')
+    .transition().duration(dur).ease(ease)
+    .attr('r', d => r(d) + 5)
+    .attr('stroke-dasharray', d => ringDash(r(d), d.cobertura_produccion_pct));
+
+  groups.select('text.label')
+    .attr('dy', d => d.tipo === 'sin_centro' ? r(d) + 16 : -r(d) - 9)
+    .style('display', d => visible(d) && d.n_efectivo_union > 0 ? null : 'none');
+
+  groups.style('pointer-events', d => visible(d) ? null : 'none')
+        .style('opacity', d => visible(d) ? 1 : 0);
+
+  drawSizeLegend(sizeScale());
+  drawLeaders();
+}
+
+function drawSizeLegend(s) {
+  const box = d3.select('#size-legend').html('');
+  const max = maxSize();
+  [0, Math.round(max * .25), Math.round(max * .5), Math.round(max)].forEach(t => {
+    const w = d3.create('div').attr('class', 'dot-wrap');
+    const px = Math.max(4, s(t));
+    w.append('div').attr('class', 'dot')
+      .style('width', px + 'px').style('height', px + 'px');
+    w.append('span').text(t);
+    box.node().appendChild(w.node());
+  });
+}
+
+function drawLeaders() {
+  gLead.selectAll('*').remove();
+  gDots.selectAll('*').remove();
+  centers.forEach((d, i) => {
+    if (!visible(d)) return;
+    const a = anchors[i], p = layout[i];
+    if (!a || !p) return;
+    if (Math.hypot(p.x - a.x, p.y - a.y) > 3) {
+      gLead.append('line')
+        .attr('x1', a.x).attr('y1', a.y)
+        .attr('x2', p.x).attr('y2', p.y)
+        .attr('stroke', '#64748b').attr('stroke-width', .7).attr('opacity', .45);
+    }
+    if (d.tipo !== 'sin_centro') {
+      gDots.append('circle')
+        .attr('data-centro', d.centro)
+        .attr('cx', a.x).attr('cy', a.y).attr('r', 2.2)
+        .attr('fill', '#67e8f9').attr('stroke', '#070b16')
+        .attr('stroke-width', .9).attr('opacity', .95);
+    }
+  });
+  if (sinC && visible(sinC)) {
+    const val = projection([39.4699, -0.3763]);
+    const p = pos(sinC);
+    gLead.append('line')
+      .attr('x1', val[0]).attr('y1', val[1])
+      .attr('x2', p.x).attr('y2', p.y)
+      .attr('stroke', '#475569').attr('stroke-width', .8)
+      .attr('stroke-dasharray', '2,5').attr('opacity', .3);
+  }
+}
+
+function showTip(evt, d) {
+  const rect = container.getBoundingClientRect();
+  const gap = d.brecha_pct >= 0 ? `+${d.brecha_pct}` : `${d.brecha_pct}`;
+  tip.style('opacity', 1)
+     .style('left', Math.min(evt.clientX - rect.left + 14, rect.width - 330) + 'px')
+     .style('top', Math.min(evt.clientY - rect.top + 14, rect.height - 320) + 'px')
+     .html(`
+       <div class="t-name">${d.centro}</div>
+       <div class="t-type">${tipoLabel[d.tipo] || d.tipo}</div>
+       <table>
+         <tr><td>Cobertura ORCID declarada</td><td>${d.cobertura_declarada_pct}% (${d.orcid_declarado}/${d.total_roster})</td></tr>
+         <tr><td>ORCID recuperado</td><td>+${d.orcid_recuperado}</td></tr>
+         <tr><td>Cobertura ORCID ampliada</td><td>${d.cobertura_ampliada_pct}%</td></tr>
+         <tr><td>Producción (ORCID + portal)</td><td>${d.cobertura_produccion_pct}% (${d.con_produccion}/${d.total_roster})</td></tr>
+         <tr class="sep"><td>Brecha de visibilidad</td><td>${gap} puntos</td></tr>
+         <tr><td>Mediana ORCID</td><td>${d.mediana_orcid ?? '—'} (n=${d.n_efectivo_orcid})</td></tr>
+         <tr><td>Mediana unión</td><td>${d.mediana_union ?? '—'} (n=${d.n_efectivo_union})</td></tr>
+         <tr class="sep"><td>Pares persona-obra</td><td>${d.pares_union.toLocaleString('es-ES')}</td></tr>
+         <tr><td>Obras únicas</td><td>${d.obras_union.toLocaleString('es-ES')}</td></tr>
+         <tr><td>· vía ORCID</td><td>${d.pares_orcid.toLocaleString('es-ES')} pares · ${d.obras_orcid.toLocaleString('es-ES')} obras</td></tr>
+         <tr><td>· vía portal</td><td>${d.pares_portal.toLocaleString('es-ES')} pares · ${d.obras_portal.toLocaleString('es-ES')} obras</td></tr>
+       </table>
+       ${d.n_efectivo_union > 0 && d.n_efectivo_union < 5
+         ? `<div class="warn">⚠ n = ${d.n_efectivo_union}: mediana frágil, un solo caso la mueve.</div>` : ''}
+       <div class="t-coord">📍 ${Number(d.lat).toFixed(4)}, ${Number(d.lon).toFixed(4)}<br>${d.coord_fuente || ''}</div>
+     `);
+}
+function hideTip() { if (!pinned) tip.style('opacity', 0); }
+
+groups.select('circle.bubble')
+  .on('mouseenter', (evt, d) => { if (!pinned) showTip(evt, d); })
+  .on('mousemove', (evt, d) => { if (!pinned) showTip(evt, d); })
+  .on('mouseleave', hideTip)
+  .on('click', function(evt, d) {
+    evt.stopPropagation();
+    pinned = (pinned === d) ? null : d;
+    if (pinned) showTip(evt, d); else hideTip();
+  });
+
+svg.on('click', () => { pinned = null; hideTip(); });
+
+const zoom = d3.zoom().scaleExtent([1, 8]).on('zoom', evt => {
+  gRoot.attr('transform', evt.transform);
+});
+svg.call(zoom);
+
+document.querySelectorAll('#color-chips .chip').forEach(ch => {
+  ch.addEventListener('click', () => {
+    document.querySelectorAll('#color-chips .chip').forEach(x => x.classList.remove('on'));
+    ch.classList.add('on');
+    colorMetric = ch.dataset.k;
+    updateLegend();
+    paint(true);
+  });
+});
+document.querySelectorAll('#size-chips .chip').forEach(ch => {
+  ch.addEventListener('click', () => {
+    document.querySelectorAll('#size-chips .chip').forEach(x => x.classList.remove('on'));
+    ch.classList.add('on');
+    sizeMetric = ch.dataset.k;
+    paint(true);
+  });
+});
+document.getElementById('f-small').addEventListener('change', () => paint(true));
+document.getElementById('f-limbo').addEventListener('change', () => paint(true));
+
+computeLayout();
+updateLegend();
+paint(false);
+groups.select('circle.bubble')
+  .transition().duration(900).ease(d3.easeCubicOut)
+  .attr('r', d => radius(d));
+groups.select('circle.ring-bg')
+  .transition().duration(900).ease(d3.easeCubicOut)
+  .attr('r', d => radius(d) + 5);
+groups.select('circle.ring-prod')
+  .transition().duration(900).ease(d3.easeCubicOut)
+  .attr('r', d => radius(d) + 5)
+  .attr('stroke-dasharray', d => ringDash(radius(d), d.cobertura_produccion_pct));
+groups.select('text.label').attr('dy', d => d.tipo === 'sin_centro' ? radius(d) + 16 : -radius(d) - 9);
+
+window.addEventListener('resize', () => {
+  W = window.innerWidth - panelW; H = window.innerHeight;
+  svg.attr('viewBox', [0, 0, W, H]);
+  projection.fitExtent([[70, 70], [W - 70, H - 70]], GEO);
+  gProv.selectAll('path').attr('d', path);
+  computeLayout();
+  groups.attr('transform', d => {
+    const p = pos(d);
+    return `translate(${p.x},${p.y})`;
+  });
+  paint(false);
+});
+</script>
+</body>
+</html>

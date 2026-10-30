@@ -46,7 +46,7 @@ h1 em{font-style:italic;font-weight:400}
 .nota{margin:0 0 6px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-suave);text-align:right}
 .nota b{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:26px;letter-spacing:0;text-transform:none;color:var(--tinta);margin-top:6px}
 
-.piezas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,3vw,28px);padding-bottom:clamp(30px,5vw,52px)}
+.piezas{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(16px,3vw,28px);padding-bottom:clamp(30px,5vw,52px)}
 .pieza{position:relative;display:flex;flex-direction:column;text-decoration:none;background:var(--papel-alto);
   border:1px solid rgba(29,15,68,.18);border-radius:4px 22px 5px 18px;overflow:hidden;
   box-shadow:0 30px 60px -46px rgba(29,15,68,.8);transition:transform .35s ease,box-shadow .35s ease,border-color .35s}
@@ -117,6 +117,17 @@ footer a:hover{color:var(--rojo);border-color:var(--rojo)}
         <span class="entrar">Entrar <span aria-hidden="true">→</span></span>
       </div>
       <span class="cinta">Guía interactiva</span>
+    </a>
+
+    <a class="pieza" href="mapa-orcid/" aria-labelledby="p-mapa">
+      <div class="foto"><img src="mapa-orcid/preview.png" alt="Mapa interactivo de los 31 centros FISABIO: burbujas por cobertura ORCID y anillos por producción visible." loading="lazy" width="1280" height="800"></div>
+      <div class="cuerpo">
+        <span class="rotulo">Datos · Ciencia abierta</span>
+        <h2 id="p-mapa">Dónde se ve la investigación</h2>
+        <p>31 centros y 1.087 personas: cobertura ORCID, producción visible y la brecha entre ambas. Un mapa para leer qué infraestructura nos hace visibles.</p>
+        <span class="entrar">Entrar <span aria-hidden="true">→</span></span>
+      </div>
+      <span class="cinta">Mapa interactivo</span>
     </a>
   </main>
 
