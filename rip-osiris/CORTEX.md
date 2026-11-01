@@ -32,11 +32,10 @@
 | Unión de ambas vías (pares) | **38.928** |
 | Unión de ambas vías (obras) | **25.472** |
 | Candidatos ORCID inverso | **102** |
-| Confirmados por solape DOI | **25** |
-| Confirmados por nombre + afiliación | **9** (6 limpios + 3 sospechosos) |
-| Probables | **25** (12 añadidos como `reverso_multisenal`) |
-| A revisar | **24** |
-| Rechazados | **7** |
+| Ya escritos | **77** (25 DOI + 42 solape/coautor + 6 nombre/afiliación + 4 variante/invertido/incompleto/OpenAlex) |
+| A revisar | **16** |
+| Descartados | **6** |
+| Sospechosos | **3** |
 
 ---
 
