@@ -155,7 +155,8 @@ python scripts\genera_mapa_v2.py
 
 ## 7. Estado
 
-- Publicado el 01-11-2026 (commit `14e53cc`): fix móvil, caché completa 77/77 y revisión final (668).
+- Publicado el 01-11-2026 (commit `4c442f2`): fix móvil, caché completa 77/77, revisión final (668) y corrección del layout inicial.
+- Corregido: `computeLayout()` se ejecuta antes de crear los grupos; al recargar, las burbujas ya no se acumulan en `(0,0)`.
 - Dataset v2 con 31 centros, tres capas y 668 ORCID ampliados.
 - Base escrita de forma idempotente: **668 ORCID**, **26.251 obras**, **55.748 work_ids**, **54.075 author_work** (31.863 `orcid_exacto` + 1.602 `orcid_reverso` + 17.514 `portal_doi` + 3.096 `portal_publicacion`).
 - Pendiente: revisión humana de **15 descartados + 5 en revisión + 3 sospechosos**. Añadidos en la revisión final: Ángel Moya y María Cuenca; Carmen Hernández queda fuera por afiliación UAB y una sola obra.

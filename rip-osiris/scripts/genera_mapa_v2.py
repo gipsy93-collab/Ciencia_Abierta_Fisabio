@@ -279,6 +279,8 @@ function shortName(n) {
 }
 
 // entrada: grupos + anillo + burbuja + etiqueta
+computeLayout();
+
 const groups = gBub.selectAll('g.bubble-group')
   .data(centers).join('g')
   .attr('class', 'bubble-group')
@@ -476,7 +478,6 @@ document.querySelectorAll('#size-chips .chip').forEach(ch => {
 document.getElementById('f-small').addEventListener('change', () => paint(true));
 document.getElementById('f-limbo').addEventListener('change', () => paint(true));
 
-computeLayout();
 updateLegend();
 paint(false);
 groups.select('circle.bubble')
