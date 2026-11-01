@@ -15,7 +15,7 @@ El mapa tiene **tres capas de cobertura** conmutables y **dos métricas de tama�
 
 | Elemento | Qué representa |
 |---|---|
-| **Relleno de la burbuja** | Cobertura seleccionada: ORCID declarada (589), ORCID ampliada (666) o producción (914) |
+| **Relleno de la burbuja** | Cobertura seleccionada: ORCID declarada (589), ORCID ampliada (668) o producción (914) |
 | **Tamaño de la burbuja** | Mediana de obras: ORCID (solo personas con ORCID) o unión (ORCID + portal) |
 | **Anillo cian** | Cobertura de producción; el hueco del anillo es lo que el ORCID no ve |
 | **Punto cian** | Coordenada exacta del edificio (geocodificada) |
@@ -24,7 +24,7 @@ El mapa tiene **tres capas de cobertura** conmutables y **dos métricas de tama�
 ### Las tres coberturas
 
 - **ORCID declarada:** personas con ORCID en su ficha del portal. 589 / 1.087 = **54,2 %**.
-- **ORCID ampliada:** declarada + recuperada por solape de DOI, coautores o nombre+afiliación. 666 / 1.087 = **61,3 %**.
+- **ORCID ampliada:** declarada + recuperada por solape de DOI, coautores o nombre+afiliación. 668 / 1.087 = **61,5 %**.
 - **Producción:** personas con al menos una obra por ORCID o por el portal. 914 / 1.087 = **84,1 %**.
 
 ### Las dos medianas
@@ -155,8 +155,8 @@ python scripts\genera_mapa_v2.py
 
 ## 7. Estado
 
-- Publicado el 01-11-2026 (commit `9031a82`): fix móvil y caché completa 77/77.
-- Dataset v2 con 31 centros, tres capas y 666 ORCID ampliados.
-- Base escrita de forma idempotente: **666 ORCID**, **26.230 obras**, **55.705 work_ids**, **54.043 author_work** (31.863 `orcid_exacto` + 1.570 `orcid_reverso` + 17.514 `portal_doi` + 3.096 `portal_publicacion`).
-- Pendiente: revisión humana de **11 señales mixtas + 10 a revisar + 1 probable + 3 sospechosos**; los 11 incluyen los falsos positivos de nombre ya detectados (Ana Kelle, Alba Fernández…), así que no se autoañaden.
+- Publicado el 01-11-2026 (commit `14e53cc`): fix móvil, caché completa 77/77 y revisión final (668).
+- Dataset v2 con 31 centros, tres capas y 668 ORCID ampliados.
+- Base escrita de forma idempotente: **668 ORCID**, **26.251 obras**, **55.748 work_ids**, **54.075 author_work** (31.863 `orcid_exacto` + 1.602 `orcid_reverso` + 17.514 `portal_doi` + 3.096 `portal_publicacion`).
+- Pendiente: revisión humana de **15 descartados + 5 en revisión + 3 sospechosos**. Añadidos en la revisión final: Ángel Moya y María Cuenca; Carmen Hernández queda fuera por afiliación UAB y una sola obra.
 - Pendiente: enriquecer los 3 títulos que quedaron como `(sin título)` cuando OpenAlex se recupere (caché resumible en `data/openalex_titles.json`).

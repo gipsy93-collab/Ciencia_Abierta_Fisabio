@@ -21,7 +21,7 @@
 |---|---|
 | Roster del portal | **1.087** |
 | ORCID declarado en la ficha | **589 (54,2 %)** |
-| ORCID ampliado (declarado + recuperado) | **666 (61,3 %)** |
+| ORCID ampliado (declarado + recuperado) | **668 (61,5 %)** |
 | Personas con producción (ORCID o portal) | **914 (84,1 %)** |
 | Publicaciones únicas del portal | **11.154** |
 | Pares persona-obra del portal | **20.616** |
@@ -45,17 +45,17 @@
 
 | Tabla | Filas | Estado |
 |---|---:|---|
-| `researchers` | 1.087 | **666 con ORCID**: 589 `portal_ficha` + 25 `reverso_doi` + 42 `reverso_multisenal` + 6 `reverso_nombre_afiliacion` + 1 `reverso_nombre_variante` + 1 `reverso_openalex` + 1 `reverso_nombre_invertido` + 1 `reverso_nombre_incompleto` |
-| `works` | **26.230** | 21.428 con DOI; 1.620 portal-only sin DOI; 3 sin título |
-| `work_ids` | **55.705** | 23.123 OpenAlex + 21.428 DOI + 11.154 portal |
-| `author_work` | **54.043** | 31.863 `orcid_exacto` + 1.570 `orcid_reverso` + 17.514 `portal_doi` + 3.096 `portal_publicacion` |
+| `researchers` | 1.087 | **668 con ORCID**: 589 `portal_ficha` + 25 `reverso_doi` + 44 `reverso_multisenal` + 6 `reverso_nombre_afiliacion` + 1 `reverso_nombre_variante` + 1 `reverso_openalex` + 1 `reverso_nombre_invertido` + 1 `reverso_nombre_incompleto` |
+| `works` | **26.251** | 21.449 con DOI; 1.620 portal-only sin DOI; 3 sin título |
+| `work_ids` | **55.748** | 23.145 OpenAlex + 21.449 DOI + 11.154 portal |
+| `author_work` | **54.075** | 31.863 `orcid_exacto` + 1.602 `orcid_reverso` + 17.514 `portal_doi` + 3.096 `portal_publicacion` |
 | `outputs` | 212 | censo previo de centros, no toca este pipeline |
 
 `PRAGMA integrity_check` = **ok** · `PRAGMA foreign_key_check` = **0 incidencias**.
 
 **Fuera de la escritura:** los 22 candidatos pendientes de revisión (11 con señales mixtas, 10 a revisar y 1 probable) y los 3 sospechosos. No se ha borrado ni modificado nada previo.
 
-**Pendiente de escritura incremental:** completada el 01-11-2026: **758 obras nuevas** y **1.570 pares `orcid_reverso`**, reutilizando las 25.472 obras existentes sin duplicarlas.
+**Pendiente de escritura incremental:** completada el 01-11-2026: **779 obras nuevas** y **1.602 pares `orcid_reverso`**, reutilizando las 25.472 obras existentes sin duplicarlas.
 
 ---
 
@@ -111,8 +111,8 @@ En `scripts/`:
 
 ## 6. Pendientes
 
-- [x] **Escritura en la base** con backup y transacción (01-11-2026): **666 ORCID** (589 + 25 + 42 + 6 + 1 + 1 + 1 + 1), 25.472 obras, 54.178 IDs, 52.473 vínculos.
-- [ ] Revisión humana de `data/revision_orcid_personas.md` (**11 señales mixtas + 10 a revisar + 1 probable + 3 sospechosos**). Los 11 incluyen los falsos positivos de nombre ya detectados (Ana Kelle, Alba Fernández…); no se autoañaden.
+- [x] **Escritura en la base** con backup y transacción (01-11-2026): **668 ORCID** (589 + 25 + 44 + 6 + 1 + 1 + 1 + 1), 26.251 obras, 55.748 IDs, 54.075 vínculos.
+- [ ] Revisión humana de `data/revision_orcid_personas.md` (**20 pendientes: 15 descartados + 5 en revisión**) + 3 sospechosos. Añadidos en la revisión final: Ángel Moya y María Cuenca; Carmen Hernández queda fuera por afiliación UAB y una sola obra.
 - [ ] 3.096 publicaciones del portal sin DOI ni año: mejorar el parser o aceptar el límite.
 - [ ] 19 grupos sin centro declarado: Fundanet o sede de la GVA.
 - [ ] Rastrear la web pública de FISABIO y la memoria de gestión (pendiente acordado).
