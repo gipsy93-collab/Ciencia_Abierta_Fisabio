@@ -46,14 +46,16 @@
 | Tabla | Filas | Estado |
 |---|---:|---|
 | `researchers` | 1.087 | **666 con ORCID**: 589 `portal_ficha` + 25 `reverso_doi` + 42 `reverso_multisenal` + 6 `reverso_nombre_afiliacion` + 1 `reverso_nombre_variante` + 1 `reverso_openalex` + 1 `reverso_nombre_invertido` + 1 `reverso_nombre_incompleto` |
-| `works` | 25.472 | 20.824 con DOI; 1.620 portal-only sin DOI; 3 sin título |
-| `work_ids` | 54.178 | 22.200 OpenAlex + 20.824 DOI + 11.154 portal |
-| `author_work` | 52.473 | 31.863 `orcid_exacto` + 17.514 `portal_doi` + 3.096 `portal_publicacion` |
+| `works` | **26.230** | 21.428 con DOI; 1.620 portal-only sin DOI; 3 sin título |
+| `work_ids` | **55.705** | 23.123 OpenAlex + 21.428 DOI + 11.154 portal |
+| `author_work` | **54.043** | 31.863 `orcid_exacto` + 1.570 `orcid_reverso` + 17.514 `portal_doi` + 3.096 `portal_publicacion` |
 | `outputs` | 212 | censo previo de centros, no toca este pipeline |
 
 `PRAGMA integrity_check` = **ok** · `PRAGMA foreign_key_check` = **0 incidencias**.
 
-**Fuera de la escritura:** los 37 `probable` y 24 `revisar` del ORCID inverso, y los 3 sospechosos (`Cristina Fernandez Martinez`, `Jose Luis Rodrigo Perez`, `Monica Romero Nieto`). No se ha borrado ni modificado nada previo.
+**Fuera de la escritura:** los 22 candidatos pendientes de revisión (11 con señales mixtas, 10 a revisar y 1 probable) y los 3 sospechosos. No se ha borrado ni modificado nada previo.
+
+**Pendiente de escritura incremental:** completada el 01-11-2026: **758 obras nuevas** y **1.570 pares `orcid_reverso`**, reutilizando las 25.472 obras existentes sin duplicarlas.
 
 ---
 
@@ -110,7 +112,7 @@ En `scripts/`:
 ## 6. Pendientes
 
 - [x] **Escritura en la base** con backup y transacción (01-11-2026): **666 ORCID** (589 + 25 + 42 + 6 + 1 + 1 + 1 + 1), 25.472 obras, 54.178 IDs, 52.473 vínculos.
-- [ ] Revisión humana de `data/revision_orcid_personas.md` (**16 a revisar + 6 descartados + 3 sospechosos**).
+- [ ] Revisión humana de `data/revision_orcid_personas.md` (**11 señales mixtas + 10 a revisar + 1 probable + 3 sospechosos**). Los 11 incluyen los falsos positivos de nombre ya detectados (Ana Kelle, Alba Fernández…); no se autoañaden.
 - [ ] 3.096 publicaciones del portal sin DOI ni año: mejorar el parser o aceptar el límite.
 - [ ] 19 grupos sin centro declarado: Fundanet o sede de la GVA.
 - [ ] Rastrear la web pública de FISABIO y la memoria de gestión (pendiente acordado).

@@ -10,7 +10,6 @@ Uso:
 """
 from __future__ import annotations
 
-import csv
 import json
 import os
 import re
@@ -28,8 +27,7 @@ DB = ROOT / "data" / "rip_osiris.sqlite"
 BACKUP = ROOT / "data" / "rip_osiris.backup-2026-11-01.sqlite"
 MAIL = os.environ.get("OPENALEX_MAILTO", "rip-osiris@localhost")
 WRITE = "--write" in sys.argv
-
-SOSPECHOSOS = {"Cristina Fernandez Martinez", "Jose Luis Rodrigo Perez", "Monica Romero Nieto"}
+SKIP_TITLES = "--skip-titles" in sys.argv
 
 
 def nd(d):
@@ -51,17 +49,28 @@ con.row_factory = sqlite3.Row
 investigadores = {r["id"]: dict(r) for r in con.execute("SELECT id, portal_id, name FROM researchers")}
 con.close()
 
-declarado = {}
-for f in csv.DictReader((ROOT / "data" / "cosecha_orcid.csv").open(encoding="utf-8-sig")):
-    if f["orcid"]:
-        declarado[int(f["researcher_id"])] = norm_orcid(f["orcid"])
+FUENTES_RECUPERADO = {
+    "reverso_doi", "reverso_nombre_afiliacion", "reverso_multisenal",
+    "reverso_nombre_variante", "reverso_openalex",
+    "reverso_nombre_invertido", "reverso_nombre_incompleto",
+}
 
+declarado = {}
 recuperado = {}
-for r in csv.DictReader((ROOT / "data" / "orcid_reverso_multisenal.csv").open(encoding="utf-8-sig")):
-    if r["estado_final"] in ("confirmado_doi", "confirmado_nombre_afiliacion") \
-       and r["nombre"] not in SOSPECHOSOS:
-        fuente = "reverso_doi" if r["estado_final"] == "confirmado_doi" else "reverso_nombre_afiliacion"
-        recuperado[int(r["researcher_id"])] = (norm_orcid(r["orcid"]), fuente)
+con = sqlite3.connect(DB)
+con.row_factory = sqlite3.Row
+for r in con.execute(
+    "SELECT id, orcid, orcid_source FROM researchers "
+    "WHERE orcid IS NOT NULL AND orcid != ''"
+):
+    o = norm_orcid(r["orcid"])
+    if not o:
+        continue
+    if r["orcid_source"] == "portal_ficha":
+        declarado[int(r["id"])] = o
+    elif r["orcid_source"] in FUENTES_RECUPERADO:
+        recuperado[int(r["id"])] = (o, r["orcid_source"])
+con.close()
 
 print(f"   declarados {len(declarado)} · recuperados {len(recuperado)}", flush=True)
 
@@ -198,38 +207,49 @@ for pid, d in portal_works.items():
 print(f"   obras únicas {len(union)} · con DOI {sum(1 for u in union.values() if u['doi'])}", flush=True)
 
 # ---------------------------------------------------------------- títulos OpenAlex
-print("5. recuperando títulos de OpenAlex...", flush=True)
-sin_titulo = [u for u in union.values() if not u["title"] and u["openalex_id"]]
-ids = [u["openalex_id"] for u in sin_titulo]
-print(f"   obras sin título con ID OpenAlex: {len(ids)}", flush=True)
-titulos = {}
-for i in range(0, len(ids), 50):
-    lote = ids[i:i + 50]
-    url = ("https://api.openalex.org/works?filter=openalex:" + "|".join(lote)
-           + "&select=id,doi,title,publication_year,type&per-page=50"
-           + f"&mailto={MAIL}")
-    req = urllib.request.Request(url, headers={"User-Agent": f"rip-osiris/0.1 (mailto:{MAIL})"})
-    for intento in range(3):
-        try:
-            with urllib.request.urlopen(req, timeout=90) as r:
-                data = json.load(r)
-            for w in data.get("results") or []:
-                wid = (w.get("id") or "").rstrip("/").split("/")[-1]
-                titulos[wid] = {
-                    "title": w.get("title"),
-                    "year": w.get("publication_year"),
-                    "type": w.get("type"),
-                    "doi": nd(w.get("doi")),
-                }
-            break
-        except Exception as exc:
-            if intento < 2:
-                time.sleep(2 ** (intento + 1))
-            else:
-                print(f"   lote fallido: {exc}", flush=True)
-    if (i // 50 + 1) % 50 == 0:
-        print(f"   lotes {i//50+1}/{(len(ids)+49)//50} · títulos {len(titulos)}", flush=True)
-    time.sleep(0.12)
+if SKIP_TITLES:
+    print("5. títulos: omitidos (--skip-titles); se usarán los del portal o «(sin título)».", flush=True)
+    titulos = {}
+else:
+    TITLE_CACHE = ROOT / "data" / "openalex_titles.json"
+    titulos = json.loads(TITLE_CACHE.read_text(encoding="utf-8")) if TITLE_CACHE.exists() else {}
+    sin_titulo = [
+        u for u in union.values()
+        if not u["title"] and u["openalex_id"] and u["openalex_id"] not in titulos
+    ]
+    ids = [u["openalex_id"] for u in sin_titulo]
+    print("5. recuperando títulos de OpenAlex...", flush=True)
+    print(f"   ya en caché: {len(titulos)} · pendientes: {len(ids)}", flush=True)
+    for i in range(0, len(ids), 50):
+        lote = ids[i:i + 50]
+        url = ("https://api.openalex.org/works?filter=openalex:" + "|".join(lote)
+               + "&select=id,doi,title,publication_year,type&per-page=50"
+               + f"&mailto={MAIL}")
+        req = urllib.request.Request(url, headers={"User-Agent": f"rip-osiris/0.1 (mailto:{MAIL})"})
+        for intento in range(4):
+            try:
+                with urllib.request.urlopen(req, timeout=90) as r:
+                    data = json.load(r)
+                for w in data.get("results") or []:
+                    wid = (w.get("id") or "").rstrip("/").split("/")[-1]
+                    titulos[wid] = {
+                        "title": w.get("title"),
+                        "year": w.get("publication_year"),
+                        "type": w.get("type"),
+                        "doi": nd(w.get("doi")),
+                    }
+                break
+            except Exception as exc:
+                if intento < 3:
+                    time.sleep(10 * (intento + 1))  # 10, 20, 30 s ante 429
+                else:
+                    print(f"   lote fallido: {exc}", flush=True)
+        if (i // 50 + 1) % 10 == 0:
+            TITLE_CACHE.write_text(json.dumps(titulos, ensure_ascii=False), encoding="utf-8")
+            print(f"   lotes {i//50+1}/{(len(ids)+49)//50} · títulos {len(titulos)}", flush=True)
+        time.sleep(0.25)  # ~4 req/s, más conservador
+
+    TITLE_CACHE.write_text(json.dumps(titulos, ensure_ascii=False), encoding="utf-8")
 
 for u in union.values():
     if u["openalex_id"] and u["openalex_id"] in titulos:
@@ -242,7 +262,7 @@ for u in union.values():
             u["type"] = t["type"]
 
 sin_titulo_final = sum(1 for u in union.values() if not u["title"])
-print(f"   títulos recuperados {len(titulos)} · obras aún sin título {sin_titulo_final}", flush=True)
+print(f"   títulos en caché {len(titulos)} · obras aún sin título {sin_titulo_final}", flush=True)
 
 # ---------------------------------------------------------------- dry-run
 print("\n=== RESUMEN ===")
@@ -276,6 +296,7 @@ print(f"   backup: {BACKUP} ({BACKUP.stat().st_size:,} bytes)", flush=True)
 # ---------------------------------------------------------------- escritura
 print("7. escribiendo en transacción...", flush=True)
 con = sqlite3.connect(DB, isolation_level=None)
+con.row_factory = sqlite3.Row
 con.execute("PRAGMA foreign_keys = ON")
 try:
     con.execute("BEGIN IMMEDIATE")

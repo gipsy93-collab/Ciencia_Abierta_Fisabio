@@ -155,8 +155,8 @@ python scripts\genera_mapa_v2.py
 
 ## 7. Estado
 
-- La versión publicada anteriormente fue verificada (HTTP 200, sin errores de consola).
-- Dataset v2 con 31 centros y las tres capas.
-- El HTML y el dataset guardados no se regeneraron con estas correcciones; sus cifras reflejan la generación anterior hasta ejecutar el flujo actualizado.
-- Hecho: escritura en la base (`researchers.orcid`, `works`, `work_ids`, `author_work`) con backup y transacción (666 ORCID · 25.472 obras · 52.473 vínculos).
-- Pendiente: revisión humana de **16 a revisar + 6 descartados + 3 sospechosos** del ORCID inverso.
+- Publicado el 01-11-2026 (commit `9031a82`): fix móvil y caché completa 77/77.
+- Dataset v2 con 31 centros, tres capas y 666 ORCID ampliados.
+- Base escrita de forma idempotente: **666 ORCID**, **26.230 obras**, **55.705 work_ids**, **54.043 author_work** (31.863 `orcid_exacto` + 1.570 `orcid_reverso` + 17.514 `portal_doi` + 3.096 `portal_publicacion`).
+- Pendiente: revisión humana de **11 señales mixtas + 10 a revisar + 1 probable + 3 sospechosos**; los 11 incluyen los falsos positivos de nombre ya detectados (Ana Kelle, Alba Fernández…), así que no se autoañaden.
+- Pendiente: enriquecer los 3 títulos que quedaron como `(sin título)` cuando OpenAlex se recupere (caché resumible en `data/openalex_titles.json`).
