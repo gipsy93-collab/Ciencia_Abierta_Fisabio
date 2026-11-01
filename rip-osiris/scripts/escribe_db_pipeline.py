@@ -290,26 +290,60 @@ try:
         "WHERE id=? AND (orcid IS NULL OR orcid='')",
         [(o, src, rid) for rid, (o, src) in recuperado.items()])
 
-    # works y work_ids
+    # works y work_ids (idempotente: reutiliza lo ya escrito)
+    ids_por_valor = {}
+    ids_existentes = set()
+    for r in con.execute("SELECT work_id, scheme, value FROM work_ids"):
+        clave = (r["scheme"], r["value"])
+        ids_por_valor.setdefault(clave, r["work_id"])
+        ids_existentes.add((r["work_id"], *clave))
+    existentes = {}
+    for r in con.execute("SELECT id, canonical_key, doi FROM works"):
+        if r["canonical_key"]:
+            existentes[r["canonical_key"]] = r["id"]
+        if r["doi"]:
+            existentes.setdefault("doi:" + r["doi"], r["id"])
+
     id_de = {}
+    nuevos = reutilizados = 0
     for n, (key, u) in enumerate(union.items(), 1):
-        title = u["title"] or "(sin título)"
-        con.execute(
-            "INSERT INTO works (doi, title, year, type, canonical_key) VALUES (?,?,?,?,?)",
-            (u["doi"], title, u["year"], u["type"], key))
-        wid = con.execute("SELECT last_insert_rowid()").fetchone()[0]
-        id_de[key] = wid
+        candidatos = [existentes.get(key)]
         if u["doi"]:
-            con.execute("INSERT INTO work_ids (work_id, scheme, value) VALUES (?,?,?)",
-                        (wid, "doi", u["doi"]))
+            candidatos.append(existentes.get("doi:" + u["doi"]))
+            candidatos.append(ids_por_valor.get(("doi", u["doi"])))
         if u["openalex_id"]:
-            con.execute("INSERT INTO work_ids (work_id, scheme, value) VALUES (?,?,?)",
-                        (wid, "openalex", u["openalex_id"]))
+            candidatos.append(ids_por_valor.get(("openalex", u["openalex_id"])))
         for pid in u["portal_pub_ids"]:
-            con.execute("INSERT INTO work_ids (work_id, scheme, value) VALUES (?,?,?)",
-                        (wid, "portal", pid))
+            candidatos.append(ids_por_valor.get(("portal", pid)))
+        wid = next((x for x in candidatos if x is not None), None)
+
+        if wid is None:
+            title = u["title"] or "(sin título)"
+            con.execute(
+                "INSERT INTO works (doi, title, year, type, canonical_key) VALUES (?,?,?,?,?)",
+                (u["doi"], title, u["year"], u["type"], key))
+            wid = con.execute("SELECT last_insert_rowid()").fetchone()[0]
+            existentes[key] = wid
+            if u["doi"]:
+                existentes.setdefault("doi:" + u["doi"], wid)
+            nuevos += 1
+        else:
+            reutilizados += 1
+        id_de[key] = wid
+
+        altas = [("doi", u["doi"])] if u["doi"] else []
+        if u["openalex_id"]:
+            altas.append(("openalex", u["openalex_id"]))
+        altas.extend(("portal", pid) for pid in u["portal_pub_ids"])
+        for scheme, value in altas:
+            if (wid, scheme, value) not in ids_existentes:
+                con.execute(
+                    "INSERT INTO work_ids (work_id, scheme, value) VALUES (?,?,?)",
+                    (wid, scheme, value))
+                ids_existentes.add((wid, scheme, value))
         if n % 5000 == 0:
-            print(f"   works {n}/{len(union)}", flush=True)
+            print(f"   works {n}/{len(union)} · nuevos {nuevos} · reutilizados {reutilizados}", flush=True)
+    print(f"   works: {nuevos} nuevos · {reutilizados} reutilizados", flush=True)
 
     # author_work ORCID: los declarados son exactos; los recuperados son
     # inferencias y no deben presentarse con confianza 1,0.
