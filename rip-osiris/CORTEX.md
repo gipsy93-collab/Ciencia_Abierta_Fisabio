@@ -21,7 +21,7 @@
 |---|---|
 | Roster del portal | **1.087** |
 | ORCID declarado en la ficha | **589 (54,2 %)** |
-| ORCID ampliado (declarado + recuperado) | **620 (57,0 %)** |
+| ORCID ampliado (declarado + recuperado) | **632 (58,1 %)** |
 | Personas con producción (ORCID o portal) | **914 (84,1 %)** |
 | Publicaciones únicas del portal | **11.154** |
 | Pares persona-obra del portal | **20.616** |
@@ -34,7 +34,7 @@
 | Candidatos ORCID inverso | **102** |
 | Confirmados por solape DOI | **25** |
 | Confirmados por nombre + afiliación | **9** (6 limpios + 3 sospechosos) |
-| Probables | **37** |
+| Probables | **25** (12 añadidos como `reverso_multisenal`) |
 | A revisar | **24** |
 | Rechazados | **7** |
 
@@ -46,7 +46,7 @@
 
 | Tabla | Filas | Estado |
 |---|---:|---|
-| `researchers` | 1.087 | **620 con ORCID**: 589 `portal_ficha` + 25 `reverso_doi` + 6 `reverso_nombre_afiliacion` |
+| `researchers` | 1.087 | **632 con ORCID**: 589 `portal_ficha` + 25 `reverso_doi` + 12 `reverso_multisenal` + 6 `reverso_nombre_afiliacion` |
 | `works` | 25.472 | 20.824 con DOI; 1.620 portal-only sin DOI; 3 sin título |
 | `work_ids` | 54.178 | 22.200 OpenAlex + 20.824 DOI + 11.154 portal |
 | `author_work` | 52.473 | 31.863 `orcid_exacto` + 17.514 `portal_doi` + 3.096 `portal_publicacion` |
@@ -84,6 +84,7 @@ En `scripts/`:
 |---|---|
 | `pipeline_portal.py` | Cosecha publicaciones + DOI → OpenAlex + ORCID inverso + validación |
 | `valida_multisenal.py` | Reclasifica los 102 candidatos con nombre + afiliación + solape DOI + apoyo |
+| `agrega_orcid_pendientes.py` | Añade los candidatos con evidencia fuerte (nombre alto + ≥1 DOI) |
 | `fase1_dataset_v2.py` | Genera `mapa_orcid_dataset_v2.json` |
 | `genera_mapa_v2.py` | Genera `mapa_orcid_v2.html` |
 | `piloto_orcid_reverso.py` | Piloto de recuperación inversa (30 sin ORCID) |
@@ -106,8 +107,8 @@ En `scripts/`:
 
 ## 6. Pendientes
 
-- [x] **Escritura en la base** con backup y transacción (01-11-2026): 620 ORCID, 25.472 obras, 54.178 IDs, 52.473 vínculos.
-- [ ] Revisión humana de `data/orcid_reverso_multisenal.csv` (37 probables + 24 a revisar).
+- [x] **Escritura en la base** con backup y transacción (01-11-2026): **632 ORCID** (589 + 25 + 12 + 6), 25.472 obras, 54.178 IDs, 52.473 vínculos.
+- [ ] Revisión humana de `data/orcid_revision_pendientes.csv` (**25 probables + 24 a revisar + 3 sospechosos**).
 - [ ] 3.096 publicaciones del portal sin DOI ni año: mejorar el parser o aceptar el límite.
 - [ ] 19 grupos sin centro declarado: Fundanet o sede de la GVA.
 - [ ] Rastrear la web pública de FISABIO y la memoria de gestión (pendiente acordado).

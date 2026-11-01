@@ -9,7 +9,6 @@ Añade al dataset actual:
 """
 from __future__ import annotations
 
-import csv
 import json
 import re
 import sqlite3
@@ -22,8 +21,6 @@ sys.stdout.reconfigure(encoding="utf-8")
 ROOT = Path(r"C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris")
 BASE = json.loads((ROOT / "data" / "mapa_orcid_dataset.json").read_text(encoding="utf-8"))
 SALIDA = ROOT / "data" / "mapa_orcid_dataset_v2.json"
-
-SOSPECHOSOS = {"Cristina Fernandez Martinez", "Jose Luis Rodrigo Perez", "Monica Romero Nieto"}
 
 
 def nd(d):
@@ -38,14 +35,11 @@ centro = {r["rid"]: r["centro"] for r in con.execute(
     """SELECT ra.researcher_id rid, o.name centro FROM researcher_affiliations ra
        JOIN orgs o ON o.id=ra.org_id WHERE ra.affiliation_type='centro'""")}
 
-declarado = {int(f["researcher_id"]) for f in csv.DictReader(
-    (ROOT / "data" / "cosecha_orcid.csv").open(encoding="utf-8-sig")) if f["orcid"]}
-
-recuperado = set()
-for r in csv.DictReader((ROOT / "data" / "orcid_reverso_multisenal.csv").open(encoding="utf-8-sig")):
-    if r["estado_final"] in ("confirmado_doi", "confirmado_nombre_afiliacion") \
-       and r["nombre"] not in SOSPECHOSOS:
-        recuperado.add(int(r["researcher_id"]))
+declarado = {r["id"] for r in con.execute(
+    "SELECT id FROM researchers WHERE orcid_source='portal_ficha'")}
+recuperado = {r["id"] for r in con.execute(
+    "SELECT id FROM researchers WHERE orcid_source IN "
+    "('reverso_doi','reverso_nombre_afiliacion','reverso_multisenal')")}
 
 orcid_works = defaultdict(set)
 for linea in (ROOT / "data" / "author_work.jsonl").open(encoding="utf-8"):
