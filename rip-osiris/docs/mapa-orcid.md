@@ -15,7 +15,7 @@ El mapa tiene **tres capas de cobertura** conmutables y **dos métricas de tama�
 
 | Elemento | Qué representa |
 |---|---|
-| **Relleno de la burbuja** | Cobertura seleccionada: ORCID declarada (589), ORCID ampliada (668) o producción (914) |
+| **Relleno de la burbuja** | Cobertura seleccionada: ORCID declarada (589), ORCID ampliada (669) o producción (914) |
 | **Tamaño de la burbuja** | Mediana de obras: ORCID (solo personas con ORCID) o unión (ORCID + portal) |
 | **Anillo cian** | Cobertura de producción; el hueco del anillo es lo que el ORCID no ve |
 | **Punto cian** | Coordenada exacta del edificio (geocodificada) |
@@ -24,7 +24,7 @@ El mapa tiene **tres capas de cobertura** conmutables y **dos métricas de tama�
 ### Las tres coberturas
 
 - **ORCID declarada:** personas con ORCID en su ficha del portal. 589 / 1.087 = **54,2 %**.
-- **ORCID ampliada:** declarada + recuperada por solape de DOI, coautores o nombre+afiliación. 668 / 1.087 = **61,5 %**.
+- **ORCID ampliada:** declarada + recuperada por solape de DOI, coautores o nombre+afiliación. 669 / 1.087 = **61,5 %**.
 - **Producción:** personas con al menos una obra por ORCID o por el portal. 914 / 1.087 = **84,1 %**.
 
 ### Las dos medianas
@@ -155,9 +155,9 @@ python scripts\genera_mapa_v2.py
 
 ## 7. Estado
 
-- Publicado el 01-11-2026 (commit `4c442f2`): fix móvil, caché completa 77/77, revisión final (668) y corrección del layout inicial.
+- Publicado el 01-11-2026 (commit `209b952`): fix móvil, caché completa 80/80, revisión final (669) y corrección del layout inicial.
 - Corregido: `computeLayout()` se ejecuta antes de crear los grupos; al recargar, las burbujas ya no se acumulan en `(0,0)`.
-- Dataset v2 con 31 centros, tres capas y 668 ORCID ampliados.
-- Base escrita de forma idempotente: **668 ORCID**, **26.251 obras**, **55.748 work_ids**, **54.075 author_work** (31.863 `orcid_exacto` + 1.602 `orcid_reverso` + 17.514 `portal_doi` + 3.096 `portal_publicacion`).
-- Pendiente: revisión humana de **15 descartados + 5 en revisión + 3 sospechosos**. Añadidos en la revisión final: Ángel Moya y María Cuenca; Carmen Hernández queda fuera por afiliación UAB y una sola obra.
+- Dataset v2 con 31 centros, tres capas y 669 ORCID ampliados.
+- Base escrita de forma idempotente: **669 ORCID**, **26.260 obras**, **55.762 work_ids**, **54.087 author_work** (31.863 `orcid_exacto` + 1.614 `orcid_reverso` + 17.514 `portal_doi` + 3.096 `portal_publicacion`).
+- Pendiente: revisión humana de **16 descartados + 3 en revisión + 3 sospechosos**. Añadidos en la revisión final: Ángel Moya, María Cuenca y Juan Francisco Navarro; Carmen Hernández queda fuera por afiliación UAB y una sola obra.
 - Pendiente: enriquecer los 3 títulos que quedaron como `(sin título)` cuando OpenAlex se recupere (caché resumible en `data/openalex_titles.json`).

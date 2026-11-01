@@ -14,11 +14,12 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8")
 ROOT = Path(r"C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris")
 DB = ROOT / "data" / "rip_osiris.sqlite"
-BACKUP = ROOT / "data" / "rip_osiris.backup-2026-11-01-f.sqlite"
+BACKUP = ROOT / "data" / "rip_osiris.backup-2026-11-01-h.sqlite"
 
 CASOS = [
     (953, "Ángel Antonio Moya Herraiz", "0000-0002-5986-9304", "reverso_multisenal"),
     (534, "Maria Cuenca Torres", "0000-0001-7282-0639", "reverso_multisenal"),
+    (968, "Juan Francisco Navarro Gracia", "0000-0002-7839-1297", "reverso_multisenal"),
 ]
 
 con = sqlite3.connect(DB)
