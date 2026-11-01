@@ -64,6 +64,19 @@ class Perfil:
 
 
 @dataclass
+class Centro:
+    centro_id: str
+    nombre: str
+    grupos: int | None = None
+
+
+@dataclass
+class Grupo:
+    grupo_id: str
+    nombre: str
+
+
+@dataclass
 class PublicacionPortal:
     pub_id: str
     titulo: str
@@ -140,6 +153,38 @@ def parsear_investigadores(texto: str) -> list[Perfil]:
     return list(vistos.values())
 
 
+def parsear_centros(texto: str) -> list[Centro]:
+    """Facetas de centro de `/get-side-filter` (tipo grupos)."""
+    patron = re.compile(
+        r'(?s)id="center-(\d+)"\s+name-value="([^"]*)".*?<span>([^<]*)</span>'
+    )
+    vistos: dict[str, Centro] = {}
+    for centro_id, nombre, etiqueta in patron.findall(texto):
+        if centro_id in vistos:
+            continue
+        m = re.search(r"\((\d+)\)\s*$", _limpiar(etiqueta))
+        vistos[centro_id] = Centro(
+            centro_id=centro_id,
+            nombre=_limpiar(nombre),
+            grupos=int(m.group(1)) if m else None,
+        )
+    return list(vistos.values())
+
+
+def parsear_grupos(texto: str) -> list[Grupo]:
+    """Tarjetas de `/get-groups` -> grupos unicos por id."""
+    patron = re.compile(
+        r'href="?(?:https://fisabio\.portalinvestigacion\.com)?/grupos/(\d+)"?[^>]*>(.*?)</a>',
+        re.S | re.I,
+    )
+    vistos: dict[str, Grupo] = {}
+    for grupo_id, nombre_html in patron.findall(texto):
+        if grupo_id in vistos:
+            continue
+        vistos[grupo_id] = Grupo(grupo_id=grupo_id, nombre=_limpiar(nombre_html))
+    return list(vistos.values())
+
+
 def parsear_publicaciones(texto: str) -> list[PublicacionPortal]:
     """Tarjetas de `/get-publications` -> publicaciones únicas por id."""
     vistos: dict[str, PublicacionPortal] = {}
@@ -157,12 +202,21 @@ def parsear_publicaciones(texto: str) -> list[PublicacionPortal]:
         autores_html = None
         for indice, parrafo in enumerate(parrafos):
             m_doi = _RE_DOI_EN_TEXTO.search(parrafo)
-            if not m_doi:
-                continue
             plano = _limpiar(parrafo)
-            doi = normalizar_doi(m_doi.group(0))
-            tipo = plano.split(".")[0].strip() or None
             anios = _RE_ANIO_EN_TEXTO.findall(plano)
+            # El párrafo de tipo/año también existe sin DOI: «Article. 2016».
+            # Se acepta en las tres primeras posiciones, pero nunca el bloque
+            # de revista/citas (ISSN + «Citas Recibidas»).
+            es_metadata = bool(m_doi) or (
+                indice <= 2
+                and anios
+                and not re.search(r"Citas Recibidas", plano, re.I)
+                and not re.match(r"\d{4}-\d{3}[\dXx]", plano)
+            )
+            if not es_metadata:
+                continue
+            doi = normalizar_doi(m_doi.group(0)) if m_doi else None
+            tipo = plano.split(".")[0].strip() or None
             anio = int(anios[-1]) if anios else None
             if indice > 0:
                 autores_html = parrafos[indice - 1]
@@ -211,19 +265,37 @@ class PortalCris:
 
     # ------------------------------------------------------------- solicitudes
     @staticmethod
-    def _filtro(limite: int, area_id: int | None = None) -> dict:
+    def _filtro(
+        limite: int,
+        area_id: int | None = None,
+        *,
+        avanzado: tuple[str, str, str] | None = None,
+        agrupado_por_rol: bool = False,
+        orden: str = "ASC",
+    ) -> dict:
         datos = {
             "filter[limit]": str(limite),
-            "filter[sort]": "ASC",
+            "filter[sort]": orden,
             "filter[letter]": "",
             "filter[search]": "",
         }
+        if agrupado_por_rol:
+            datos["filter[groupedByRole]"] = "true"
         if area_id is not None:
             datos.update(
                 {
                     "filter[advanced][0][type]": "area",
                     "filter[advanced][0][id]": str(area_id),
                     "filter[advanced][0][name]": "",
+                }
+            )
+        if avanzado is not None:
+            tipo, ident, nombre = avanzado
+            datos.update(
+                {
+                    "filter[advanced][0][type]": tipo,
+                    "filter[advanced][0][id]": str(ident),
+                    "filter[advanced][0][name]": nombre,
                 }
             )
         return datos
@@ -302,13 +374,63 @@ class PortalCris:
     # ------------------------------------------------------------- operaciones
     def listar_todos(self, limite: int = 2000) -> list[Perfil]:
         return parsear_investigadores(
-            self._solicitar("POST", "/get-researchers", self._filtro(limite))
+            self._solicitar(
+                "POST",
+                "/get-researchers",
+                self._filtro(
+                    limite,
+                    agrupado_por_rol=True,
+                    orden="ASC-ordenInvestigador",
+                ),
+            )
         )
 
     def listar_area(self, area_id: int, limite: int = 200) -> list[Perfil]:
         """Filtro por área (avanzado). No verificado en S84."""
         return parsear_investigadores(
-            self._solicitar("POST", "/get-researchers", self._filtro(limite, area_id))
+            self._solicitar(
+                "POST",
+                "/get-researchers",
+                self._filtro(
+                    limite,
+                    area_id,
+                    agrupado_por_rol=True,
+                    orden="ASC-ordenInvestigador",
+                ),
+            )
+        )
+
+    def listar_centros(self) -> list[Centro]:
+        """Facetas de centro del listado de grupos."""
+        datos = {
+            "filter[limit]": "9",
+            "filter[sort]": "ASC",
+            "filter[letter]": "%",
+            "filter[search]": "",
+            "type": "7",
+        }
+        return parsear_centros(self._solicitar("POST", "/get-side-filter", datos))
+
+    def listar_grupos_centro(
+        self, centro_id: str | int, centro_nombre: str, limite: int = 500
+    ) -> list[Grupo]:
+        datos = self._filtro(
+            limite,
+            avanzado=("center", str(centro_id), centro_nombre),
+        )
+        return parsear_grupos(self._solicitar("POST", "/get-groups", datos))
+
+    def listar_investigadores_grupo(
+        self, grupo_id: str | int, limite: int = 500
+    ) -> list[Perfil]:
+        datos = self._filtro(
+            limite,
+            avanzado=("group", str(grupo_id), ""),
+            agrupado_por_rol=True,
+            orden="ASC-ordenInvestigador",
+        )
+        return parsear_investigadores(
+            self._solicitar("POST", "/get-researchers", datos)
         )
 
     def publicaciones(self, limite: int = 12000) -> list[PublicacionPortal]:

@@ -26,6 +26,7 @@
 | Publicaciones únicas del portal | **11.154** |
 | Pares persona-obra del portal | **20.616** |
 | Publicaciones del portal con DOI | **9.534 (85,5 %)** |
+| Publicaciones del portal con año/tipo | **20.616 (100 %)** |
 | DOIs del portal resueltos en OpenAlex | **9.479 (99,4 %)** |
 | Pares persona-obra vía ORCID | **31.882** |
 | Obras únicas vía ORCID | **22.216** |
@@ -46,7 +47,7 @@
 | Tabla | Filas | Estado |
 |---|---:|---|
 | `researchers` | 1.087 | **669 con ORCID**: 589 `portal_ficha` + 25 `reverso_doi` + 45 `reverso_multisenal` + 6 `reverso_nombre_afiliacion` + 1 `reverso_nombre_variante` + 1 `reverso_openalex` + 1 `reverso_nombre_invertido` + 1 `reverso_nombre_incompleto` |
-| `works` | **26.260** | 21.453 con DOI; 1.620 portal-only sin DOI; 3 sin título |
+| `works` | **26.260** | 21.453 con DOI; 1.620 portal-only sin DOI, ya con año/tipo; 3 sin título |
 | `work_ids` | **55.762** | 23.155 OpenAlex + 21.453 DOI + 11.154 portal |
 | `author_work` | **54.087** | 31.863 `orcid_exacto` + 1.614 `orcid_reverso` + 17.514 `portal_doi` + 3.096 `portal_publicacion` |
 | `outputs` | 212 | censo previo de centros, no toca este pipeline |
@@ -93,6 +94,8 @@ En `scripts/`:
 | `genera_mapa_v2.py` | Genera `mapa_orcid_v2.html` |
 | `piloto_orcid_reverso.py` | Piloto de recuperación inversa (30 sin ORCID) |
 | `parser_pubs.py` | Parser de la lista de publicaciones del portal |
+| `reparse_publicaciones.py` | Re-parsea la caché y recupera año/tipo sin DOI |
+| `actualiza_works_year.py` | Vuelca año/tipo del portal a `works` (solo nulos) |
 
 ---
 
@@ -113,7 +116,7 @@ En `scripts/`:
 
 - [x] **Escritura en la base** con backup y transacción (01-11-2026): **669 ORCID** (589 + 25 + 45 + 6 + 1 + 1 + 1 + 1), 26.260 obras, 55.762 IDs, 54.087 vínculos.
 - [ ] Revisión humana de `data/revision_orcid_personas.md` (**16 descartados + 3 en revisión**) + 3 sospechosos. Añadidos en la revisión final: Ángel Moya, María Cuenca y Juan Francisco Navarro; Carmen Hernández queda fuera por afiliación UAB y una sola obra.
-- [ ] 3.096 publicaciones del portal sin DOI ni año: mejorar el parser o aceptar el límite.
+- [x] 3.096 publicaciones del portal sin DOI ni año: re-parseadas desde la caché; ahora tienen año y tipo (`works.year` nulo 1; `works.type` nulo 788).
 - [ ] 19 grupos sin centro declarado: Fundanet o sede de la GVA.
 - [ ] Rastrear la web pública de FISABIO y la memoria de gestión (pendiente acordado).
 - [ ] Mover los scripts de `scripts/` al flujo del proyecto (tests, CLI) si se consolida.
@@ -127,7 +130,7 @@ En `scripts/`:
 3. **ORCID como llave.** El nombre falla por homónimos; el ORCID resuelve el 81 % de los que lo declaran.
 4. **ORCID inverso multiseñal.** Nombre + afiliación + solape DOI + apoyo. Un candidato con una sola obra es hipótesis; con ≥2 y validación es dato.
 5. **No inferir centro por nombre.** El centro se deriva del grupo público; 188 quedan sin centro y se declaran.
-6. **El portal no es el universo.** 146 personas sin ORCID no tienen publicaciones en el CRIS; 3.096 publicaciones no tienen DOI/año.
+6. **El portal no es el universo.** 146 personas sin ORCID no tienen publicaciones en el CRIS; 3.096 publicaciones no tienen DOI, aunque ya tienen año/tipo; 788 obras ORCID no tienen tipo.
 7. **La cobertura no es calidad.** Mide adopción de infraestructura, no actividad investigadora.
 
 ---

@@ -121,7 +121,7 @@ Los scripts viven en `scripts/` (`fase1_dataset_v2.py`, `genera_mapa_v2.py`, `pi
 
 1. **El portal no es el universo.** Su lista es el registro institucional (Fundanet/CRIS), no toda la producción.
 2. **146 personas sin ORCID no tienen publicaciones en el portal.** No significa que no publiquen; significa que el CRIS no las registra.
-3. **3.096 publicaciones (27,8 %) no tienen DOI ni año** en el parser actual. Se enlazan por `participant`, pero sin año.
+3. **3.096 publicaciones (27,8 %) no tienen DOI**, pero ya tienen año y tipo tras el re-parse de la caché.
 4. **La mediana unión sigue siendo de las personas visibles**, no del censo completo del centro.
 5. **n < 5** es frágil: un solo caso mueve la mediana. El tooltip lo advierte.
 6. **La cobertura no es calidad:** mide adopción de una infraestructura, no actividad investigadora.
