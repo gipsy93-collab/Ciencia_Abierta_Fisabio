@@ -40,7 +40,8 @@ declarado = {r["id"] for r in con.execute(
 recuperado = {r["id"] for r in con.execute(
     "SELECT id FROM researchers WHERE orcid_source IN "
     "('reverso_doi','reverso_nombre_afiliacion','reverso_multisenal',"
-    "'reverso_nombre_variante','reverso_openalex')")}
+    "'reverso_nombre_variante','reverso_openalex',"
+    "'reverso_nombre_invertido','reverso_nombre_incompleto')")}
 
 orcid_works = defaultdict(set)
 for linea in (ROOT / "data" / "author_work.jsonl").open(encoding="utf-8"):
