@@ -150,7 +150,7 @@ HTML = r"""<!DOCTYPE html>
     </div>
 
     <div class="foot">
-      Fuente: fichas del portal FISABIO + ORCID declarado + ORCID inverso (25 por DOI + 12 por solape parcial + 6 por nombre+afiliación) + publicaciones del portal + OpenAlex.<br>
+      Fuente: fichas del portal FISABIO + ORCID declarado + ORCID inverso (25 por DOI + 16 por solape parcial + 6 por nombre/afiliación + 2 por variante/OpenAlex) + publicaciones del portal + OpenAlex.<br>
       Mediana unión = personas con obras por cualquiera de las dos vías · 30-10-2026.<br>
       El punto cian marca la coordenada exacta; la burbuja solo se separa cuando dos centros coinciden.
     </div>

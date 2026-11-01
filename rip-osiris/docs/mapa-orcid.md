@@ -15,7 +15,7 @@ El mapa tiene **tres capas de cobertura** conmutables y **dos métricas de tama�
 
 | Elemento | Qué representa |
 |---|---|
-| **Relleno de la burbuja** | Cobertura seleccionada: ORCID declarada (589), ORCID ampliada (632) o producción (914) |
+| **Relleno de la burbuja** | Cobertura seleccionada: ORCID declarada (589), ORCID ampliada (638) o producción (914) |
 | **Tamaño de la burbuja** | Mediana de obras: ORCID (solo personas con ORCID) o unión (ORCID + portal) |
 | **Anillo cian** | Cobertura de producción; el hueco del anillo es lo que el ORCID no ve |
 | **Punto cian** | Coordenada exacta del edificio (geocodificada) |
@@ -24,7 +24,7 @@ El mapa tiene **tres capas de cobertura** conmutables y **dos métricas de tama�
 ### Las tres coberturas
 
 - **ORCID declarada:** personas con ORCID en su ficha del portal. 589 / 1.087 = **54,2 %**.
-- **ORCID ampliada:** declarada + recuperada por solape de DOI o nombre+afiliación. 632 / 1.087 = **58,1 %**.
+- **ORCID ampliada:** declarada + recuperada por solape de DOI o nombre+afiliación. 638 / 1.087 = **58,7 %**.
 - **Producción:** personas con al menos una obra por ORCID o por el portal. 914 / 1.087 = **84,1 %**.
 
 ### Las dos medianas
@@ -79,7 +79,7 @@ El mapa mide **visibilidad**, no actividad investigadora. Un centro con 80 % de 
 | `data/cv_provincias.geojson` | Provincias de Castellón, Valencia y Alicante |
 | `data/portal_publicaciones.jsonl` | Publicaciones por investigador (20.616 pares, 11.154 únicas) |
 | `data/portal_doi_openalex.json` | DOI → obra OpenAlex + authorships |
-| `data/orcid_reverso_multisenal.csv` | 102 candidatos ORCID clasificados (25 confirmados DOI, 9 nombre+afiliación, 25 probables, 24 a revisar, 7 rechazados; 12 de los probables ya escritos como `reverso_multisenal`) |
+| `data/orcid_reverso_multisenal.csv` | 102 candidatos ORCID clasificados (25 confirmados DOI, 9 nombre+afiliación, 21 probables, 23 a revisar, 6 descartados; 16 de los probables y 2 variantes ya escritos) |
 | `data/cosecha_orcid.csv` | ORCID declarado de las 1.087 fichas |
 | `data/anclaje_orcid.csv` | 475 autores OpenAlex con métricas |
 | `data/author_work.jsonl` | 31.882 pares persona-obra vía ORCID |
