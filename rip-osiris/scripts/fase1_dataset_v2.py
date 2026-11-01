@@ -14,18 +14,23 @@ import re
 import sqlite3
 import sys
 from collections import defaultdict
+from datetime import date
 from pathlib import Path
 from statistics import mean, median
 
 sys.stdout.reconfigure(encoding="utf-8")
-ROOT = Path(r"C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris")
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 BASE = json.loads((ROOT / "data" / "mapa_orcid_dataset.json").read_text(encoding="utf-8"))
 SALIDA = ROOT / "data" / "mapa_orcid_dataset_v2.json"
 
 
 def nd(d):
     d = (d or "").strip().lower()
-    return re.sub(r"^https?://(dx\.)?doi\.org/", "", d)
+    d = re.sub(r"^https?://(dx\.)?doi\.org/", "", d)
+    d = re.sub(r"^doi:\s*", "", d)
+    m = re.search(r"10\.\d{4,9}/[-._;()/:a-z0-9]+", d, re.I)
+    return m.group(0).rstrip(".,;)") if m else ""
 
 
 con = sqlite3.connect(ROOT / "data" / "rip_osiris.sqlite")
@@ -35,19 +40,70 @@ centro = {r["rid"]: r["centro"] for r in con.execute(
     """SELECT ra.researcher_id rid, o.name centro FROM researcher_affiliations ra
        JOIN orgs o ON o.id=ra.org_id WHERE ra.affiliation_type='centro'""")}
 
-declarado = {r["id"] for r in con.execute(
-    "SELECT id FROM researchers WHERE orcid_source='portal_ficha'")}
-recuperado = {r["id"] for r in con.execute(
-    "SELECT id FROM researchers WHERE orcid_source IN "
-    "('reverso_doi','reverso_nombre_afiliacion','reverso_multisenal',"
-    "'reverso_nombre_variante','reverso_openalex',"
-    "'reverso_nombre_invertido','reverso_nombre_incompleto')")}
+fuentes_recuperado = {
+    "reverso_doi", "reverso_nombre_afiliacion", "reverso_multisenal",
+    "reverso_nombre_variante", "reverso_openalex", "reverso_nombre_invertido",
+    "reverso_nombre_incompleto",
+}
+filas_orcid = list(con.execute(
+    "SELECT id, orcid, orcid_source FROM researchers "
+    "WHERE orcid IS NOT NULL AND orcid != ''"
+))
+duenos_orcid = defaultdict(set)
+for r in filas_orcid:
+    ident = re.sub(r"^https?://(www\.)?orcid\.org/", "", r["orcid"].strip()).upper()
+    duenos_orcid[ident].add(int(r["id"]))
+declarado = {
+    int(r["id"]) for r in filas_orcid
+    if r["orcid_source"] in {"portal", "portal_ficha"}
+}
+recuperados_ambiguos = {
+    int(r["id"]) for r in filas_orcid
+    if r["orcid_source"] in fuentes_recuperado
+    and len(duenos_orcid[re.sub(r"^https?://(www\.)?orcid\.org/", "", r["orcid"].strip()).upper()]) > 1
+}
+orcid_recuperado = {
+    int(r["id"]): r["orcid"] for r in filas_orcid
+    if r["orcid_source"] in fuentes_recuperado
+    and int(r["id"]) not in recuperados_ambiguos
+}
+recuperado = set(orcid_recuperado)
 
 orcid_works = defaultdict(set)
 for linea in (ROOT / "data" / "author_work.jsonl").open(encoding="utf-8"):
     a = json.loads(linea)
     d = nd(a.get("doi"))
     orcid_works[a["researcher_id"]].add(d if d else "openalex:" + a["work_id"])
+
+# Los ORCID recuperados no estaban en la cosecha inicial de author_work.jsonl.
+# Añadir sus obras OpenAlex solo cuando la caché acredita que la lista está
+# completa; así no se presentan primeras páginas parciales como producción total.
+cache_path = ROOT / "data" / "orcid_oa_cache.json"
+cache = json.loads(cache_path.read_text(encoding="utf-8")) if cache_path.exists() else {}
+recuperados_con_obras = 0
+recuperados_pendientes = 0
+for rid, ident in orcid_recuperado.items():
+    ident = re.sub(r"^https?://(www\.)?orcid\.org/", "", ident.strip()).upper()
+    entrada = cache.get(ident)
+    if not entrada:
+        recuperados_pendientes += 1
+        continue
+    obras = entrada.get("results") or []
+    esperado = (entrada.get("meta") or {}).get("count")
+    try:
+        completa = esperado is not None and len(obras) >= int(esperado)
+    except (TypeError, ValueError):
+        completa = False
+    if not completa:
+        recuperados_pendientes += 1
+        continue
+    for obra in obras:
+        doi = nd(obra.get("doi"))
+        work_id = (obra.get("id") or "").rstrip("/").split("/")[-1]
+        clave = doi or (f"openalex:{work_id}" if work_id.startswith("W") else "")
+        if clave:
+            orcid_works[rid].add(clave)
+    recuperados_con_obras += 1
 
 portal_works = defaultdict(set)
 for linea in (ROOT / "data" / "portal_publicaciones.jsonl").open(encoding="utf-8"):
@@ -131,18 +187,25 @@ for c, a in agg.items():
 
 centros.sort(key=lambda x: -x["total_roster"])
 datos = {
-    "generado": "2026-10-30",
+    "generado": date.today().isoformat(),
     "fuente": "roster portal FISABIO + ORCID declarado + ORCID inverso + publicaciones del portal + OpenAlex",
+    "orcid_recuperados_con_obras_completas": recuperados_con_obras,
+    "orcid_recuperados_pendientes_de_cosecha": recuperados_pendientes,
+    "orcid_recuperados_ambiguos": len(recuperados_ambiguos),
     "nota_metodo": (
         "Cobertura declarada = ORCID en la ficha. Ampliada = declarada + recuperada "
         "por solape de DOI/nombre+afiliación. Producción = personas con obras por ORCID o por "
         "el portal. Mediana ORCID = solo personas con obras vía ORCID. Mediana unión = personas "
-        "con obras por cualquiera de las dos vías; corrige el sesgo de selección del ORCID."
+        "con obras por cualquiera de las dos vías. Las obras OpenAlex de ORCID recuperados "
+        "se incorporan solo si la caché contiene todas las páginas; las pendientes se cuentan "
+        "por el portal hasta completar esa cosecha."
     ),
     "centros": centros,
 }
 SALIDA.write_text(json.dumps(datos, ensure_ascii=False, indent=1), encoding="utf-8")
-print(f"centros: {len(centros)} · escrito {SALIDA}\n")
+print(f"centros: {len(centros)} · ORCID recuperados con obras completas: "
+      f"{recuperados_con_obras} · pendientes: {recuperados_pendientes} · "
+      f"ORCID duplicados excluidos: {len(recuperados_ambiguos)} · escrito {SALIDA}\n")
 print(f"{'centro':44} {'n':>4} {'decl':>5} {'amp':>5} {'prod':>5} {'medO':>5} {'medU':>5}")
 for c in centros:
     if c["total_roster"] < 5:

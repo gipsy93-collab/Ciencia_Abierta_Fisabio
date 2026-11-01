@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-ROOT = Path(r"C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris")
+ROOT = Path(__file__).resolve().parents[1]
 DATOS = json.loads((ROOT / "data" / "mapa_orcid_dataset_v2.json").read_text(encoding="utf-8"))
 GEO = json.loads((ROOT / "data" / "cv_provincias.geojson").read_text(encoding="utf-8"))
 SALIDA = ROOT / "data" / "mapa_orcid_v2.html"
@@ -92,7 +92,12 @@ HTML = r"""<!DOCTYPE html>
   #tooltip .t-coord{font-size:.55rem;color:#64748b;margin-top:8px;
     border-top:1px solid rgba(148,163,184,.12);padding-top:6px;line-height:1.4}
   #hint{position:absolute;bottom:14px;right:16px;font-size:.6rem;color:#334155;letter-spacing:.03em}
-  @media(max-width:860px){#panel{display:none}}
+  @media(max-width:860px){
+    #app{flex-direction:column}
+    #panel{width:100%;flex:0 0 42vh;max-height:42vh;border-right:0;
+      border-bottom:1px solid var(--line);padding:14px 16px}
+    #map-container{min-height:58vh}
+  }
 </style>
 </head>
 <body>
@@ -150,8 +155,9 @@ HTML = r"""<!DOCTYPE html>
     </div>
 
     <div class="foot">
-      Fuente: fichas del portal FISABIO + ORCID declarado + ORCID inverso (25 por DOI + 42 por solape o coautor + 6 por nombre/afiliación + 4 por variante, invertido o incompleto) + publicaciones del portal + OpenAlex.<br>
-      Mediana unión = personas con obras por cualquiera de las dos vías · 30-10-2026.<br>
+      Fuente: fichas del portal FISABIO + ORCID declarado y recuperado + publicaciones del portal + OpenAlex.<br>
+      __COBERTURA_RECUPERADOS__<br>
+      Mediana unión = personas con obras por cualquiera de las dos vías.<br>
       El punto cian marca la coordenada exacta; la burbuja solo se separa cuando dos centros coinciden.
     </div>
   </aside>
@@ -173,9 +179,9 @@ centers.forEach(d => {
   if (d.tipo === 'sin_centro') { d.lon = d.lon + 0.34; d.lat = d.lat - 0.11; }
 });
 
-const panelW = 390;
-let W = window.innerWidth - panelW;
-let H = window.innerHeight;
+const mapEl = document.getElementById('map-container');
+let W = mapEl.clientWidth || 1;
+let H = mapEl.clientHeight || 1;
 
 const svg = d3.select('#map').attr('viewBox', [0, 0, W, H]);
 const gRoot = svg.append('g');
@@ -486,7 +492,8 @@ groups.select('circle.ring-prod')
 groups.select('text.label').attr('dy', d => d.tipo === 'sin_centro' ? radius(d) + 16 : -radius(d) - 9);
 
 window.addEventListener('resize', () => {
-  W = window.innerWidth - panelW; H = window.innerHeight;
+  W = mapEl.clientWidth || 1;
+  H = mapEl.clientHeight || 1;
   svg.attr('viewBox', [0, 0, W, H]);
   projection.fitExtent([[70, 70], [W - 70, H - 70]], GEO);
   gProv.selectAll('path').attr('d', path);
@@ -502,6 +509,17 @@ window.addEventListener('resize', () => {
 </html>
 """
 
-HTML = HTML.replace("__DATOS__", datos_js).replace("__GEO__", geo_js)
+if "orcid_recuperados_con_obras_completas" in DATOS:
+    incluidos = int(DATOS["orcid_recuperados_con_obras_completas"])
+    pendientes = int(DATOS.get("orcid_recuperados_pendientes_de_cosecha", 0))
+    nota_recuperados = (
+        f"Obras ORCID de perfiles recuperados: cosecha completa para {incluidos}; "
+        f"{pendientes} pendientes y excluidos de esa métrica."
+    )
+else:
+    nota_recuperados = "Estado de cosecha ORCID recuperado no disponible; regenere primero el dataset."
+HTML = (HTML.replace("__DATOS__", datos_js)
+        .replace("__GEO__", geo_js)
+        .replace("__COBERTURA_RECUPERADOS__", nota_recuperados))
 SALIDA.write_text(HTML, encoding="utf-8")
 print(f"HTML escrito: {SALIDA} · {len(HTML):,} chars")

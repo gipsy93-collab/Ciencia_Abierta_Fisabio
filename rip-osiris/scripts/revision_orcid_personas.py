@@ -12,6 +12,7 @@ from __future__ import annotations
 import csv
 import difflib
 import json
+import os
 import re
 import sys
 import time
@@ -21,8 +22,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
-ROOT = Path(r"C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris")
-MAIL = "gipsy93@gmail.com"
+ROOT = Path(__file__).resolve().parents[1]
+MAIL = os.environ.get("OPENALEX_MAILTO", "rip-osiris@localhost")
 CACHE = ROOT / "data" / "orcid_oa_cache.json"
 SALIDA_MD = ROOT / "data" / "revision_orcid_personas.md"
 SALIDA_CSV = ROOT / "data" / "revision_orcid_personas.csv"
@@ -78,10 +79,51 @@ def get_json(url, intentos=3):
     return None
 
 
+def obras_openalex_completas(orcid, cache):
+    """Devuelve todas las páginas de obras; una primera página no es el censo."""
+    entrada = cache.get(orcid)
+    if entrada:
+        resultados = entrada.get("results") or []
+        esperado = (entrada.get("meta") or {}).get("count")
+        try:
+            if esperado is not None and len(resultados) >= int(esperado):
+                return entrada
+        except (TypeError, ValueError):
+            pass
+
+    resultados = []
+    meta = {}
+    pagina = 1
+    while True:
+        url = (f"https://api.openalex.org/works?filter=author.orcid:{orcid}"
+               f"&select=id,title,publication_year,doi,authorships&per-page=200"
+               f"&page={pagina}&mailto={MAIL}")
+        respuesta = get_json(url)
+        if not respuesta:
+            # Si la red falla, se conserva la caché antigua, pero el consumidor
+            # detectará que count > results y no la tratará como completa.
+            return entrada or {"results": [], "meta": {"count": None}}
+        lote = respuesta.get("results") or []
+        meta = respuesta.get("meta") or meta
+        resultados.extend(lote)
+        esperado = meta.get("count")
+        if not lote or (esperado is not None and len(resultados) >= int(esperado)):
+            break
+        pagina += 1
+        time.sleep(0.15)
+    return {"meta": meta, "results": resultados}
+
+
 # ---------------------------------------------------------------- carga
 con_db = __import__("sqlite3").connect(ROOT / "data" / "rip_osiris.sqlite")
 con_db.row_factory = __import__("sqlite3").Row
 ya = {r["id"] for r in con_db.execute("SELECT id FROM researchers WHERE orcid IS NOT NULL")}
+orcid_recuperados = [r["orcid"] for r in con_db.execute(
+    "SELECT orcid FROM researchers WHERE orcid IS NOT NULL AND orcid != '' "
+    "AND orcid_source IN ('reverso_doi','reverso_nombre_afiliacion',"
+    "'reverso_multisenal','reverso_nombre_variante','reverso_openalex',"
+    "'reverso_nombre_invertido','reverso_nombre_incompleto')"
+)]
 con_db.close()
 
 review = list(csv.DictReader((ROOT / "data" / "orcid_revision_pendientes.csv").open(encoding="utf-8-sig")))
@@ -96,12 +138,19 @@ for linea in (ROOT / "data" / "portal_publicaciones.jsonl").open(encoding="utf-8
 portal_oa = json.loads((ROOT / "data" / "portal_doi_openalex.json").read_text(encoding="utf-8"))
 cache = json.loads(CACHE.read_text(encoding="utf-8")) if CACHE.exists() else {}
 
+# Refrescar también las obras de ORCID ya recuperados: no figuran en la cosecha
+# inicial de author_work.jsonl, pero sí deben entrar en la mediana de unión.
+for ident in sorted(set(orcid_recuperados)):
+    ident = re.sub(r"^https?://(www\.)?orcid\.org/", "", ident.strip()).upper()
+    cache[ident] = obras_openalex_completas(ident, cache)
+    time.sleep(0.15)
+
 print(f"pendientes: {len(pendientes)}", flush=True)
 
 filas = []
 for i, r in enumerate(pendientes, 1):
     rid = int(r["researcher_id"])
-    orcid = r["orcid"]
+    orcid = re.sub(r"^https?://(www\.)?orcid\.org/", "", r["orcid"].strip()).upper()
     nombre = r["nombre"]
     f = portal_pubs.get(rid, {"pubs": []})
     portal_dois = {nd(p.get("doi")) for p in f["pubs"] if p.get("doi")}
@@ -116,11 +165,7 @@ for i, r in enumerate(pendientes, 1):
                 co_portal.add(n)
 
     # obras OpenAlex del ORCID
-    if orcid not in cache:
-        d = get_json(f"https://api.openalex.org/works?filter=author.orcid:{orcid}"
-                     "&select=id,title,publication_year,doi,authorships&per-page=200&mailto=" + MAIL)
-        cache[orcid] = d or {"results": [], "meta": {"count": 0}}
-        time.sleep(0.15)
+    cache[orcid] = obras_openalex_completas(orcid, cache)
     obras = cache[orcid].get("results") or []
     orcid_dois = {nd(w.get("doi")) for w in obras if w.get("doi")}
     co_orcid = set()

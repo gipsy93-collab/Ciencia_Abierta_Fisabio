@@ -1,6 +1,6 @@
 """Escritura del pipeline en la base (política conservadora).
 
-- researchers.orcid: 589 declarados + 25 confirmados DOI + 6 nombre/afiliación limpios.
+- researchers.orcid: ORCID declarados y candidatos confirmados por el pipeline.
 - works / work_ids / author_work: unión de la vía ORCID y la vía portal.
 - Backup previo y una sola transacción.
 
@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import re
 import shutil
 import sqlite3
@@ -22,10 +23,10 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
-ROOT = Path(r"C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris")
+ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "rip_osiris.sqlite"
 BACKUP = ROOT / "data" / "rip_osiris.backup-2026-11-01.sqlite"
-MAIL = "gipsy93@gmail.com"
+MAIL = os.environ.get("OPENALEX_MAILTO", "rip-osiris@localhost")
 WRITE = "--write" in sys.argv
 
 SOSPECHOSOS = {"Cristina Fernandez Martinez", "Jose Luis Rodrigo Perez", "Monica Romero Nieto"}
@@ -40,7 +41,7 @@ def norm_orcid(o):
     if not o:
         return None
     o = re.sub(r"^https?://(www\.)?orcid\.org/", "", o.strip())
-    return o.strip() or None
+    return o.strip().upper() or None
 
 
 # ---------------------------------------------------------------- carga
@@ -82,7 +83,45 @@ for linea in (ROOT / "data" / "author_work.jsonl").open(encoding="utf-8"):
         d["doi"] = nd(a["doi"])
     d["researchers"].add(a["researcher_id"])
     orcid_pairs.add((a["researcher_id"], oid))
+
+# Completar también las obras OpenAlex de ORCID recuperados; author_work.jsonl
+# se cosechó antes de encontrar esas identidades.
+cache_path = ROOT / "data" / "orcid_oa_cache.json"
+orcid_cache = json.loads(cache_path.read_text(encoding="utf-8")) if cache_path.exists() else {}
+orcid_recuperados_pendientes = []
+for rid, (orcid, _) in recuperado.items():
+    ident = norm_orcid(orcid)
+    entry = orcid_cache.get(ident) or {}
+    works = entry.get("results") or []
+    expected = (entry.get("meta") or {}).get("count")
+    try:
+        complete = expected is not None and len(works) >= int(expected)
+    except (TypeError, ValueError):
+        complete = False
+    if not complete:
+        orcid_recuperados_pendientes.append(rid)
+        continue
+    for work in works:
+        oid = (work.get("id") or "").rstrip("/").split("/")[-1]
+        if not oid.startswith("W"):
+            continue
+        d = orcid_works.setdefault(oid, {
+            "openalex_id": oid, "doi": None, "title": None,
+            "year": work.get("publication_year"), "type": None,
+            "researchers": set(), "portal_pub_ids": set(),
+        })
+        if not d["doi"] and work.get("doi"):
+            d["doi"] = nd(work["doi"])
+        if not d["title"] and work.get("title"):
+            d["title"] = work["title"]
+        if not d["year"] and work.get("publication_year"):
+            d["year"] = work["publication_year"]
+        d["researchers"].add(rid)
+        orcid_pairs.add((rid, oid))
 print(f"   obras ORCID {len(orcid_works)} · pares {len(orcid_pairs)}", flush=True)
+print(f"   ORCID recuperados con caché completa: "
+      f"{len(recuperado) - len(orcid_recuperados_pendientes)} · "
+      f"pendientes: {len(orcid_recuperados_pendientes)}", flush=True)
 
 # ---------------------------------------------------------------- vía portal
 print("3. cargando obras del portal...", flush=True)
@@ -220,6 +259,12 @@ if not WRITE:
     print("\nDRY-RUN. Para escribir: python scripts/escribe_db_pipeline.py --write")
     sys.exit(0)
 
+if orcid_recuperados_pendientes:
+    raise SystemExit(
+        "No escribo la base: falta cosecha OpenAlex completa para ORCID recuperados. "
+        "Ejecute scripts/revision_orcid_personas.py y vuelva a revisar el dry-run."
+    )
+
 # ---------------------------------------------------------------- backup
 print("\n6. backup...", flush=True)
 if BACKUP.exists():
@@ -266,12 +311,17 @@ try:
         if n % 5000 == 0:
             print(f"   works {n}/{len(union)}", flush=True)
 
-    # author_work ORCID
+    # author_work ORCID: los declarados son exactos; los recuperados son
+    # inferencias y no deben presentarse con confianza 1,0.
+    recuperado_ids = set(recuperado)
     filas = []
     for rid, oid in orcid_pairs:
         key = by_openalex.get(oid)
         if key and key in id_de:
-            filas.append((rid, id_de[key], "orcid_exacto", 1.0))
+            if rid in recuperado_ids:
+                filas.append((rid, id_de[key], "orcid_reverso", 0.85))
+            else:
+                filas.append((rid, id_de[key], "orcid_exacto", 1.0))
     con.executemany(
         "INSERT OR IGNORE INTO author_work (researcher_id, work_id, source, confidence) "
         "VALUES (?,?,?,?)", filas)

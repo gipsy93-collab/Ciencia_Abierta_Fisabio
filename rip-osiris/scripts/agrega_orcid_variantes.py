@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
-ROOT = Path(r"C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris")
+ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "rip_osiris.sqlite"
 BACKUP = ROOT / "data" / "rip_osiris.backup-2026-11-01-c.sqlite"
 

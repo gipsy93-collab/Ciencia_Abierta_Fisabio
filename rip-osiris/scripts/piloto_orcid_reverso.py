@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import re
 import sqlite3
 import sys
@@ -19,13 +20,13 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-ROOT = Path(r"C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris")
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from rip_osiris.anchor.cris import PortalCris, parsear_publicaciones  # noqa: E402
 from rip_osiris.config import Config  # noqa: E402
 
-MAIL = "gipsy93@gmail.com"
+MAIL = os.environ.get("OPENALEX_MAILTO", "rip-osiris@localhost")
 
 con = sqlite3.connect(ROOT / "data" / "rip_osiris.sqlite")
 con.row_factory = sqlite3.Row

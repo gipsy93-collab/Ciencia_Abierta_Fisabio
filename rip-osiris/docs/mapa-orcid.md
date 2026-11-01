@@ -125,12 +125,38 @@ Los scripts viven en `scripts/` (`fase1_dataset_v2.py`, `genera_mapa_v2.py`, `pi
 4. **La mediana unión sigue siendo de las personas visibles**, no del censo completo del centro.
 5. **n < 5** es frágil: un solo caso mueve la mediana. El tooltip lo advierte.
 6. **La cobertura no es calidad:** mide adopción de una infraestructura, no actividad investigadora.
+7. **El cruce sin DOI no es deduplicación completa.** Las obras sin DOI conservan el identificador de su fuente; una misma obra en el portal y OpenAlex puede quedar como dos obras.
+8. **Los ORCID recuperados requieren cosecha completa para sus métricas.** Sus obras OpenAlex solo se incorporan si la caché contiene todas las páginas; el dataset informa cuántos quedan pendientes.
 
 ---
 
-## 6. Estado
+## 6. Reglas de validación y regeneración
 
-- Mapa v2 publicado y verificado (HTTP 200, sin errores de consola).
+- La afiliación cuenta como evidencia solo si ORCID declara FISABIO o el centro asignado a esa persona por el portal. La palabra genérica «hospital» no confirma una identidad.
+- Dos o más DOI distintos en común, que representen al menos la mitad de los DOI del portal, pueden confirmar el candidato. Nombre y afiliación sin DOI compartido quedan como probable/revisión, no como confirmación automática.
+- Se evalúan todos los ORCID candidatos de cada persona. Si más de uno supera el umbral, o el ORCID ya pertenece a otra persona, el caso queda para revisión.
+- Un fallo al leer el perfil o sus publicaciones no se guarda como una lista vacía: la persona queda pendiente para reintento.
+- Los scripts resuelven la raíz del proyecto desde su ubicación. `OPENALEX_MAILTO` permite configurar el correo de contacto del API.
+
+Para actualizar los artefactos tras completar las cachés y revisar candidatos:
+
+```powershell
+python scripts\pipeline_portal.py 4
+python scripts\valida_multisenal.py
+python scripts\revision_orcid_personas.py
+python scripts\escribe_db_pipeline.py
+# Revisar el dry-run y aprobar los candidatos antes de ejecutar la escritura:
+python scripts\escribe_db_pipeline.py --write
+python scripts\fase1_dataset_v2.py
+python scripts\genera_mapa_v2.py
+```
+
+`escribe_db_pipeline.py` crea una copia de seguridad antes de escribir. La revisión del CSV y del dry-run es necesaria porque el nuevo umbral puede cambiar qué identidades se aceptan; el mapa no actualiza la base por sí solo.
+
+## 7. Estado
+
+- La versión publicada anteriormente fue verificada (HTTP 200, sin errores de consola).
 - Dataset v2 con 31 centros y las tres capas.
-- Pendiente: escritura en la base (`researchers.orcid`, `works`, `work_ids`, `author_work`) con backup y transacción.
-- Pendiente: revisión humana de los 37 `probable` y 24 `revisar` del ORCID inverso.
+- El HTML y el dataset guardados no se regeneraron con estas correcciones; sus cifras reflejan la generación anterior hasta ejecutar el flujo actualizado.
+- Hecho: escritura en la base (`researchers.orcid`, `works`, `work_ids`, `author_work`) con backup y transacción (666 ORCID · 25.472 obras · 52.473 vínculos).
+- Pendiente: revisión humana de **16 a revisar + 6 descartados + 3 sospechosos** del ORCID inverso.

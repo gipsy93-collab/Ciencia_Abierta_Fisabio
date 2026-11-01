@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import re
 import sqlite3
 import sys
@@ -24,13 +25,13 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-ROOT = Path(r"C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris")
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from rip_osiris.anchor.cris import PortalCris, parsear_publicaciones  # noqa: E402
 from rip_osiris.config import Config  # noqa: E402
 
-MAIL = "gipsy93@gmail.com"
+MAIL = os.environ.get("OPENALEX_MAILTO", "rip-osiris@localhost")
 PUB_JSONL = ROOT / "data" / "portal_publicaciones.jsonl"
 DOI_JSON = ROOT / "data" / "portal_doi_openalex.json"
 REVERSO_CSV = ROOT / "data" / "orcid_reverso_candidatos.csv"
@@ -53,6 +54,80 @@ def compatible(a: str, b: str) -> bool:
         return False
     inter = ta & tb
     return len(inter) >= 2 and len(inter) / min(len(ta), len(tb)) >= 0.5
+
+
+# Variantes Valenciano/Castellano y formas abreviadas que aparecen en ORCID.
+ALIASES_ORG = {
+    "elx": "elche",
+    "doctor": "dr",
+    "sant": "san",
+    "joan": "juan",
+    "alcoi": "alcoy",
+    "castello": "castellon",
+    "sagunt": "sagunto",
+    "universitari": "universitario",
+    "universitaria": "universitario",
+    "transfusiones": "transfusion",
+    "transfusio": "transfusion",
+    "investigacio": "investigacion",
+    "comunitat": "comunidad",
+}
+
+GENERICOS_ORG = {
+    "hospital", "general", "universitario", "de", "del", "la", "el",
+    "los", "las", "centro", "atencion", "primaria", "salud", "publica",
+    "servicio", "clinica", "comarcal", "virgen", "doctor", "dr",
+    "fundacion", "fomento", "investigacion", "sanitaria", "biomedica",
+    "comunitat", "comunidad", "valenciana", "valencia",
+}
+
+
+def normalizar_org(nombre: str) -> list[str]:
+    return [ALIASES_ORG.get(t, t) for t in norm_tokens(nombre)]
+
+
+def _raiz(token: str) -> str:
+    return token[:6] if len(token) >= 6 else token
+
+
+def _coincide_token(a: str, b: str) -> bool:
+    if a == b:
+        return True
+    ra, rb = _raiz(a), _raiz(b)
+    return len(ra) >= 4 and ra == rb
+
+
+def afiliacion_fisabio(afiliaciones: list[str], centros: set[str]) -> str | None:
+    """Acepta FISABIO explícito o el centro del portal, con alias y raíces.
+
+    No acepta «hospital» por sí solo: exige al menos un token distintivo
+    (ciudad, apellido o nombre propio del centro) y una palabra de salud.
+    """
+    for afiliacion in afiliaciones:
+        tokens_af = set(normalizar_org(afiliacion))
+        if "fisabio" in tokens_af or (
+            "fomento" in tokens_af
+            and "investigacion" in tokens_af
+            and "sanitaria" in tokens_af
+        ):
+            return afiliacion
+        norm_af = " ".join(normalizar_org(afiliacion))
+        for centro in centros:
+            tokens_ce = set(normalizar_org(centro))
+            if not tokens_ce:
+                continue
+            norm_ce = " ".join(normalizar_org(centro))
+            corto, largo = ((norm_af, norm_ce) if len(tokens_af) <= len(tokens_ce)
+                            else (norm_ce, norm_af))
+            if corto and corto in largo and len(corto.split()) >= 3:
+                return afiliacion
+            distintivos = tokens_ce - GENERICOS_ORG
+            if (
+                any(_coincide_token(d, t) for d in distintivos for t in tokens_af)
+                and tokens_af & {"hospital", "centro", "salud", "clinica", "universitario"}
+            ):
+                return afiliacion
+    return None
 
 
 def get_json(url: str, intentos: int = 3) -> dict | None:
@@ -82,7 +157,14 @@ def etapa1():
     if PUB_JSONL.exists():
         for linea in PUB_JSONL.open(encoding="utf-8"):
             try:
-                hechos.add(json.loads(linea)["researcher_id"])
+                fila = json.loads(linea)
+                # Las filas históricas vacías tras un fallo no cuentan como
+                # cosechadas: se vuelven a intentar en la siguiente ejecución.
+                if fila.get("completa") is False or (
+                    int(fila.get("declaradas") or 0) > 0 and not fila.get("pubs")
+                ):
+                    continue
+                hechos.add(fila["researcher_id"])
             except Exception:
                 pass
     pendientes = [g for g in gente if g["id"] not in hechos]
@@ -99,7 +181,14 @@ def etapa1():
         try:
             perfil = portal._solicitar("GET", f"/investigadores/{pid}")
             m = re_conteo(pid).search(perfil)
-            declaradas = int(m.group(1)) if m else 0
+            if m:
+                declaradas = int(m.group(1))
+            elif f'/investigadores/{pid}/publicaciones"' in perfil:
+                # Perfil legítimo sin publicaciones: el portal muestra el
+                # enlace «Publicaciones» pero no el contador.
+                declaradas = 0
+            else:
+                raise ValueError("ficha sin sección de publicaciones")
             errores = 0
         except Exception as exc:
             print(f"   ERROR perfil {g['name'][:30]}: {exc}", flush=True)
@@ -117,10 +206,21 @@ def etapa1():
             try:
                 html = portal._solicitar("POST", "/get-publications", datos)
                 pubs = parsear_publicaciones(html)
+                if not pubs:
+                    raise ValueError("la lista declaró publicaciones, pero el parser no encontró ninguna")
+                if len(pubs) < declaradas:
+                    raise ValueError(
+                        f"parser incompleto: {len(pubs)} de {declaradas} publicaciones declaradas"
+                    )
                 errores = 0
             except Exception as exc:
                 print(f"   ERROR pubs {g['name'][:30]}: {exc}", flush=True)
                 errores += 1
+                if errores >= 8:
+                    print("[1] aborto por errores seguidos", flush=True)
+                    break
+                # No se escribe una fila incompleta como si fueran cero obras.
+                continue
 
         fila = {
             "researcher_id": g["id"],
@@ -252,18 +352,31 @@ def etapa4():
         print("[4] falta", REVERSO_CSV)
         return
     filas = list(csv.DictReader(REVERSO_CSV.open(encoding="utf-8-sig")))
-    # un candidato por investigador: el de mayor apoyo
-    mejores = {}
+    # Validar todos los candidatos. Elegir el máximo de apoyo antes de mirar
+    # DOI y afiliación descarta alternativas y resuelve empates arbitrariamente.
+    por_persona = defaultdict(list)
     for r in filas:
-        rid = int(r["researcher_id"])
-        if rid not in mejores or int(r["apoyo"]) > int(mejores[rid]["apoyo"]):
-            mejores[rid] = r
+        por_persona[int(r["researcher_id"])].append(r)
+
+    con = sqlite3.connect(ROOT / "data" / "rip_osiris.sqlite")
+    centros = defaultdict(set)
+    for rid, nombre in con.execute(
+        """SELECT ra.researcher_id, o.name FROM researcher_affiliations ra
+           JOIN orgs o ON o.id=ra.org_id WHERE ra.affiliation_type='centro'"""
+    ):
+        centros[int(rid)].add(nombre)
+    con.close()
 
     salida = []
-    for i, r in enumerate(mejores.values(), 1):
+    cache_orcid = {}
+    for i, r in enumerate(filas, 1):
         orcid = r["orcid_candidato"]
-        person = get_json(f"https://pub.orcid.org/v3.0/{orcid}/person")
-        emp = get_json(f"https://pub.orcid.org/v3.0/{orcid}/employments")
+        if orcid not in cache_orcid:
+            cache_orcid[orcid] = (
+                get_json(f"https://pub.orcid.org/v3.0/{orcid}/person"),
+                get_json(f"https://pub.orcid.org/v3.0/{orcid}/employments"),
+            )
+        person, emp = cache_orcid[orcid]
         nombre_orcid = ""
         afiliaciones = []
         if person:
@@ -280,10 +393,10 @@ def etapa4():
                     if org:
                         afiliaciones.append(org)
         nombre_ok = compatible(r["nombre"], nombre_orcid) if nombre_orcid else False
-        afiliacion_ok = any(
-            any(k in (a or "").lower() for k in ("fisabio", "fomento de la investigaci",
-                                                 "hospital", "salud pública", "salut pública"))
-            for a in afiliaciones)
+        centro_persona = centros.get(int(r["researcher_id"]), set())
+        afiliacion_match = afiliacion_fisabio(afiliaciones, centro_persona)
+        afiliacion_ok = afiliacion_match is not None
+        n_candidatos = len(por_persona[int(r["researcher_id"])])
         estado = ("validado" if nombre_ok and afiliacion_ok else
                   "nombre_coincide" if nombre_ok else
                   "afiliacion_coincide" if afiliacion_ok else "sin_validar")
@@ -291,12 +404,15 @@ def etapa4():
             **r,
             "nombre_orcid": nombre_orcid,
             "afiliaciones_orcid": " | ".join(sorted(set(afiliaciones)))[:300],
+            "centros_portal": " | ".join(sorted(centro_persona)),
+            "afiliacion_match": afiliacion_match or "",
             "nombre_coincide": nombre_ok,
             "afiliacion_coincide": afiliacion_ok,
+            "n_candidatos": n_candidatos,
             "estado": estado,
         })
         if i % 25 == 0:
-            print(f"   {i}/{len(mejores)} validados", flush=True)
+            print(f"   {i}/{len(filas)} validados", flush=True)
         time.sleep(0.3)
 
     campos = list(salida[0].keys()) if salida else []
@@ -305,6 +421,7 @@ def etapa4():
         w.writeheader()
         w.writerows(salida)
     from collections import Counter
+    print(f"[4] candidatos evaluados: {len(salida)} · personas: {len(por_persona)}", flush=True)
     print("[4] estados:", Counter(r["estado"] for r in salida), flush=True)
 
 
