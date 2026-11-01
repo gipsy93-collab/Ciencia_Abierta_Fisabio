@@ -96,6 +96,8 @@ En `scripts/`:
 | `parser_pubs.py` | Parser de la lista de publicaciones del portal |
 | `reparse_publicaciones.py` | Re-parsea la caché y recupera año/tipo sin DOI |
 | `actualiza_works_year.py` | Vuelca año/tipo del portal a `works` (solo nulos) |
+| `genera_hoja_confirmacion.py` | Genera la hoja de confirmación ORCID (80 + 3) |
+| `importa_confirmaciones.py` | Importa confirmaciones/rechazos con backup y transacción |
 
 ---
 
@@ -116,6 +118,7 @@ En `scripts/`:
 
 - [x] **Escritura en la base** con backup y transacción (01-11-2026): **669 ORCID** (589 + 25 + 45 + 6 + 1 + 1 + 1 + 1), 26.260 obras, 55.762 IDs, 54.087 vínculos.
 - [ ] Revisión humana de `data/revision_orcid_personas.md` (**16 descartados + 3 en revisión**) + 3 sospechosos. Añadidos en la revisión final: Ángel Moya, María Cuenca y Juan Francisco Navarro; Carmen Hernández queda fuera por afiliación UAB y una sola obra.
+- [ ] **Confirmación ORCID:** hoja `data/hoja_confirmacion_orcid.csv` con **83 personas** (80 recuperadas + 3 en revisión). Rellenar `decision` (`confirmar`/`rechazar`/`revisar`) y `confirmado_por` (`persona`/`institucion`), y ejecutar `python scripts/importa_confirmaciones.py --write`.
 - [x] 3.096 publicaciones del portal sin DOI ni año: re-parseadas desde la caché; ahora tienen año y tipo (`works.year` nulo 1; `works.type` nulo 788).
 - [ ] 19 grupos sin centro declarado: Fundanet o sede de la GVA.
 - [ ] Rastrear la web pública de FISABIO y la memoria de gestión (pendiente acordado).

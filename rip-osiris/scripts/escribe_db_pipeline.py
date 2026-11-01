@@ -53,6 +53,7 @@ FUENTES_RECUPERADO = {
     "reverso_doi", "reverso_nombre_afiliacion", "reverso_multisenal",
     "reverso_nombre_variante", "reverso_openalex",
     "reverso_nombre_invertido", "reverso_nombre_incompleto",
+    "confirmado_persona", "confirmado_institucion",
 }
 
 declarado = {}

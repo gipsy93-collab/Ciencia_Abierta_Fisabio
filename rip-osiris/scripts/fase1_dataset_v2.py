@@ -43,7 +43,7 @@ centro = {r["rid"]: r["centro"] for r in con.execute(
 fuentes_recuperado = {
     "reverso_doi", "reverso_nombre_afiliacion", "reverso_multisenal",
     "reverso_nombre_variante", "reverso_openalex", "reverso_nombre_invertido",
-    "reverso_nombre_incompleto",
+    "reverso_nombre_incompleto", "confirmado_persona", "confirmado_institucion",
 }
 filas_orcid = list(con.execute(
     "SELECT id, orcid, orcid_source FROM researchers "

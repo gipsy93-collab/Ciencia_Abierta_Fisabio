@@ -122,7 +122,8 @@ orcid_recuperados = [r["orcid"] for r in con_db.execute(
     "SELECT orcid FROM researchers WHERE orcid IS NOT NULL AND orcid != '' "
     "AND orcid_source IN ('reverso_doi','reverso_nombre_afiliacion',"
     "'reverso_multisenal','reverso_nombre_variante','reverso_openalex',"
-    "'reverso_nombre_invertido','reverso_nombre_incompleto')"
+    "'reverso_nombre_invertido','reverso_nombre_incompleto',"
+    "'confirmado_persona','confirmado_institucion')"
 )]
 con_db.close()
 
