@@ -1,0 +1,145 @@
+# CORTEX · rip-osiris
+
+> **Memoria técnica del proyecto.** La memoria general de Gipsy vive en el vault:
+> `C:\Users\gipsy\Documents\Obsidian Vault\CORTEX.md`
+>
+> Documentación narrativa del pipeline:
+> `...\Obsidian Vault\03 Proyectos\FISABIO\Arquitectura-Pipeline-ORCID.md`
+>
+> Nota técnica del mapa:
+> `docs\mapa-orcid.md`
+
+**Actualizado:** 01-11-2026
+**Rama de trabajo:** `feat/rip-demo-rastreo` (el mapa publicado está en `main`)
+**Ruta:** `C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris`
+
+---
+
+## 1. Estado actual
+
+| Indicador | Valor |
+|---|---|
+| Roster del portal | **1.087** |
+| ORCID declarado en la ficha | **589 (54,2 %)** |
+| ORCID ampliado (declarado + recuperado) | **620 (57,0 %)** |
+| Personas con producción (ORCID o portal) | **914 (84,1 %)** |
+| Publicaciones únicas del portal | **11.154** |
+| Pares persona-obra del portal | **20.616** |
+| Publicaciones del portal con DOI | **9.534 (85,5 %)** |
+| DOIs del portal resueltos en OpenAlex | **9.479 (99,4 %)** |
+| Pares persona-obra vía ORCID | **31.882** |
+| Obras únicas vía ORCID | **22.216** |
+| Unión de ambas vías (pares) | **38.928** |
+| Unión de ambas vías (obras) | **25.472** |
+| Candidatos ORCID inverso | **102** |
+| Confirmados por solape DOI | **25** |
+| Confirmados por nombre + afiliación | **9** (6 limpios + 3 sospechosos) |
+| Probables | **37** |
+| A revisar | **24** |
+| Rechazados | **7** |
+
+---
+
+## 2. Estado de la base
+
+`data/rip_osiris.sqlite` · **escrita el 01-11-2026** con backup previo en `data/rip_osiris.backup-2026-11-01.sqlite`.
+
+| Tabla | Filas | Estado |
+|---|---:|---|
+| `researchers` | 1.087 | **620 con ORCID**: 589 `portal_ficha` + 25 `reverso_doi` + 6 `reverso_nombre_afiliacion` |
+| `works` | 25.472 | 20.824 con DOI; 1.620 portal-only sin DOI; 3 sin título |
+| `work_ids` | 54.178 | 22.200 OpenAlex + 20.824 DOI + 11.154 portal |
+| `author_work` | 52.473 | 31.863 `orcid_exacto` + 17.514 `portal_doi` + 3.096 `portal_publicacion` |
+| `outputs` | 212 | censo previo de centros, no toca este pipeline |
+
+`PRAGMA integrity_check` = **ok** · `PRAGMA foreign_key_check` = **0 incidencias**.
+
+**Fuera de la escritura:** los 37 `probable` y 24 `revisar` del ORCID inverso, y los 3 sospechosos (`Cristina Fernandez Martinez`, `Jose Luis Rodrigo Perez`, `Monica Romero Nieto`). No se ha borrado ni modificado nada previo.
+
+---
+
+## 3. Artefactos (fuente de verdad)
+
+| Archivo | Contenido |
+|---|---|
+| `data/cosecha_orcid.csv` | 1.087 fichas con ORCID declarado |
+| `data/anclaje_orcid.csv` | 475 autores OpenAlex con métricas |
+| `data/author_work.jsonl` | 31.882 pares persona-obra vía ORCID |
+| `data/portal_publicaciones.jsonl` | 20.616 pares / 11.154 publicaciones del portal |
+| `data/portal_doi_openalex.json` | DOI → obra OpenAlex + authorships |
+| `data/orcid_reverso_candidatos.csv` | 102 candidatos ORCID con apoyo |
+| `data/orcid_reverso_validado.csv` | Validación contra `pub.orcid.org` |
+| `data/orcid_reverso_multisenal.csv` | Clasificación final (DOI + nombre + afiliación + apoyo) |
+| `data/mapa_orcid_dataset_v2.json` | Dataset del mapa con las tres capas |
+| `data/mapa_orcid_v2.html` | Mapa interactivo autocontenido |
+| `data/cv_provincias.geojson` | Provincias de Castellón, Valencia y Alicante |
+
+---
+
+## 4. Scripts
+
+En `scripts/`:
+
+| Script | Qué hace |
+|---|---|
+| `pipeline_portal.py` | Cosecha publicaciones + DOI → OpenAlex + ORCID inverso + validación |
+| `valida_multisenal.py` | Reclasifica los 102 candidatos con nombre + afiliación + solape DOI + apoyo |
+| `fase1_dataset_v2.py` | Genera `mapa_orcid_dataset_v2.json` |
+| `genera_mapa_v2.py` | Genera `mapa_orcid_v2.html` |
+| `piloto_orcid_reverso.py` | Piloto de recuperación inversa (30 sin ORCID) |
+| `parser_pubs.py` | Parser de la lista de publicaciones del portal |
+
+---
+
+## 5. Mapa
+
+- **Publicado:** <https://gipsy93-collab.github.io/Ciencia_Abierta_Fisabio/mapa-orcid/>
+- **Portada:** <https://gipsy93-collab.github.io/Ciencia_Abierta_Fisabio/> (tercera pieza)
+- **Repo:** `gipsy93-collab/Ciencia_Abierta_Fisabio`, `main`, carpeta `mapa-orcid/`, commit `0ccc497`
+- **Local:** `data/mapa_orcid_v2.html`
+- **Tres capas:** ORCID declarada (589) · ampliada (620) · producción (914)
+- **Dos medianas:** ORCID (inflada) vs unión (corregida)
+- **Anillo cian:** producción; el hueco es lo que el ORCID no ve
+- **Punto cian:** coordenada exacta del edificio
+
+---
+
+## 6. Pendientes
+
+- [x] **Escritura en la base** con backup y transacción (01-11-2026): 620 ORCID, 25.472 obras, 54.178 IDs, 52.473 vínculos.
+- [ ] Revisión humana de `data/orcid_reverso_multisenal.csv` (37 probables + 24 a revisar).
+- [ ] 3.096 publicaciones del portal sin DOI ni año: mejorar el parser o aceptar el límite.
+- [ ] 19 grupos sin centro declarado: Fundanet o sede de la GVA.
+- [ ] Rastrear la web pública de FISABIO y la memoria de gestión (pendiente acordado).
+- [ ] Mover los scripts de `scripts/` al flujo del proyecto (tests, CLI) si se consolida.
+
+---
+
+## 7. Decisiones metodológicas
+
+1. **Mediana, no media.** Distribución asimétrica; Elda 13/17/214 → media 81, mediana 17.
+2. **Dos medianas.** La ORCID está inflada por selección; la unión corrige con el portal.
+3. **ORCID como llave.** El nombre falla por homónimos; el ORCID resuelve el 81 % de los que lo declaran.
+4. **ORCID inverso multiseñal.** Nombre + afiliación + solape DOI + apoyo. Un candidato con una sola obra es hipótesis; con ≥2 y validación es dato.
+5. **No inferir centro por nombre.** El centro se deriva del grupo público; 188 quedan sin centro y se declaran.
+6. **El portal no es el universo.** 146 personas sin ORCID no tienen publicaciones en el CRIS; 3.096 publicaciones no tienen DOI/año.
+7. **La cobertura no es calidad.** Mide adopción de infraestructura, no actividad investigadora.
+
+---
+
+## 8. Comandos rápidos
+
+```powershell
+cd C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris
+$env:PYTHONPATH="."
+
+# Regenerar dataset y mapa
+python scripts\fase1_dataset_v2.py
+python scripts\genera_mapa_v2.py
+
+# Reclasificar candidatos ORCID
+python scripts\valida_multisenal.py
+
+# Pipeline completo (si hay que rehacerlo)
+python scripts\pipeline_portal.py all
+```
