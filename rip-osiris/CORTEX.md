@@ -150,6 +150,7 @@ En `scripts/`:
 5. **No inferir centro por nombre.** El centro se deriva del grupo público; 188 quedan sin centro y se declaran. **Excepción:** el centro declarado por la institución (Fundanet) sí se importa, con `source='fundanet'`, evidencia literal y confianza menor si el valor viene truncado.
 6. **El portal no es el universo.** 146 personas sin ORCID no tienen publicaciones en el CRIS; 3.096 publicaciones no tienen DOI, aunque ya tienen año/tipo; 788 obras ORCID no tienen tipo.
 7. **La cobertura no es calidad.** Mide adopción de infraestructura, no actividad investigadora.
+8. **Regla de fuentes: tres capas y se sube solo por necesidad** (02-11-2026). Capa 1, API abierta (gratis, determinista); capa 2, Fetch de documento (gratis, con caché); capa 3, navegador con agente (0,016 $/paso, no determinista) **solo con login, multipaso o marcado hostil y autorización escrita**. Ningún dato de capa 3 entra sin `evidence_literal`, URL, captura y fecha. Detalle: `docs/arquitectura-fuentes.md`.
 
 ---
 
