@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OSIRIS | Catálogo de Fuentes de Información — v2</title>
+  <title>OSIRIS | Catálogo de Fuentes de Información — v2.1</title>
   <style>
     :root {
       --primary: #005f73;
@@ -63,6 +63,25 @@
     .legend .a2 { border-left-color: var(--a2); }
     .legend .a3 { border-left-color: var(--a3); }
     .legend .a0 { border-left-color: var(--a0); }
+
+    .legal-panel {
+      max-width: 1200px;
+      margin: 0 auto 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 0.88rem;
+      box-shadow: var(--shadow);
+    }
+    .legal-panel summary { cursor: pointer; font-weight: 600; color: var(--primary); }
+    .legal-panel[open] summary { margin-bottom: 10px; }
+    .legal-body p { margin-bottom: 8px; }
+    .legal-body ul { margin: 0 0 8px 18px; }
+    .legal-body li { margin-bottom: 6px; }
+    .legal-body .legal-note { background: #f1f3f5; border-radius: 6px; padding: 10px; }
+    .legal-body code { background: #e9ecef; padding: 1px 4px; border-radius: 4px; }
 
     .controls {
       max-width: 1200px;
@@ -162,7 +181,7 @@
       transition: max-height 0.35s ease;
       margin-top: 0;
     }
-    .card.expanded .details { max-height: 900px; margin-top: 10px; }
+    .card.expanded .details { max-height: 1200px; margin-top: 10px; }
     .card.expanded .summary { color: var(--text); }
     .details dl {
       display: grid;
@@ -208,8 +227,8 @@
 <body>
 
 <header>
-  <h1>OSIRIS | Catálogo de Fuentes de Información — v2</h1>
-  <p>Identificación, acceso técnico, licencia y justificación de inclusión para el mapeo de producción científica de FISABIO. Complementa al CRIS propietario (Fundanet) con fuentes no tradicionales.</p>
+  <h1>OSIRIS | Catálogo de Fuentes de Información — v2.1</h1>
+  <p>Identificación, acceso técnico, licencia, base legal y justificación de inclusión para el mapeo de producción científica de FISABIO. Complementa al CRIS propietario (Fundanet) con fuentes no tradicionales, priorizando lo cosechable y legalmente sostenible.</p>
 </header>
 
 <div class="legend">
@@ -219,9 +238,25 @@
   <div class="item a0"><b>Identidad y estándares</b>No son fuentes de contenido: son vocabularios e identificadores para normalizar y exportar.</div>
 </div>
 
+<details class="legal-panel" open>
+  <summary>Marco legal de la selección · por qué estas fuentes y no otras</summary>
+  <div class="legal-body">
+    <p>La selección no es una preferencia técnica: cada fuente debe poder cosecharse con una base jurídica identificable. OSIRIS es un proyecto de investigación científica no comercial de un organismo de investigación (FISABIO), lo que activa las excepciones de la LPI, pero no elimina las obligaciones contractuales, los términos de uso ni el RGPD. La memoria exige en Fase 1 la verificación del copyright de los sitios (T1.3) y declara la imposibilidad de scraping como riesgo nº 1: este marco es la respuesta.</p>
+    <ul>
+      <li><b>RDL 1/1996 (LPI), arts. 12, 67 y 133–137.</b> Los datos factuales no son obra (art. 12); el art. 67 (introducido por el RDL 24/2021, que transpone la Directiva (UE) 2019/790) permite la minería de textos y datos con fines de investigación; el art. 135.1.b limita el derecho <i>sui generis</i> sobre bases de datos cuando la extracción es para investigación científica no comercial y se cita la fuente.</li>
+      <li><b>Ley 37/2007 (RISP), art. 3.bis.</b> Los datos de investigación del sector público son reutilizables; ampara BOE, DOGV, Dades Obertes GVA, AEMPS y registros públicos.</li>
+      <li><b>Ley 17/2022 y Ley 14/2011, art. 37.</b> Marco de Ciencia Abierta: justifica la apuesta por metadatos abiertos, código libre y exportación interoperable (Dublin Core, BibTeX, CERIF).</li>
+      <li><b>RGPD (UE) 2016/679 y LOPDGDD 3/2018.</b> Nombres, ORCID y afiliaciones son datos personales: base de interés público/legítimo (art. 6.1.e/f), minimización, finalidad declarada y no cesión a terceros.</li>
+      <li><b>Directiva 96/9/CE y Directiva INSPIRE 2007/2/CE.</b> Derecho <i>sui generis</i> de bases de datos y, cuando aplique, información geográfica de la GVA.</li>
+      <li><b>robots.txt, ToS y licencias CC.</b> No son normas, pero condicionan la legalidad contractual: si la fuente prohíbe la extracción o reserva derechos (art. 67.3 LPI), se negocia convenio o se descarta.</li>
+    </ul>
+    <p class="legal-note">Regla de oro: <b>se cosechan metadatos y se enlaza el contenido</b>. No se redistribuyen PDFs con copyright, no se publican datos personales y lo licenciado queda en <code>data/licensed/</code> (fuera de git). Cada ficha indica su base legal y la condición que la limita.</p>
+  </div>
+</details>
+
 <main>
   <div class="controls">
-    <input type="text" id="search" placeholder="Buscar por nombre, categoría, protocolo o justificación...">
+    <input type="text" id="search" placeholder="Buscar por nombre, categoría, protocolo, justificación o base legal...">
     <div class="filters" id="filters"></div>
   </div>
   <p class="count" id="count"></p>
@@ -230,8 +265,8 @@
 </main>
 
 <footer>
-  OSIRIS Framework v2 · Revisión del catálogo v1 (Qwen, 14-10-2026) · Uso interno FISABIO · Reutilización institucional permitida.<br>
-  Las etiquetas «(verificar)» señalan endpoints que deben confirmarse en la Fase 1 del proyecto antes de automatizar la cosecha.
+  OSIRIS Framework v2.1 · Revisión del catálogo v1 (Qwen, 14-10-2026) · Ampliación con OpenCitations, Unpaywall, Sherpa Romeo, Wikidata, Redalyc, Latindex, REDIB, arXiv y Scimago · Uso interno FISABIO · Reutilización institucional permitida.<br>
+  Las etiquetas «(verificar)» señalan endpoints que deben confirmarse en la Fase 1 del proyecto antes de automatizar la cosecha. La base legal de cada ficha es orientativa: el cierre necesita el visto bueno del servicio jurídico/DPO de FISABIO.
 </footer>
 
 <script>
@@ -292,13 +327,13 @@
       summary: "Registro de identificadores persistentes (DOI) para datasets, software, informes y otros research objects.",
       details: "Esencial para Ciencia Abierta y FAIR. Permite citar objetos no tradicionales, alineándose con DORA y CoARA." },
 
-    { id: 6, name: "OpenAIRE", anillo: "a1", cat: "nucleo", url: "https://www.openaire.eu",
+    { id: 6, name: "OpenAIRE / OpenAIRE Graph", anillo: "a1", cat: "nucleo", url: "https://www.openaire.eu",
       protocol: "REST + OAI-PMH + Research Graph (volcado)",
-      endpoint: "api.openaire.eu",
-      licMeta: "Abierta (CC BY)", licCont: "Enlace OA", coste: "Gratis", costeLvl: "bajo",
+      endpoint: "api.openaire.eu · graph.openaire.eu",
+      licMeta: "CC BY", licCont: "Enlace OA", coste: "Gratis", costeLvl: "bajo",
       riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3, OE5",
-      summary: "Agregación europea de outputs; vincula publicaciones con proyectos financiados.",
-      details: "Base compartida con RECOLECTA (mismo software D-Net). Permite recuperar producción asociada a grants aunque la afiliación no esté bien declarada." },
+      summary: "Agregación europea de outputs y Research Graph completo: publicaciones, datasets, software, proyectos y organizaciones.",
+      details: "El OpenAIRE Graph se publica como volcado CC BY y permite recuperar producción asociada a grants aunque la afiliación no esté bien declarada. Comparte software D-Net con RECOLECTA. Es la puerta europea a la ciencia abierta y el complemento natural de OpenAlex/Crossref." },
 
     { id: 7, name: "CORDIS", anillo: "a1", cat: "proy", url: "https://cordis.europa.eu",
       protocol: "API de datos abiertos + volcado", endpoint: "data.europa.eu · cordis.europa.eu",
@@ -584,8 +619,132 @@
       licMeta: "Gratuito (individual)", licCont: "—", coste: "Gratis (herramienta)", costeLvl: "bajo",
       riesgo: "Bajo/medio", riesgoLvl: "medio", oe: "OE2",
       summary: "CORRECCIÓN v1: no es una base de policy briefs. Es una herramienta gratuita individual alimentada por Overton.",
-      details: "Solapa con Overton. No proporciona cosecha ni datos para organizaciones. Se conserva solo como interfaz de consulta, no como fuente." }
+      details: "Solapa con Overton. No proporciona cosecha ni datos para organizaciones. Se conserva solo como interfaz de consulta, no como fuente." },
+
+    // ---------------------- AMPLIACIÓN v2.1 · GRAFOS ABIERTOS Y COBERTURA IBEROAMERICANA ----------------------
+    { id: 47, name: "OpenCitations", anillo: "a1", cat: "nucleo", url: "https://opencitations.net",
+      protocol: "REST + volcado (COCI, OpenCitations Index, Meta)", endpoint: "api.opencitations.net",
+      licMeta: "CC0", licCont: "Enlace (no aloja texto completo)", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE2, OE3",
+      summary: "Grafo abierto de citas. Alternativa CC0 a las citas propietarias de WoS/Scopus.",
+      details: "Publica citas y metadatos de referencia con DOI. Permite construir métricas de citas sin licencia comercial y auditar la cobertura de OpenAlex/Crossref. No sustituye al texto completo." },
+
+    { id: 48, name: "Unpaywall", anillo: "a1", cat: "nucleo", url: "https://unpaywall.org",
+      protocol: "REST", endpoint: "api.unpaywall.org",
+      licMeta: "CC0", licCont: "Enlace a la versión OA (según editor)", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3, OE5",
+      summary: "Localiza la versión OA legal de un DOI (editor, repositorio o preprint).",
+      details: "API gratuita con email; devuelve la mejor localización OA y su licencia. Reduce el riesgo legal porque enlaza la copia permitida en lugar de descargar el PDF del editor." },
+
+    { id: 49, name: "Sherpa Romeo", anillo: "a1", cat: "nucleo", url: "https://v2.sherpa.ac.uk/romeo/",
+      protocol: "REST", endpoint: "api.sherpa.ac.uk/romeo",
+      licMeta: "CC BY-NC-SA (verificar)", licCont: "Enlace a la política", coste: "Gratis (uso no comercial)", costeLvl: "bajo",
+      riesgo: "Bajo/medio", riesgoLvl: "medio", oe: "OE3, OE5",
+      summary: "Políticas de autoarchivo y acceso abierto de revistas y editoriales.",
+      details: "Permite comprobar qué versión (preprint, postprint o VoR) puede depositarse y con qué condiciones. Es la pieza que convierte la cosecha en un flujo legalmente defendible." },
+
+    { id: 50, name: "Wikidata", anillo: "a1", cat: "nucleo", url: "https://www.wikidata.org",
+      protocol: "REST / SPARQL / volcado", endpoint: "query.wikidata.org",
+      licMeta: "CC0", licCont: "CC0 (salvo excepciones)", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3, OE4",
+      summary: "Grafo de conocimiento abierto con identificadores de personas, instituciones, obras y proyectos.",
+      details: "Enlaza ORCID, ROR, DOI y otros PIDs; enriquece la desambiguación y la trazabilidad institucional. Verificar la calidad y la fuente de cada declaración antes de usarla como evidencia." },
+
+    { id: 51, name: "Redalyc", anillo: "a2", cat: "local", url: "https://www.redalyc.org",
+      protocol: "OAI-PMH (verificar)", endpoint: "redalyc.org (verificar)",
+      licMeta: "Abierta", licCont: "OA (CC por artículo)", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Red de revistas científicas de América Latina, el Caribe, España y Portugal.",
+      details: "Cobertura iberoamericana en español y portugués; complementa SciELO y Dialnet para producción no indexada en WoS/Scopus." },
+
+    { id: 52, name: "Latindex", anillo: "a2", cat: "local", url: "https://www.latindex.org",
+      protocol: "Portal / datos abiertos (verificar)", endpoint: "latindex.org (verificar)",
+      licMeta: "Abierta", licCont: "Enlace", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Directorio y catálogo de revistas científicas iberoamericanas.",
+      details: "Identifica revistas y su calidad editorial; útil para clasificar venues y justificar la cobertura lingüística y territorial." },
+
+    { id: 53, name: "REDIB", anillo: "a2", cat: "local", url: "https://www.redib.org",
+      protocol: "OAI-PMH (verificar)", endpoint: "redib.org (verificar)",
+      licMeta: "Abierta", licCont: "OA", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Medio", riesgoLvl: "medio", oe: "OE3",
+      summary: "Red Iberoamericana de Innovación y Conocimiento Científico.",
+      details: "Agrega revistas y contenidos iberoamericanos; complementa Redalyc y SciELO para la producción en español y portugués." },
+
+    { id: 54, name: "arXiv", anillo: "a1", cat: "robj", url: "https://arxiv.org",
+      protocol: "API / OAI-PMH", endpoint: "export.arxiv.org/api",
+      licMeta: "Abierta", licCont: "CC según preprint", coste: "Gratis", costeLvl: "bajo",
+      riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE3",
+      summary: "Preprints de física, matemáticas, informática y áreas afines.",
+      details: "Relevante para salud digital, IA sanitaria, estadística y bioinformática. Modelar como versión vinculada al VoR para evitar doble conteo." },
+
+    { id: 55, name: "Scimago (SJR)", anillo: "a1", cat: "nucleo", url: "https://www.scimagojr.com",
+      protocol: "Descarga CSV / portal", endpoint: "scimagojr.com (verificar)",
+      licMeta: "CC BY-NC (verificar)", licCont: "— (indicadores)", coste: "Gratis (uso no comercial)", costeLvl: "bajo",
+      riesgo: "Bajo/medio", riesgoLvl: "medio", oe: "OE2",
+      summary: "Indicadores bibliométricos de revistas (SJR, H-index, cuartiles).",
+      details: "Alimenta cuadros de mando y comparaciones de revistas sin depender del JCR. Uso no comercial; citar la fuente." }
   ];
+
+  // ---------------------- Base legal por fuente ----------------------
+  // Cada entrada responde a: por qué se puede cosechar, qué límite legal tiene y qué norma lo ampara.
+  const LEGAL = {
+    1: "Metadatos CC0 vía API/snapshot. LPI arts. 12 y 67 (TDM): cosecha y análisis permitidos; el full-text no se redistribuye. RGPD: datos profesionales de autores (art. 6.1.e/f).",
+    2: "Metadatos CC0 (API/Public Data File/OAI). LPI arts. 12 y 67; solo enlace al contenido. RGPD: autores.",
+    3: "Metadatos abiertos y contenido OA cuando existe (CC). LPI art. 67 (TDM); respetar la CC de cada artículo; no redistribuir full-text cerrado. RGPD: autores.",
+    4: "Metadatos abiertos vía E-utilities; solo enlace. LPI art. 67 (TDM); el full-text es del editor. RGPD: autores.",
+    5: "Metadatos CC0 (API/OAI). LPI arts. 12 y 67; enlace al objeto. RGPD: autores.",
+    6: "Metadatos CC BY y Research Graph CC BY. LPI art. 67 (TDM); atribución; no redistribuir full-text de terceros. RGPD: autores.",
+    7: "Metadatos CC BY 4.0 (API/volcado). LPI art. 67 (TDM); atribución. RGPD: personas en proyectos.",
+    8: "Metadatos CC0; contenido según licencia del depósito. LPI art. 67; respetar la CC; RGPD: autores.",
+    9: "Metadatos CC0; contenido según licencia del depósito. LPI art. 67; respetar la CC; RGPD: autores.",
+    10: "Metadatos abiertos; código según licencia del repositorio. LPI art. 67; respetar la licencia del software; RGPD: autores.",
+    11: "Metadatos abiertos; preprints CC BY/CC0. LPI art. 67; atribución; no mezclar versiones. RGPD: autores.",
+    12: "Metadatos CC0; contenido CC0/CC BY según proyecto. LPI art. 67; respetar la CC; RGPD: autores.",
+    13: "Agregador OAI-PMH; metadatos abiertos y enlace OA. LPI art. 67; el contenido queda en el repositorio de origen; RGPD: autores.",
+    14: "Metadatos abiertos vía OAI; enlace OA. LPI art. 67; verificar condiciones de cosecha; RGPD: autores.",
+    15: "Metadatos abiertos; contenido OA. LPI art. 67; API key y cuotas; respetar la CC; RGPD: autores.",
+    16: "Metadatos abiertos vía API; enlace. LPI art. 67; verificar ToS y cuotas; RGPD: autores.",
+    17: "Metadatos CC0; enlace OA. LPI arts. 12 y 67; RGPD: autores.",
+    18: "Agregador OAI; metadatos abiertos. LPI art. 67; el contenido queda en origen; RGPD: autores.",
+    19: "Los ToS de la Fundación Dialnet prohíben estudios bibliométricos sin autorización; el art. 135.1.b LPI no ampara frente a una reserva contractual. Requiere convenio. RGPD: autores.",
+    20: "Metadatos abiertos y OA por revista vía OAI. LPI art. 67; respetar la CC de cada revista; RGPD: autores.",
+    21: "Metadatos abiertos y OA por artículo. LPI art. 67; respetar la CC; operado por el ISCIII. RGPD: autores.",
+    22: "Datos públicos (RISP); sin robots.txt; solo metadatos factuales y cita. LPI arts. 12 y 67; resumen © autor; RGPD: autores.",
+    23: "Metadatos abiertos y OA vía OAI. LPI art. 67; respetar la licencia del depósito; RGPD: autores.",
+    24: "Metadatos abiertos y OA vía OAI (RODERIC, Riunet, RUA, UJI). LPI art. 67; respetar la licencia de cada repositorio; RGPD: autores.",
+    25: "Metadatos abiertos y OA vía OAI. LPI art. 67; respetar la licencia del depósito; RGPD: autores.",
+    26: "Datos públicos reutilizables (Ley 37/2007, art. 3.bis) y CC por dataset. LPI art. 67; INSPIRE si es geográfico; RGPD si hay datos personales.",
+    27: "Licencia/key; la API no incluye el PDF; contrato. El art. 67 LPI no sustituye la licencia; datos en data/licensed; nunca backbone; RGPD.",
+    28: "Licencia propietaria; contrato; solo agregados; no redistribuir. RGPD: autores.",
+    29: "Licencia propietaria; prueba de 14 días; contrato; solo agregados. RGPD: autores.",
+    30: "Licencia propietaria; data/licensed; solo tablas agregadas; no redistribuir. RGPD: autores.",
+    31: "Licencia propietaria; contrato; solo agregados. RGPD: autores.",
+    32: "API pública; datos personales (RGPD art. 6.1.e/f), minimización y atribución; no redistribuir emails.",
+    33: "CC0; sin datos personales.",
+    34: "Datos internos; convenio con Semicrol; RGPD; no redistribuir.",
+    35: "Exportación estándar del propio investigador; RGPD; uso interno.",
+    36: "Estándares abiertos; sin datos personales.",
+    37: "Documento público; reutilización RISP (Ley 37/2007); API oficial. RGPD si hay datos personales.",
+    38: "Documento público; RISP; sin API, solo metadatos/enlace; respetar robots y ToS. RGPD si hay datos personales.",
+    39: "CC BY-NC-ND 3.0; robots permite; solo metadatos/enlace, sin obra derivada ni uso comercial. LPI arts. 67 y 135.1.b.",
+    40: "Documento público regulatorio; RISP; solo metadatos. RGPD si hay datos personales.",
+    41: "Datos públicos; API oficial; sin datos de pacientes; RGPD.",
+    42: "Datos públicos; API a verificar; RGPD; uso de investigación.",
+    43: "Datos públicos; sin API; scraping moderado; solo metadatos; RGPD.",
+    44: "Datos CC/OA; API a verificar; RGPD; uso de investigación.",
+    45: "Suscripción; contrato; no cosechar sin licencia; RGPD.",
+    46: "Herramienta gratuita individual; sin cosecha; ToS; no es fuente.",
+    47: "Citas CC0 (API/volcado). LPI arts. 12 y 67; solo metadatos; RGPD: identificadores.",
+    48: "Metadatos CC0; solo enlaza la copia OA y su licencia; no aloja el PDF. LPI art. 67; RGPD: autores.",
+    49: "Datos CC BY-NC-SA (verificar); uso no comercial de investigación (LPI art. 135.1.b y RISP art. 3.bis); citar la fuente.",
+    50: "CC0; reutilización libre. RGPD: las declaraciones sobre personas son datos personales; base de interés público/legítimo y minimización.",
+    51: "Metadatos abiertos y OA por artículo vía OAI/API. LPI art. 67; respetar la CC; RGPD: autores.",
+    52: "Datos factuales de revistas (LPI art. 12); reutilización con cita; verificar ToS/robots; RGPD: editores.",
+    53: "Metadatos abiertos y OA vía OAI. LPI art. 67; respetar las licencias; RGPD: autores.",
+    54: "Metadatos abiertos; contenido CC según preprint. LPI art. 67; atribución; RGPD: autores.",
+    55: "Datos CC BY-NC (verificar); uso no comercial de investigación (LPI art. 135.1.b y RISP art. 3.bis); no redistribuir con fines comerciales."
+  };
 
   // ---------------------- Render ----------------------
   const grid = document.getElementById('sources-grid');
@@ -627,7 +786,7 @@
     const q = searchInput.value.toLowerCase().trim();
     const filtered = sources.filter(s => {
       const byRing = activeFilter === 'todos' || s.anillo === activeFilter;
-      const hay = [s.name, s.summary, s.details, s.protocol, CAT[s.cat], RING[s.anillo]].join(' ').toLowerCase();
+      const hay = [s.name, s.summary, s.details, s.protocol, CAT[s.cat], RING[s.anillo], LEGAL[s.id] || ""].join(' ').toLowerCase();
       return byRing && (!q || hay.includes(q));
     });
 
@@ -664,6 +823,7 @@
             '<dt>Licencia contenido</dt><dd>' + esc(s.licCont) + '</dd>' +
             '<dt>Coste</dt><dd>' + esc(s.coste) + '</dd>' +
             '<dt>Alineación</dt><dd>' + esc(s.oe) + '</dd>' +
+            '<dt>Base legal</dt><dd>' + esc(LEGAL[s.id] || "—") + '</dd>' +
           '</dl>' +
           '<p class="note">' + esc(s.details) + '</p>' +
           '<a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer" class="link-btn" onclick="event.stopPropagation();">Visitar fuente</a>' +
