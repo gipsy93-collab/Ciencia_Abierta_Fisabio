@@ -35,6 +35,11 @@
   .toggle{display:flex;align-items:center;gap:9px;font-size:.74rem;color:var(--muted);
     padding:5px 0;cursor:pointer}
   .toggle input{accent-color:var(--cyan);width:14px;height:14px}
+  body.simple .adv-only{display:none!important}
+  body.advanced .simple-only{display:none!important}
+  .mode{display:flex;justify-content:flex-end;margin:-6px 0 10px}
+  .mode .toggle{font-size:.66rem;padding:3px 0;color:#64748b}
+  .mode .toggle:hover{color:var(--muted)}
   .legend-row{display:flex;align-items:center;gap:8px;font-size:.64rem;color:var(--muted);margin-top:6px}
   .bar{height:7px;border-radius:4px;flex:1;background:linear-gradient(90deg,#38bdf8,#818cf8,#c084fc,#fb7185)}
   .dots{display:flex;align-items:flex-end;gap:8px;margin-top:8px;height:44px}
@@ -83,23 +88,32 @@
   }
 </style>
 </head>
-<body>
+<body class="simple">
 <div id="app">
   <aside id="panel">
     <h1>Mapa <span>ORCID</span> · FISABIO</h1>
     <div class="sub">Cobertura del identificador y producción visible.<br>1.087 personas · 31 centros · dos vías: ORCID y portal (CRIS).</div>
 
+    <div class="mode">
+      <label class="toggle"><input type="checkbox" id="f-adv"> Detalles técnicos</label>
+    </div>
+
     <div class="block">
       <h2>Relleno = cobertura</h2>
       <div class="chips" id="color-chips">
         <div class="chip on" data-k="cobertura_declarada_pct">ORCID declarada</div>
-        <div class="chip" data-k="cobertura_ampliada_pct">ORCID ampliada</div>
+        <div class="chip adv-only" data-k="cobertura_ampliada_pct">ORCID ampliada</div>
         <div class="chip" data-k="cobertura_produccion_pct">Producción</div>
       </div>
       <div class="legend-row"><span id="legend-min">0 %</span><div class="bar" id="legend-bar"></div><span id="legend-max">100 %</span></div>
     </div>
 
-    <div class="block">
+    <div class="block simple-only">
+      <h2>Tamaño = personas con producción</h2>
+      <div class="dots" id="size-legend-simple"></div>
+    </div>
+
+    <div class="block adv-only">
       <h2>Tamaño = mediana de obras</h2>
       <div class="chips" id="size-chips">
         <div class="chip" data-k="mediana_orcid">Mediana ORCID</div>
@@ -114,7 +128,15 @@
       <label class="toggle"><input type="checkbox" id="f-limbo" checked> Mostrar «sin centro»</label>
     </div>
 
-    <div class="block">
+    <div class="block simple-only">
+      <h2>Cómo leerlo</h2>
+      <div class="note amber">
+        El <b>color</b> indica el % de personas con ORCID. El <b>anillo cian</b>, el % con producción visible.
+        El hueco del anillo es lo que la infraestructura ORCID no ve.
+      </div>
+    </div>
+
+    <div class="block adv-only">
       <h2>El anillo</h2>
       <div class="legend-row">
         <span style="width:10px;height:10px;border-radius:50%;border:2px solid var(--cyan);display:inline-block"></span>
@@ -126,11 +148,11 @@
       </div>
     </div>
 
-    <div class="block">
+    <div class="block adv-only">
       <h2>Dos medianas, no una</h2>
       <div class="note">
-        La mediana ORCID está <b>inflada por selección</b>: solo cuenta a quienes tienen ORCID, que suelen ser los más productivos. En <b>Vinalopó</b> era 53; al incluir las publicaciones del portal, la mediana unión baja a <b>8</b>.
-        <div class="ex">Vinalopó · ORCID: 7 personas · mediana 53<br>Vinalopó · unión: 18 personas · mediana 8</div>
+        La mediana ORCID está <b>inflada por selección</b>: solo cuenta a quienes tienen ORCID, que suelen ser los más productivos. En <b>Vinalopó</b> era <span id="vin-med-o">—</span>; al incluir las publicaciones del portal, la mediana unión baja a <b id="vin-med-u">—</b>.
+        <div class="ex" id="ex-vinalopo"></div>
       </div>
       <div class="note amber" style="margin-top:9px">
         <b>La brecha es el hallazgo:</b> Elda tiene 24 % de cobertura ORCID pero <b>70 % de producción</b>; Vinalopó, 32 % y 64 %. El CRIS ve investigadores que el ORCID no identifica.
@@ -139,8 +161,8 @@
 
     <div class="foot">
       Fuente: fichas del portal FISABIO + ORCID declarado y recuperado + publicaciones del portal + OpenAlex.<br>
-      Obras ORCID de perfiles recuperados: cosecha completa para 80; 0 pendientes y excluidos de esa métrica.<br>
-      Mediana unión = personas con obras por cualquiera de las dos vías.<br>
+      <span class="adv-only">Obras ORCID de perfiles recuperados: cosecha completa para 80; 0 pendientes y excluidos de esa métrica.<br>
+      Mediana unión = personas con obras por cualquiera de las dos vías.<br></span>
       El punto cian marca la coordenada exacta; la burbuja solo se separa cuando dos centros coinciden.
     </div>
   </aside>
@@ -161,6 +183,16 @@ const centers = DATA.centros.map(d => Object.assign({}, d));
 centers.forEach(d => {
   if (d.tipo === 'sin_centro') { d.lon = d.lon + 0.34; d.lat = d.lat - 0.11; }
 });
+
+// el ejemplo de la nota se toma del dataset: no envejece con cada actualización
+const vin = centers.find(d => /VINALOP/i.test(d.centro || ''));
+if (vin) {
+  document.getElementById('vin-med-o').textContent = vin.mediana_orcid ?? '—';
+  document.getElementById('vin-med-u').textContent = vin.mediana_union ?? '—';
+  document.getElementById('ex-vinalopo').innerHTML =
+    `Vinalopó · ORCID: ${vin.n_efectivo_orcid} personas · mediana ${vin.mediana_orcid ?? '—'}<br>` +
+    `Vinalopó · unión: ${vin.n_efectivo_union} personas · mediana ${vin.mediana_union ?? '—'}`;
+}
 
 const mapEl = document.getElementById('map-container');
 let W = mapEl.clientWidth || 1;
@@ -229,7 +261,8 @@ function colorScale() {
 }
 
 let colorMetric = 'cobertura_declarada_pct';
-let sizeMetric = 'mediana_union';
+let sizeMetric = 'con_produccion';
+let advanced = false;
 let pinned = null;
 
 const tip = d3.select('#tooltip');
@@ -351,15 +384,19 @@ function paint(animate) {
 }
 
 function drawSizeLegend(s) {
-  const box = d3.select('#size-legend').html('');
-  const max = maxSize();
-  [0, Math.round(max * .25), Math.round(max * .5), Math.round(max)].forEach(t => {
-    const w = d3.create('div').attr('class', 'dot-wrap');
-    const px = Math.max(4, s(t));
-    w.append('div').attr('class', 'dot')
-      .style('width', px + 'px').style('height', px + 'px');
-    w.append('span').text(t);
-    box.node().appendChild(w.node());
+  ['#size-legend', '#size-legend-simple'].forEach(sel => {
+    const box = d3.select(sel);
+    if (box.empty()) return;
+    box.html('');
+    const max = maxSize();
+    [0, Math.round(max * .25), Math.round(max * .5), Math.round(max)].forEach(t => {
+      const w = d3.create('div').attr('class', 'dot-wrap');
+      const px = Math.max(4, s(t));
+      w.append('div').attr('class', 'dot')
+        .style('width', px + 'px').style('height', px + 'px');
+      w.append('span').text(t);
+      box.node().appendChild(w.node());
+    });
   });
 }
 
@@ -398,6 +435,15 @@ function drawLeaders() {
 function showTip(evt, d) {
   const rect = container.getBoundingClientRect();
   const gap = d.brecha_pct >= 0 ? `+${d.brecha_pct}` : `${d.brecha_pct}`;
+  const filas_avanzadas = advanced ? `
+         <tr><td>ORCID recuperado</td><td>+${d.orcid_recuperado}</td></tr>
+         <tr><td>Cobertura ORCID ampliada</td><td>${d.cobertura_ampliada_pct}%</td></tr>
+         <tr class="sep"><td>Mediana ORCID</td><td>${d.mediana_orcid ?? '—'} (n=${d.n_efectivo_orcid})</td></tr>
+         <tr><td>Mediana unión</td><td>${d.mediana_union ?? '—'} (n=${d.n_efectivo_union})</td></tr>
+         <tr class="sep"><td>Pares persona-obra</td><td>${d.pares_union.toLocaleString('es-ES')}</td></tr>
+         <tr><td>Obras únicas</td><td>${d.obras_union.toLocaleString('es-ES')}</td></tr>
+         <tr><td>· vía ORCID</td><td>${d.pares_orcid.toLocaleString('es-ES')} pares · ${d.obras_orcid.toLocaleString('es-ES')} obras</td></tr>
+         <tr><td>· vía portal</td><td>${d.pares_portal.toLocaleString('es-ES')} pares · ${d.obras_portal.toLocaleString('es-ES')} obras</td></tr>` : '';
   tip.style('opacity', 1)
      .style('left', Math.min(evt.clientX - rect.left + 14, rect.width - 330) + 'px')
      .style('top', Math.min(evt.clientY - rect.top + 14, rect.height - 320) + 'px')
@@ -405,21 +451,14 @@ function showTip(evt, d) {
        <div class="t-name">${d.centro}</div>
        <div class="t-type">${tipoLabel[d.tipo] || d.tipo}</div>
        <table>
-         <tr><td>Cobertura ORCID declarada</td><td>${d.cobertura_declarada_pct}% (${d.orcid_declarado}/${d.total_roster})</td></tr>
-         <tr><td>ORCID recuperado</td><td>+${d.orcid_recuperado}</td></tr>
-         <tr><td>Cobertura ORCID ampliada</td><td>${d.cobertura_ampliada_pct}%</td></tr>
-         <tr><td>Producción (ORCID + portal)</td><td>${d.cobertura_produccion_pct}% (${d.con_produccion}/${d.total_roster})</td></tr>
+         <tr><td>${advanced ? 'Cobertura ORCID declarada' : 'Cobertura ORCID'}</td><td>${d.cobertura_declarada_pct}% (${d.orcid_declarado}/${d.total_roster})</td></tr>
+         <tr><td>${advanced ? 'Producción (ORCID + portal)' : 'Producción visible'}</td><td>${d.cobertura_produccion_pct}% (${d.con_produccion}/${d.total_roster})</td></tr>
          <tr class="sep"><td>Brecha de visibilidad</td><td>${gap} puntos</td></tr>
-         <tr><td>Mediana ORCID</td><td>${d.mediana_orcid ?? '—'} (n=${d.n_efectivo_orcid})</td></tr>
-         <tr><td>Mediana unión</td><td>${d.mediana_union ?? '—'} (n=${d.n_efectivo_union})</td></tr>
-         <tr class="sep"><td>Pares persona-obra</td><td>${d.pares_union.toLocaleString('es-ES')}</td></tr>
-         <tr><td>Obras únicas</td><td>${d.obras_union.toLocaleString('es-ES')}</td></tr>
-         <tr><td>· vía ORCID</td><td>${d.pares_orcid.toLocaleString('es-ES')} pares · ${d.obras_orcid.toLocaleString('es-ES')} obras</td></tr>
-         <tr><td>· vía portal</td><td>${d.pares_portal.toLocaleString('es-ES')} pares · ${d.obras_portal.toLocaleString('es-ES')} obras</td></tr>
+         ${filas_avanzadas}
        </table>
-       ${d.n_efectivo_union > 0 && d.n_efectivo_union < 5
+       ${advanced && d.n_efectivo_union > 0 && d.n_efectivo_union < 5
          ? `<div class="warn">⚠ n = ${d.n_efectivo_union}: mediana frágil, un solo caso la mueve.</div>` : ''}
-       <div class="t-coord">📍 ${Number(d.lat).toFixed(4)}, ${Number(d.lon).toFixed(4)}<br>${d.coord_fuente || ''}</div>
+       ${advanced ? `<div class="t-coord">📍 ${Number(d.lat).toFixed(4)}, ${Number(d.lon).toFixed(4)}<br>${d.coord_fuente || ''}</div>` : ''}
      `);
 }
 function hideTip() { if (!pinned) tip.style('opacity', 0); }
@@ -441,23 +480,37 @@ const zoom = d3.zoom().scaleExtent([1, 8]).on('zoom', evt => {
 });
 svg.call(zoom);
 
-document.querySelectorAll('#color-chips .chip').forEach(ch => {
-  ch.addEventListener('click', () => {
-    document.querySelectorAll('#color-chips .chip').forEach(x => x.classList.remove('on'));
-    ch.classList.add('on');
-    colorMetric = ch.dataset.k;
+function setColor(k) {
+  colorMetric = k;
+  document.querySelectorAll('#color-chips .chip').forEach(x => x.classList.toggle('on', x.dataset.k === k));
+  updateLegend();
+  paint(true);
+}
+function setSize(k) {
+  sizeMetric = k;
+  document.querySelectorAll('#size-chips .chip').forEach(x => x.classList.toggle('on', x.dataset.k === k));
+  paint(true);
+}
+function applyMode() {
+  advanced = document.getElementById('f-adv').checked;
+  document.body.classList.toggle('advanced', advanced);
+  document.body.classList.toggle('simple', !advanced);
+  pinned = null;
+  hideTip();
+  if (!advanced && colorMetric === 'cobertura_ampliada_pct') {
+    colorMetric = 'cobertura_declarada_pct';
+    document.querySelectorAll('#color-chips .chip').forEach(x => x.classList.toggle('on', x.dataset.k === colorMetric));
     updateLegend();
-    paint(true);
-  });
+  }
+  setSize(advanced ? 'mediana_union' : 'con_produccion');
+}
+document.querySelectorAll('#color-chips .chip').forEach(ch => {
+  ch.addEventListener('click', () => setColor(ch.dataset.k));
 });
 document.querySelectorAll('#size-chips .chip').forEach(ch => {
-  ch.addEventListener('click', () => {
-    document.querySelectorAll('#size-chips .chip').forEach(x => x.classList.remove('on'));
-    ch.classList.add('on');
-    sizeMetric = ch.dataset.k;
-    paint(true);
-  });
+  ch.addEventListener('click', () => setSize(ch.dataset.k));
 });
+document.getElementById('f-adv').addEventListener('change', applyMode);
 document.getElementById('f-small').addEventListener('change', () => paint(true));
 document.getElementById('f-limbo').addEventListener('change', () => paint(true));
 
