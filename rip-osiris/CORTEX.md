@@ -103,6 +103,9 @@ En `scripts/`:
 | `cruza_fundanet.py` | Cruce de los 9 ORCID de Fundanet con la base |
 | `importa_centros_fundanet.py` | Importa el centro de Fundanet como afiliación con procedencia (dry-run/`--write`) |
 | `registra_verificaciones_orcid.py` | Crea `orcid_verifications` y registra confirmaciones (oauth/persona/institucion) |
+| `censo_datasets_fisabio.py` | Censo de datasets: DataCite, Zenodo, OpenAlex, CKAN, Figshare (afiliación + ORCID) |
+| `crea_tabla_datasets.py` | Crea `datasets` con esquema HealthDCAT-AP y carga el censo |
+| `actualiza_datasets_ckan.py` | Refresca acceso, licencia y tenedor de los 6 del catálogo CKAN |
 | `backup_util.py` | Nombre de backup libre del día (evita sobrescribir backups) |
 
 ---
@@ -166,3 +169,18 @@ python scripts\valida_multisenal.py
 # Pipeline completo (si hay que rehacerlo)
 python scripts\pipeline_portal.py all
 ```
+
+---
+
+## 9. Datasets y EHDS (02-11-2026)
+
+- **Censo de datasets** (`scripts/censo_datasets_fisabio.py`): dos vías independientes —afiliación textual en DataCite/Zenodo y los 669 ORCID— más OpenAlex (institución `I4210097149`), CKAN y Figshare.
+  - **238 registros → 134 recursos únicos** (104 duplicados de versión de Zenodo).
+  - **114 datasets + 20 software**; 232 con DOI.
+  - Solo por afiliación: **79**; solo por ORCID: **37**. Son complementarias.
+  - **43 DOI (18,5 %) ya estaban en `works`**: 29 `dataset`, 7 `software`, 3 `review`, 3 `article`, 1 sin tipo → la producción mezcla outputs.
+  - El catálogo institucional (6) cubre **1 de cada 19** recursos publicados con DOI.
+- **Tabla `datasets`** (`scripts/crea_tabla_datasets.py` y `scripts/actualiza_datasets_ckan.py`; backups `...-2026-11-02-d.sqlite` y `-e`): 134 filas, esquema alineado a **HealthDCAT-AP R8**. `health_category` (declarado) queda **vacío**; la inferencia va en `health_category_propuesta` (52 filas). Acceso: 1 `public`, 2 `restricted`, 3 `non_public`, 128 `unknown`. Licencia declarada: **90/134** (0 en los 6 del catálogo). 27 enlazados a `works`.
+- **Ficha EHDS** (`docs/ficha-ehds-datasets.md`): glosario, marco (Reg. 2025/327; Reg. de Ejecución **2026/2098**, aplicable **26-03-2029**; HealthDCAT-AP R8), **8 elementos obligatorios** y matriz de cumplimiento: los 6 conjuntos del catálogo cumplen **2 de 8**.
+- **Hallazgo institucional:** la web declara **939 investigadores y 173 grupos** (2025) frente a **1.087 y 184** del portal de investigación. Brecha de **148 personas y 11 grupos** sin explicar.
+- **Pendiente:** asignar PID a los 6 del catálogo, declarar licencia, mapear `access_rights` al vocabulario NAL, separar tenedor (FIHGUV/ISABIAL) de publicador (FISABIO) y seguir la designación del HDAB español.
