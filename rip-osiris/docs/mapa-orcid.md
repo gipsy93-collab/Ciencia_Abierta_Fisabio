@@ -172,3 +172,22 @@ python scripts\genera_mapa_v2.py
   - Quitar los **188 pares con año imposible**: **no cambia ninguna mediana**; afecta a perfiles individuales, no a los centros.
   - Los **cuatro centros de la brecha** (Elda, Vinalopó, Castellón, San Juan) se mueven como máximo **2 puntos** entre escenarios.
 - **Lectura:** las medianas de los centros grandes y de los cuatro centros de la brecha son robustas; las de los centros pequeños (n<10) son frágiles y deben leerse con cautela. La incertidumbre principal son las **obras sin DOI**, no los ORCID recuperados ni los homónimos.
+
+## 9. Piloto de centro con Fundanet (02-11-2026)
+
+- **Fuente:** volcado de 9 investigadores con ORCID de Fundanet (nombre, «Centro del Tercero», departamento, área).
+- **Cruce de identidad:** **9/9 coinciden** con la base, mismo ORCID y fuente `portal_ficha`; **9/9 checksum válidos**; **0 gaps, 0 conflictos**. El ORCID de Fundanet es un subconjunto del portal: **no añade cobertura de identificador**.
+- **Lo que sí aporta:** el **centro**. 4 de los 9 no tenían centro en la base y Fundanet sí lo declara.
+- **Escrito** (`scripts/importa_centros_fundanet.py --write`, backup `rip_osiris.backup-2026-11-02-b.sqlite`, transacción única):
+
+  | Persona | Centro añadido | Match |
+  |---|---|---|
+  | Jose Miguel Sequi Sabater | H. Francesc de Borja de Gandía | prefijo (truncado) |
+  | Jaime Falco Martinez | H. Vinalopó Salud | prefijo (truncado) |
+  | Carla Miro Vicedo | H. Virgen de los Lirios de Alcoi | prefijo (truncado) |
+  | Ainhoa Romero Espinós | H. Virgen de los Lirios de Alcoi | prefijo (truncado) |
+
+- **Control de idempotencia:** los otros 5 ya tenían centro y el script los detecta como `ya_tiene_centro` (mismo `org_id`); una segunda ejecución da **0 inserciones**. **0 conflictos** de centro.
+- **Procedencia:** `source='fundanet'`, `method='fundanet_centro_tercero'`, `status='declarado_institucion'`, `confidence=0,85` (valor truncado). El `evidence_literal` guarda el literal **tal como vino**, con la marca de truncamiento y el departamento.
+- **Efecto:** «sin centro» pasa de **188 a 184**; total de afiliaciones 1.860 → 1.864. `integrity_check` ok, 0 FK rotas.
+- **Límite declarado:** el campo es «Centro del Tercero», **no** «Colectivo de Pertenencia». Para Ana Belso sabemos que el Colectivo («Hospital General de Elda») coincide con la base, pero en los otros 4 el valor viene truncado. Antes de escalar a los 184 hay que pedir el **Colectivo de Pertenencia completo**.

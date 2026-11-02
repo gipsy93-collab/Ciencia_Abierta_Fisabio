@@ -100,6 +100,8 @@ En `scripts/`:
 | `importa_confirmaciones.py` | Importa confirmaciones/rechazos con backup y transacción |
 | `valida_orcid_checksum.py` | Valida el dígito de control de los 669 ORCID |
 | `sensibilidad_medianas.py` | Sensibilidad de las medianas a recuperados, no-DOI y homónimos |
+| `cruza_fundanet.py` | Cruce de los 9 ORCID de Fundanet con la base |
+| `importa_centros_fundanet.py` | Importa el centro de Fundanet como afiliación con procedencia (dry-run/`--write`) |
 
 ---
 
@@ -124,6 +126,9 @@ En `scripts/`:
 - [x] Validar el dígito de control de los 669 ORCID: **669/669 válidos**.
 - [x] Análisis de sensibilidad: mediana estable a recuperados y homónimos; la incertidumbre principal son las obras sin DOI.
 - [x] 3.096 publicaciones del portal sin DOI ni año: re-parseadas desde la caché; ahora tienen año y tipo (`works.year` nulo 1; `works.type` nulo 788).
+- [x] **Piloto de centro con Fundanet** (02-11-2026): los 9 ORCID del volcado coinciden 9/9 con la base (0 gaps, 0 conflictos); 4 no tenían centro y se añadió con `source='fundanet'` (Sequi → Francesc de Borja; Falco → Vinalopó; Miro y Romero → Virgen de los Lirios). «Sin centro» 188 → **184**. Backup `rip_osiris.backup-2026-11-02-b.sqlite`.
+- [ ] **Escalar el centro a los 184 restantes:** hace falta el export de Fundanet con **Colectivo de Pertenencia completo** (el volcado trae «Centro del Tercero» truncado).
+- [ ] **Taxonomía de verificación ORCID:** decidir entre tabla `orcid_verifications`, sufijo en `orcid_source` o columnas `orcid_verified*`. Los 9 de Fundanet son corroboración institucional, no verificación OAuth.
 - [ ] 19 grupos sin centro declarado: Fundanet o sede de la GVA.
 - [ ] Rastrear la web pública de FISABIO y la memoria de gestión (pendiente acordado).
 - [ ] Mover los scripts de `scripts/` al flujo del proyecto (tests, CLI) si se consolida.
@@ -136,7 +141,7 @@ En `scripts/`:
 2. **Dos medianas.** La ORCID está inflada por selección; la unión corrige con el portal.
 3. **ORCID como llave.** El nombre falla por homónimos; el ORCID resuelve el 81 % de los que lo declaran.
 4. **ORCID inverso multiseñal.** Nombre + afiliación + solape DOI + apoyo. Un candidato con una sola obra es hipótesis; con ≥2 y validación es dato.
-5. **No inferir centro por nombre.** El centro se deriva del grupo público; 188 quedan sin centro y se declaran.
+5. **No inferir centro por nombre.** El centro se deriva del grupo público; 188 quedan sin centro y se declaran. **Excepción:** el centro declarado por la institución (Fundanet) sí se importa, con `source='fundanet'`, evidencia literal y confianza menor si el valor viene truncado.
 6. **El portal no es el universo.** 146 personas sin ORCID no tienen publicaciones en el CRIS; 3.096 publicaciones no tienen DOI, aunque ya tienen año/tipo; 788 obras ORCID no tienen tipo.
 7. **La cobertura no es calidad.** Mide adopción de infraestructura, no actividad investigadora.
 
