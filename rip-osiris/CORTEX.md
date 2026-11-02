@@ -102,6 +102,8 @@ En `scripts/`:
 | `sensibilidad_medianas.py` | Sensibilidad de las medianas a recuperados, no-DOI y homónimos |
 | `cruza_fundanet.py` | Cruce de los 9 ORCID de Fundanet con la base |
 | `importa_centros_fundanet.py` | Importa el centro de Fundanet como afiliación con procedencia (dry-run/`--write`) |
+| `registra_verificaciones_orcid.py` | Crea `orcid_verifications` y registra confirmaciones (oauth/persona/institucion) |
+| `backup_util.py` | Nombre de backup libre del día (evita sobrescribir backups) |
 
 ---
 
@@ -128,7 +130,8 @@ En `scripts/`:
 - [x] 3.096 publicaciones del portal sin DOI ni año: re-parseadas desde la caché; ahora tienen año y tipo (`works.year` nulo 1; `works.type` nulo 788).
 - [x] **Piloto de centro con Fundanet** (02-11-2026): los 9 ORCID del volcado coinciden 9/9 con la base (0 gaps, 0 conflictos); 4 no tenían centro y se añadió con `source='fundanet'` (Sequi → Francesc de Borja; Falco → Vinalopó; Miro y Romero → Virgen de los Lirios). «Sin centro» 188 → **184**. Backup `rip_osiris.backup-2026-11-02-b.sqlite`.
 - [ ] **Escalar el centro a los 184 restantes:** hace falta el export de Fundanet con **Colectivo de Pertenencia completo** (el volcado trae «Centro del Tercero» truncado).
-- [ ] **Taxonomía de verificación ORCID:** decidir entre tabla `orcid_verifications`, sufijo en `orcid_source` o columnas `orcid_verified*`. Los 9 de Fundanet son corroboración institucional, no verificación OAuth.
+- [x] **Taxonomía de verificación ORCID** (02-11-2026): `orcid_source` sigue siendo **procedencia**; la tabla nueva `orcid_verifications` guarda **quién confirmó** (`metodo`: `oauth` 1,00 · `persona` 0,95 · `institucion` 0,80), con `fuente`, `evidencia`, `confianza` y `fecha`. Cargadas **9 verificaciones institucionales** (Fundanet); **0 OAuth**. `importa_confirmaciones.py` ya escribe en la tabla.
+- [x] **Mapa v3** (02-11-2026): regenerado con «sin centro» 184 y «ORCID confirmado» en el tooltip; publicado en `main` (`5e11bf5`).
 - [ ] 19 grupos sin centro declarado: Fundanet o sede de la GVA.
 - [ ] Rastrear la web pública de FISABIO y la memoria de gestión (pendiente acordado).
 - [ ] Mover los scripts de `scripts/` al flujo del proyecto (tests, CLI) si se consolida.

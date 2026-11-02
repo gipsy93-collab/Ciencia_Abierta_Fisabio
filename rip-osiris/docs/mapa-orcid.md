@@ -191,3 +191,17 @@ python scripts\genera_mapa_v2.py
 - **Procedencia:** `source='fundanet'`, `method='fundanet_centro_tercero'`, `status='declarado_institucion'`, `confidence=0,85` (valor truncado). El `evidence_literal` guarda el literal **tal como vino**, con la marca de truncamiento y el departamento.
 - **Efecto:** «sin centro» pasa de **188 a 184**; total de afiliaciones 1.860 → 1.864. `integrity_check` ok, 0 FK rotas.
 - **Límite declarado:** el campo es «Centro del Tercero», **no** «Colectivo de Pertenencia». Para Ana Belso sabemos que el Colectivo («Hospital General de Elda») coincide con la base, pero en los otros 4 el valor viene truncado. Antes de escalar a los 184 hay que pedir el **Colectivo de Pertenencia completo**.
+
+### 9.1. Taxonomía de verificación ORCID (02-11-2026)
+
+Se separa **procedencia** de **confirmación**. Antes se mezclaban en `orcid_source`.
+
+| Concepto | Dónde vive | Valores |
+|---|---|---|
+| De dónde salió el ORCID | `researchers.orcid_source` | `portal_ficha`, `reverso_doi`, `reverso_multisenal`, `reverso_nombre_afiliacion`, `reverso_nombre_variante`, `reverso_nombre_invertido`, `reverso_nombre_incompleto`, `reverso_openalex`, `confirmado_persona`, `confirmado_institucion`, `rechazado_revision` |
+| Quién lo confirmó | `orcid_verifications` | `metodo`: `oauth` (1,00) · `persona` (0,95) · `institucion` (0,80); más `fuente`, `evidencia`, `confianza` y `fecha` |
+
+- **Una persona puede tener varias verificaciones** (institucional + personal + OAuth). La tabla guarda historial; la procedencia no se sobrescribe.
+- **Primera carga:** 9 verificaciones `institucion`/`fundanet` (los 9 ORCID del volcado, ya coincidentes con el portal). Ninguna es OAuth: **no hay verificación absoluta**.
+- **El importador de la hoja** (`importa_confirmaciones.py`) escribe también en `orcid_verifications` (`metodo=persona|institucion`, `fuente=hoja_confirmacion`); un rechazo retira la verificación de ese ORCID.
+- **El mapa** muestra «ORCID confirmado» en el tooltip avanzado y `orcid_verificados` en el dataset (total 9: 0 oauth, 0 persona, 9 institución).
