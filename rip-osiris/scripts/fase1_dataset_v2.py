@@ -36,9 +36,17 @@ def nd(d):
 con = sqlite3.connect(ROOT / "data" / "rip_osiris.sqlite")
 con.row_factory = sqlite3.Row
 gente = [dict(r) for r in con.execute("SELECT id, portal_id, name FROM researchers")]
-centro = {r["rid"]: r["centro"] for r in con.execute(
+centros_por_rid: dict[int, list[str]] = defaultdict(list)
+for r in con.execute(
     """SELECT ra.researcher_id rid, o.name centro FROM researcher_affiliations ra
-       JOIN orgs o ON o.id=ra.org_id WHERE ra.affiliation_type='centro'""")}
+       JOIN orgs o ON o.id=ra.org_id WHERE ra.affiliation_type='centro'
+       ORDER BY ra.id"""
+):
+    rid_row = int(r["rid"])
+    if r["centro"] not in centros_por_rid[rid_row]:
+        centros_por_rid[rid_row].append(r["centro"])
+centro = {rid_row: cs[0] for rid_row, cs in centros_por_rid.items()}
+investigadores_multicentro = sum(1 for cs in centros_por_rid.values() if len(cs) > 1)
 
 fuentes_recuperado = {
     "reverso_doi", "reverso_nombre_afiliacion", "reverso_multisenal",
@@ -68,6 +76,19 @@ orcid_recuperado = {
     and int(r["id"]) not in recuperados_ambiguos
 }
 recuperado = set(orcid_recuperado)
+
+# Verificaciones: quién confirmó el ORCID (tabla orcid_verifications), distinto de
+# la procedencia (orcid_source). Puede haber varias por persona; se guarda la más fuerte.
+jerarquia_metodo = {"oauth": 3, "persona": 2, "institucion": 1}
+verificados: dict[int, str] = {}
+try:
+    for r in con.execute("SELECT researcher_id, metodo FROM orcid_verifications"):
+        rid_v = int(r["researcher_id"])
+        previo = verificados.get(rid_v)
+        if previo is None or jerarquia_metodo.get(r["metodo"], 0) > jerarquia_metodo.get(previo, 0):
+            verificados[rid_v] = r["metodo"]
+except sqlite3.OperationalError:
+    print("aviso: no existe orcid_verifications; se cuenta 0 verificados")
 
 orcid_works = defaultdict(set)
 for linea in (ROOT / "data" / "author_work.jsonl").open(encoding="utf-8"):
@@ -118,7 +139,7 @@ for rid in set(orcid_works) | set(portal_works):
 
 # agregación por centro
 agg = defaultdict(lambda: {
-    "total": 0, "decl": 0, "rec": 0, "prod": 0,
+    "total": 0, "decl": 0, "rec": 0, "ver": 0, "prod": 0,
     "n_o": 0, "n_u": 0, "p_o": 0, "p_p": 0, "p_u": 0,
     "obras_o": set(), "obras_p": set(), "obras_u": set(),
     "lista_o": [], "lista_u": [],
@@ -130,6 +151,7 @@ for g in gente:
     a["total"] += 1
     a["decl"] += rid in declarado
     a["rec"] += rid in recuperado
+    a["ver"] += rid in verificados
     if union.get(rid):
         a["prod"] += 1
     if orcid_works.get(rid):
@@ -158,6 +180,7 @@ for c, a in agg.items():
         "orcid_declarado": a["decl"],
         "orcid_recuperado": a["rec"],
         "orcid_ampliado": a["decl"] + a["rec"],
+        "orcid_verificados": a["ver"],
         "cobertura_declarada_pct": round(100 * a["decl"] / total, 1),
         "cobertura_ampliada_pct": round(100 * (a["decl"] + a["rec"]) / total, 1),
         "con_publicaciones_portal": sum(1 for g in gente
@@ -192,6 +215,12 @@ datos = {
     "orcid_recuperados_con_obras_completas": recuperados_con_obras,
     "orcid_recuperados_pendientes_de_cosecha": recuperados_pendientes,
     "orcid_recuperados_ambiguos": len(recuperados_ambiguos),
+    "orcid_verificados_total": len(verificados),
+    "orcid_verificados_por_metodo": {
+        m: sum(1 for v in verificados.values() if v == m)
+        for m in ("oauth", "persona", "institucion")
+    },
+    "investigadores_multicentro": investigadores_multicentro,
     "nota_metodo": (
         "Cobertura declarada = ORCID en la ficha. Ampliada = declarada + recuperada "
         "por solape de DOI/nombre+afiliación. Producción = personas con obras por ORCID o por "
@@ -205,7 +234,8 @@ datos = {
 SALIDA.write_text(json.dumps(datos, ensure_ascii=False, indent=1), encoding="utf-8")
 print(f"centros: {len(centros)} · ORCID recuperados con obras completas: "
       f"{recuperados_con_obras} · pendientes: {recuperados_pendientes} · "
-      f"ORCID duplicados excluidos: {len(recuperados_ambiguos)} · escrito {SALIDA}\n")
+      f"ORCID duplicados excluidos: {len(recuperados_ambiguos)} · "
+      f"multicentro: {investigadores_multicentro} · escrito {SALIDA}\n")
 print(f"{'centro':44} {'n':>4} {'decl':>5} {'amp':>5} {'prod':>5} {'medO':>5} {'medU':>5}")
 for c in centros:
     if c["total_roster"] < 5:

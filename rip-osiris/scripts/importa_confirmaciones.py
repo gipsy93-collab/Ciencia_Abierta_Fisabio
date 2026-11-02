@@ -21,19 +21,24 @@ import csv
 import shutil
 import sqlite3
 import sys
+from datetime import date
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
-ROOT = Path(r"C:\Users\gipsy\repos\Ciencia_Abierta_Fisabio\rip-osiris")
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from rip_osiris.anchor.orcid import normalizar_orcid  # noqa: E402
+from backup_util import siguiente_backup  # noqa: E402
+from registra_verificaciones_orcid import DDL as DDL_VERIFICACIONES  # noqa: E402
+
 DB = ROOT / "data" / "rip_osiris.sqlite"
 HOJA = ROOT / "data" / "hoja_confirmacion_orcid.csv"
-BACKUP = ROOT / "data" / "rip_osiris.backup-2026-11-02-b.sqlite"
 WRITE = "--write" in sys.argv
 
 
 def norm_orcid(o: str) -> str:
-    o = (o or "").strip().upper()
-    return o
+    return normalizar_orcid((o or "").strip()) or ""
 
 
 filas = list(csv.DictReader(HOJA.open(encoding="utf-8-sig")))
@@ -64,7 +69,7 @@ for f in decisiones:
         orcid = norm_orcid(f.get("orcid", ""))
         if not orcid:
             invalidos += 1
-            print(f"  IGNORADO (sin ORCID): {nombre}")
+            print(f"  IGNORADO (ORCID inválido o vacío): {nombre} · {f.get('orcid')!r}")
             continue
         por = (f.get("confirmado_por") or "").strip().lower()
         if por == "institucion":
@@ -78,7 +83,7 @@ for f in decisiones:
         cambios.append((orcid, fuente, rid, nombre))
     else:  # rechazar
         rechazados += 1
-        cambios.append((None, "rechazado_revision", rid, nombre))
+        cambios.append((norm_orcid(f.get("orcid", "")), "rechazado_revision", rid, nombre))
 
 print(f"decisiones: {len(decisiones)} · confirmar persona: {confirmados_persona} · "
       f"confirmar institución: {confirmados_institucion} · rechazar: {rechazados} · "
@@ -93,17 +98,26 @@ if not WRITE:
     con.close()
     sys.exit(0)
 
-if not BACKUP.exists():
-    shutil.copy2(DB, BACKUP)
-    print(f"backup: {BACKUP.name} ({BACKUP.stat().st_size:,} bytes)")
+destino_backup = siguiente_backup(DB)
+shutil.copy2(DB, destino_backup)
+print(f"backup: {destino_backup.name} ({destino_backup.stat().st_size:,} bytes)")
 
 try:
     con.execute("BEGIN IMMEDIATE")
+    con.execute(DDL_VERIFICACIONES)
     for orcid, fuente, rid, nombre in cambios:
         if fuente.startswith("confirmado_"):
             con.execute(
                 "UPDATE researchers SET orcid=?, orcid_source=? WHERE id=?",
                 (orcid, fuente, rid))
+            metodo = "institucion" if fuente == "confirmado_institucion" else "persona"
+            con.execute(
+                """INSERT OR IGNORE INTO orcid_verifications
+                   (researcher_id, orcid, metodo, fuente, evidencia, confianza, fecha)
+                   VALUES (?,?,?,?,?,?,?)""",
+                (rid, orcid, metodo, "hoja_confirmacion",
+                 f"Hoja de confirmación: {nombre}", 0.80 if metodo == "institucion" else 0.95,
+                 date.today().isoformat()))
         else:
             con.execute(
                 "UPDATE researchers SET orcid=NULL, orcid_source='rechazado_revision' WHERE id=?",
@@ -112,6 +126,10 @@ try:
                 "DELETE FROM author_work WHERE researcher_id=? AND source='orcid_reverso'",
                 (rid,))
             borrados += cur.rowcount
+            if orcid:
+                con.execute(
+                    "DELETE FROM orcid_verifications WHERE researcher_id=? AND orcid=?",
+                    (rid, orcid))
     con.execute("COMMIT")
     print("COMMIT OK")
 except Exception as exc:
