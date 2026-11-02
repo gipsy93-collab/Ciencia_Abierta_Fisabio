@@ -161,3 +161,14 @@ python scripts\genera_mapa_v2.py
 - Base escrita de forma idempotente: **669 ORCID**, **26.260 obras**, **55.762 work_ids**, **54.087 author_work** (31.863 `orcid_exacto` + 1.614 `orcid_reverso` + 17.514 `portal_doi` + 3.096 `portal_publicacion`).
 - Pendiente: revisión humana de **16 descartados + 3 en revisión + 3 sospechosos**. Añadidos en la revisión final: Ángel Moya, María Cuenca y Juan Francisco Navarro; Carmen Hernández queda fuera por afiliación UAB y una sola obra.
 - Pendiente: enriquecer los 3 títulos que quedaron como `(sin título)` cuando OpenAlex se recupere (caché resumible en `data/openalex_titles.json`).
+
+## 8. Fiabilidad y sensibilidad (02-11-2026)
+
+- **Dígito de control ORCID:** **669/669 válidos** (ISO 7064 mod 11-2). No hay erratas de tecleo.
+- **Reproducibilidad:** la mediana base del análisis de sensibilidad coincide con el dataset publicado (diferencia **0,0**).
+- **Sensibilidad de la mediana:**
+  - Quitar los **80 ORCID recuperados**: la mayoría de centros no cambia; el mayor descenso es La Ribera (28→22), seguido de Dr. Peset (24→22), Elche (18→16), San Juan (16→14) y Elda (7→6).
+  - Quitar las **obras sin DOI**: es la mayor fuente de incertidumbre (Transfusiones 95→75, CAP Elda 10→1, Sagunto 24→16, FISABIO 40→32, DG Salud Pública 22→15).
+  - Quitar los **188 pares con año imposible**: **no cambia ninguna mediana**; afecta a perfiles individuales, no a los centros.
+  - Los **cuatro centros de la brecha** (Elda, Vinalopó, Castellón, San Juan) se mueven como máximo **2 puntos** entre escenarios.
+- **Lectura:** las medianas de los centros grandes y de los cuatro centros de la brecha son robustas; las de los centros pequeños (n<10) son frágiles y deben leerse con cautela. La incertidumbre principal son las **obras sin DOI**, no los ORCID recuperados ni los homónimos.
