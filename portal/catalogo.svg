@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" role="img" aria-labelledby="t d">
+  <title id="t">Catálogo de fuentes OSIRIS</title>
+  <desc id="d">55 fuentes en tres anillos: núcleo abierto, fuentes locales y conectores licenciados, más identidad y estándares.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#005f73"/>
+      <stop offset="1" stop-color="#023f4e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.82" cy="0.12" r="0.75">
+      <stop offset="0" stop-color="#0a9396" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#0a9396" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0H0V64" fill="none" stroke="#FCF8EE" stroke-opacity="0.07" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1280" height="800" fill="url(#bg)"/>
+  <rect width="1280" height="800" fill="url(#glow)"/>
+  <rect width="1280" height="800" fill="url(#grid)"/>
+
+  <text x="80" y="96" fill="#FCF8EE" fill-opacity="0.72" font-family="Outfit, Arial, sans-serif" font-size="21" letter-spacing="5">UNIDAD DE CIENCIA ABIERTA · FISABIO</text>
+
+  <text x="80" y="252" fill="#FCF8EE" font-family="Georgia, 'Times New Roman', serif" font-size="82" font-weight="700">Catálogo de fuentes</text>
+  <text x="80" y="314" fill="#FCF8EE" fill-opacity="0.86" font-family="Outfit, Arial, sans-serif" font-size="29" letter-spacing="1">OSIRIS · 55 fuentes para ir más allá de WoS, Scopus y PubMed</text>
+  <text x="80" y="362" fill="#FCF8EE" fill-opacity="0.58" font-family="Outfit, Arial, sans-serif" font-size="20" letter-spacing="4">METADATOS · OAI-PMH · LICENCIAS · BASE LEGAL</text>
+
+  <g font-family="Outfit, Arial, sans-serif">
+    <!-- Anillo 1 -->
+    <g transform="translate(80, 420)">
+      <circle cx="78" cy="78" r="74" fill="none" stroke="#0a9396" stroke-width="13"/>
+      <text x="78" y="92" text-anchor="middle" fill="#FCF8EE" font-family="Georgia, serif" font-size="46" font-weight="700">24</text>
+      <text x="78" y="196" text-anchor="middle" fill="#FCF8EE" font-size="18" letter-spacing="2">NÚCLEO ABIERTO</text>
+    </g>
+    <!-- Anillo 2 -->
+    <g transform="translate(360, 420)">
+      <circle cx="78" cy="78" r="74" fill="none" stroke="#ee9b00" stroke-width="13"/>
+      <text x="78" y="92" text-anchor="middle" fill="#FCF8EE" font-family="Georgia, serif" font-size="46" font-weight="700">19</text>
+      <text x="78" y="196" text-anchor="middle" fill="#FCF8EE" font-size="18" letter-spacing="2">LOCAL / OAI</text>
+    </g>
+    <!-- Anillo 3 -->
+    <g transform="translate(640, 420)">
+      <circle cx="78" cy="78" r="74" fill="none" stroke="#ae2012" stroke-width="13"/>
+      <text x="78" y="92" text-anchor="middle" fill="#FCF8EE" font-family="Georgia, serif" font-size="46" font-weight="700">7</text>
+      <text x="78" y="196" text-anchor="middle" fill="#FCF8EE" font-size="18" letter-spacing="2">LICENCIADO</text>
+    </g>
+    <!-- Identidad -->
+    <g transform="translate(920, 420)">
+      <circle cx="78" cy="78" r="74" fill="none" stroke="#5a189a" stroke-width="13"/>
+      <text x="78" y="92" text-anchor="middle" fill="#FCF8EE" font-family="Georgia, serif" font-size="46" font-weight="700">5</text>
+      <text x="78" y="196" text-anchor="middle" fill="#FCF8EE" font-size="18" letter-spacing="2">IDENTIDAD</text>
+    </g>
+  </g>
+
+  <line x1="80" y1="700" x2="1200" y2="700" stroke="#FCF8EE" stroke-opacity="0.2" stroke-width="1"/>
+  <text x="80" y="748" fill="#FCF8EE" fill-opacity="0.72" font-family="Outfit, Arial, sans-serif" font-size="21" letter-spacing="1">Cada ficha: protocolo · endpoint · licencias · coste · riesgo · base legal (LPI, RISP, RGPD)</text>
+  <text x="1200" y="748" text-anchor="end" fill="#FCF8EE" fill-opacity="0.55" font-family="Outfit, Arial, sans-serif" font-size="20" letter-spacing="2">v2.1</text>
+</svg>
