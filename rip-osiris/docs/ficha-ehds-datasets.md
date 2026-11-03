@@ -58,13 +58,15 @@ Leyenda: **✔** declarado · **~** derivable pero sin vocabulario · **✘** au
 | Description | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | Health category | ✘ | ✘ | ✘ | ✘ | ✘ | ✘ |
 | Health data access body | ✘ | ✘ | ✘ | ✘ | ✘ | ✘ |
-| Identifier | ✘ | ✘ | ✘ | ✘ | ✘ | ✘ |
+| Identifier | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | Structured data | ✘ | ✘ | ✘ | ✘ | ✘ | ✘ |
 | Title | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
-| **Cumple 8/8** | **3** | **2** | **2** | **2** | **3** | **3** |
+| **Cumple 8/8** | **4** | **3** | **3** | **3** | **4** | **4** |
 | License | ✘ | ✘ | ✘ | ✘ | ✘ | ✘ |
 
-**Resultado: 2 o 3 de 8 elementos obligatorios.** Los dos que siempre se cumplen son los triviales (título y descripción). Ninguno tiene licencia, identificador persistente, categoría de salud ni organismo de acceso.
+**Resultado: 3 o 4 de 8 elementos obligatorios.** Los que siempre se cumplen son los triviales (título, descripción e identificador de catálogo). Ninguno tiene licencia, categoría de salud, organismo de acceso ni declaración de datos estructurados.
+
+**Matiz sobre el identificador:** la URI del catálogo (`…/dataset/padchest`) sí es un `dct:identifier` válido según DCAT-AP. Lo que **no** hay es un **identificador persistente** (DOI o equivalente) que resuelva fuera de este catálogo y permita citarlo. Si el validador de HealthData@EU exige PID, entonces el elemento cuenta como no cumplido y el resultado baja a **2 o 3 de 8**.
 
 **Cuidado con `access_rights`:** solo 3 de los 6 lo declaran. El catálogo **muestra «Abierto» cuando el campo está vacío**, que es un valor por defecto engañoso: ausencia de declaración no es apertura. El dato correcto es «sin declarar».
 
@@ -76,7 +78,7 @@ Leyenda: **✔** declarado · **~** derivable pero sin vocabulario · **✘** au
 |---|---|---|
 | **Title** | PadChest: un gran conjunto de datos de imágenes de rayos X de tórax con informes anotados de etiquetas múltiples | ✔ declarado |
 | **Description** | Conjunto etiquetado a gran escala de radiografías de tórax con informes asociados; más de 160.000 imágenes de 67.000 pacientes | ✔ declarado |
-| **Identifier** | `ckan:padchest` (propuesto). El DOI de la publicación descriptora es `10.1016/j.media.2020.101797`, pero **no es el identificador del recurso** | ✘ |
+| Identifier | **URI de catálogo** (`…/dataset/padchest`). PID: ninguno; el DOI de la publicación descriptora es `10.1016/j.media.2020.101797`, pero **no identifica el recurso** | ✔ URI · ✘ PID |
 | **Access rights** | Cerrado según CKAN (`False`). Debe expresarse como `non-public` del vocabulario NAL | ~ |
 | **Health category** | *Medical imaging* (propuesta) | ✘ |
 | **Applicable legislation** | `http://data.europa.eu/eli/reg/2025/327/oj` (propuesta) | ✘ |
@@ -104,7 +106,7 @@ El acceso sale de `access_rights`, el único campo que es declaración. **`isope
 
 ## 6. Brechas principales
 
-1. **Identificador persistente: 0 de 6.** Sin PID no hay federación posible con HealthData@EU.
+1. **Identificador persistente: 0 de 6.** Todos tienen URI de catálogo, ninguno tiene PID. Sin PID no hay federación ni cita externa.
 2. **Licencia: 0 de 6.** «License not specified» no es una licencia. Fuera del catálogo, **90 de los 134 recursos sí declaran licencia**: el problema no es del personal investigador, es del catálogo.
 3. **El catálogo confunde «no declarado» con «abierto».** Tres de los seis tienen `access_rights` vacío y la web los muestra con la etiqueta verde «Abierto». Para datos de salud, el valor por defecto debería ser «sin declarar», nunca «abierto».
 4. **Organismo de acceso: 0 de 6.** El HDAB español está en construcción (HDAB-ES); conviene seguirlo.
