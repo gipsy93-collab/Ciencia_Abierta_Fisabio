@@ -60,13 +60,17 @@ def clasifica(titulo: str) -> str | None:
 
 
 def acceso(d: dict) -> str:
+    """Solo `access_rights` es declaración. `isopen` no sirve: es False en los 6.
+
+    Y vacío NO es abierto: es «sin declarar». La web del catálogo lo pinta como
+    «Abierto» por defecto, lo que en datos de salud es un default engañoso.
+    """
     v = (d.get("access_rights") or "").strip().lower()
-    if v in ("public", "restricted", "non-public", "non_public"):
-        return "non_public" if v in ("non-public", "non_public") else v
-    isopen = d.get("isopen")
-    if isopen is True:
+    if v == "public":
         return "public"
-    if isopen is False:
+    if v == "restricted":
+        return "restricted"
+    if v in ("non-public", "non_public"):
         return "non_public"
     return "unknown"
 

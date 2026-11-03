@@ -53,7 +53,7 @@ Leyenda: **✔** declarado · **~** derivable pero sin vocabulario · **✘** au
 
 | Elemento | BIMCV-COVID19− | BIMCV-COVID19+ | BIMCV Prostate | PadChest | DHR FIHGUV | DHR ISABIAL |
 |---|:--:|:--:|:--:|:--:|:--:|:--:|
-| Access rights | ~ | ~ | ~ | ~ | ~ | ~ |
+| Access rights | ✔ | ✘ | ✘ | ✘ | ✔ | ✔ |
 | Applicable legislation | ✘ | ✘ | ✘ | ✘ | ✘ | ✘ |
 | Description | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | Health category | ✘ | ✘ | ✘ | ✘ | ✘ | ✘ |
@@ -61,10 +61,12 @@ Leyenda: **✔** declarado · **~** derivable pero sin vocabulario · **✘** au
 | Identifier | ✘ | ✘ | ✘ | ✘ | ✘ | ✘ |
 | Structured data | ✘ | ✘ | ✘ | ✘ | ✘ | ✘ |
 | Title | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
-| **Cumple 8/8** | **2** | **2** | **2** | **2** | **2** | **2** |
+| **Cumple 8/8** | **3** | **2** | **2** | **2** | **3** | **3** |
 | License | ✘ | ✘ | ✘ | ✘ | ✘ | ✘ |
 
-**Resultado: 2 de 8 elementos obligatorios en los 6 conjuntos (25 %).** Los dos que se cumplen son los triviales (título y descripción). Ninguno tiene licencia, identificador persistente ni organismo de acceso.
+**Resultado: 2 o 3 de 8 elementos obligatorios.** Los dos que siempre se cumplen son los triviales (título y descripción). Ninguno tiene licencia, identificador persistente, categoría de salud ni organismo de acceso.
+
+**Cuidado con `access_rights`:** solo 3 de los 6 lo declaran. El catálogo **muestra «Abierto» cuando el campo está vacío**, que es un valor por defecto engañoso: ausencia de declaración no es apertura. El dato correcto es «sin declarar».
 
 ## 5. Fichas
 
@@ -91,23 +93,24 @@ Leyenda: **✔** declarado · **~** derivable pero sin vocabulario · **✘** au
 
 | Conjunto | Título | Acceso (CKAN) | Health category (propuesta) | Identificador | Observación |
 |---|---|---|---|---|---|
-| `bimcv-covid19negative` | BIMCV-COVID19−: imágenes de RX y TC de pacientes negativos | **Público** | Medical imaging | ✘ | El único declarado público; sin licencia |
-| `bimcv-covid19-positivos` | BIMCV-COVID19+: imágenes de RX y TC de pacientes positivos | **No público** | Medical imaging | ✘ | |
-| `bimcv-prostate` | BIMCV Prostate Dataset V1 | **No público** | Medical imaging | ✘ | >9.000 sesiones de RM, 16 centros |
-| `padchest` | PadChest: imágenes de tórax con informes anotados | **No público** | Medical imaging | ✘ | |
-| `dhr-fihguv` | DHR del FIHGUV para GVA PharmaTrace Hub | **Restringido** | Electronic health records | ✘ | Tenedor: FIHGUV, no FISABIO |
-| `dhr-isabial` | DHR de ISABIAL para GVAPharmaTrace Hub | **Restringido** | Electronic health records | ✘ | Tenedor: ISABIAL, no FISABIO |
+| `bimcv-covid19negative` | BIMCV-COVID19−: imágenes de RX y TC de pacientes negativos | **Público** (declarado) | Medical imaging | ✘ | El único con acceso público declarado; sin licencia |
+| `bimcv-covid19-positivos` | BIMCV-COVID19+: imágenes de RX y TC de pacientes positivos | **Sin declarar** | Medical imaging | ✘ | La web lo pinta como «Abierto» |
+| `bimcv-prostate` | BIMCV Prostate Dataset V1 | **Sin declarar** | Medical imaging | ✘ | >9.000 sesiones de RM, 16 centros |
+| `padchest` | PadChest: imágenes de tórax con informes anotados | **Sin declarar** | Medical imaging | ✘ | La web lo pinta como «Abierto» |
+| `dhr-fihguv` | DHR del FIHGUV para GVA PharmaTrace Hub | **Restringido** (declarado) | Electronic health records | ✘ | Tenedor: FIHGUV, no FISABIO |
+| `dhr-isabial` | DHR de ISABIAL para GVAPharmaTrace Hub | **Restringido** (declarado) | Electronic health records | ✘ | Tenedor: ISABIAL, no FISABIO |
 
-El acceso se ha derivado de `access_rights` e `isopen` de CKAN y mapeado a los tres valores del vocabulario NAL (`public` / `restricted` / `non-public`). No es una declaración de la institución: es una traducción de lo que el catálogo ya publica.
+El acceso sale de `access_rights`, el único campo que es declaración. **`isopen` no sirve**: vale `False` en los 6, incluso en el que declara acceso público.
 
 ## 6. Brechas principales
 
 1. **Identificador persistente: 0 de 6.** Sin PID no hay federación posible con HealthData@EU.
 2. **Licencia: 0 de 6.** «License not specified» no es una licencia. Fuera del catálogo, **90 de los 134 recursos sí declaran licencia**: el problema no es del personal investigador, es del catálogo.
-3. **Organismo de acceso: 0 de 6.** El HDAB español está en construcción (HDAB-ES); conviene seguirlo.
-4. **Categoría de salud: 0 de 6.** Es el campo que permite buscar por tipo de dato; sin él el catálogo no es navegable.
-5. **Tenedor mal atribuido en 2 casos:** los DHR son de FIHGUV e ISABIAL, no de FISABIO. El catálogo mezcla tenedor y publicador.
-6. **`Structured data` sin declarar en 6 de 6:** obliga a decidir si hay tabla de variables y, si la hay, a publicarla en CSVW.
+3. **El catálogo confunde «no declarado» con «abierto».** Tres de los seis tienen `access_rights` vacío y la web los muestra con la etiqueta verde «Abierto». Para datos de salud, el valor por defecto debería ser «sin declarar», nunca «abierto».
+4. **Organismo de acceso: 0 de 6.** El HDAB español está en construcción (HDAB-ES); conviene seguirlo.
+5. **Categoría de salud: 0 de 6.** Es el campo que permite buscar por tipo de dato; sin él el catálogo no es navegable.
+6. **Tenedor mal atribuido en 2 casos:** los DHR son de FIHGUV e ISABIAL, no de FISABIO. El catálogo mezcla tenedor y publicador.
+7. **`Structured data` sin declarar en 6 de 6:** obliga a decidir si hay tabla de variables y, si la hay, a publicarla en CSVW.
 
 ## 7. Qué haría falta para llegar a 2029
 
