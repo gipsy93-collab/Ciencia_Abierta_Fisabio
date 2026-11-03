@@ -205,3 +205,49 @@ Se separa **procedencia** de **confirmación**. Antes se mezclaban en `orcid_sou
 - **Primera carga:** 9 verificaciones `institucion`/`fundanet` (los 9 ORCID del volcado, ya coincidentes con el portal). Ninguna es OAuth: **no hay verificación absoluta**.
 - **El importador de la hoja** (`importa_confirmaciones.py`) escribe también en `orcid_verifications` (`metodo=persona|institucion`, `fuente=hoja_confirmacion`); un rechazo retira la verificación de ese ORCID.
 - **El mapa** muestra «ORCID confirmado» en el tooltip avanzado y `orcid_verificados` en el dataset (total 9: 0 oauth, 0 persona, 9 institución).
+
+## 10. Export completo de Fundanet (03-11-2026)
+
+**Entrada:** `qtkfmbyx.hzt.xlsx` — 1.106 filas, 602 con ORCID, 1.092 con «Centro del Tercero».
+
+### 10.1. Qué confirma y qué no
+
+| Comprobación | Resultado | Lectura |
+|---|---|---|
+| ORCID del portal presentes en Fundanet | **586 / 589** | El CRIS replica el portal |
+| Conflictos de ORCID | **3** | Galbis Caravajal, Hernández Mijares, Íñiguez Hernández: portal y CRIS discrepan |
+| ORCID recuperados presentes en Fundanet | **0 / 80** | **Fundanet no puede validar lo inferido** |
+| Personas sin centro que ganan uno | **179** | De 184 |
+| Centros externos (universidades, empresas) | **24** | No se inventan: se listan |
+
+**Conclusión:** Fundanet sirve para **adscripción**, no para verificar ORCID. Los 80 recuperados siguen necesitando confirmación personal.
+
+### 10.2. Lo escrito
+
+`scripts/importa_centros_fundanet_full.py --write` → **155 centros** (`source='fundanet'`, `method='fundanet_centro_tercero'`, `status='declarado_institucion'`, confianza 0,90, evidencia literal con departamento). Backup `rip_osiris.backup-2026-11-02-f.sqlite`. `integrity_check` ok, 0 FK.
+
+**«Sin centro»: 184 → 29.**
+
+No se tocan: **156 personas con centro distinto** (centro del grupo ≠ centro del tercero: alguien puede estar contratado por la universidad y trabajar en un grupo del hospital), los **3 conflictos** de ORCID, **1 ORCID nuevo** (Juan Carlos Sánchez López, UMH) y **19 filas fuera del roster** (incluidas `PRUEBA` y `SEMICROL, S.L`).
+
+### 10.3. Efecto en las medianas
+
+| Centro | n | Mediana unión | Cobertura ORCID | Producción |
+|---|---:|---:|---:|---:|
+| Alcoi | 14 → **38** | 15 → **6,5** | 85,7 % → **52,6 %** | 92,9 % → 84,2 % |
+| Sagunto | 10 → 16 | 24,5 → **8** | 50,0 % → 43,8 % | 100 % → 100 % |
+| La Pedrera (Denia) | 8 → 18 | 8 → **3** | 37,5 % → 27,8 % | 87,5 % → 72,2 % |
+| FISABIO Salud Pública | 143 → 173 | 40 → 33 | 79,7 % → 75,1 % | 94,4 % → 91,9 % |
+| Elche | 155 → 178 | 18 → 18 | 51,6 % → 48,9 % | 79,4 % → 80,3 % |
+| Dr. Peset | 143 → 162 | 23,5 → **25** | 56,6 % → **58,6 %** | 92,3 % → 93,2 % |
+| *(sin centro)* | 184 → **29** | 9 → **19,5** | 47,3 % → 58,6 % | 78,8 % → 82,8 % |
+
+**Los cuatro centros de la brecha** se mueven poco: Elda mediana 7→6 (producción 70,3→71,1 %), Vinalopó 9→7 (65,5→67,7 %), Castellón 9,5→8 (83,1→78,9 %), San Juan 16→16,5 (79,2→80,0 %).
+
+### 10.4. El hallazgo incómodo
+
+**La cobertura del 85,7 % de Alcoi era un artefacto.** Se calculaba sobre 14 personas porque 24 de sus investigadores no tenían centro asignado. Con el denominador corregido (38), baja al **52,6 %**. Lo mismo, en menor medida, en Sagunto y La Pedrera.
+
+Es la primera vez que una corrección de datos **invalida una afirmación previa** del mapa. La brecha de los cuatro centros se mantiene; la excelencia de Alcoi, no.
+
+**Estado:** dataset y mapa regenerados en local (`data/mapa_orcid_v2.html`, `data/mapa_orcid_dataset_v2.json`). Copias previas en `*.pre-fundanet.*`. **No publicado en Pages.**
