@@ -208,14 +208,14 @@ Se separa **procedencia** de **confirmación**. Antes se mezclaban en `orcid_sou
 
 ## 10. Export completo de Fundanet (03-11-2026)
 
-**Entrada:** `qtkfmbyx.hzt.xlsx` — 1.106 filas, 602 con ORCID, 1.092 con «Centro del Tercero».
+**Entrada:** `qtkfmbyx.hzt.xlsx` — **1.105 filas**, 601 con ORCID, 1.091 con «Centro del Tercero».
 
 ### 10.1. Qué confirma y qué no
 
 | Comprobación | Resultado | Lectura |
 |---|---|---|
-| ORCID del portal presentes en Fundanet | **586 / 589** | El CRIS replica el portal |
-| Conflictos de ORCID | **3** | Galbis Caravajal, Hernández Mijares, Íñiguez Hernández: portal y CRIS discrepan |
+| ORCID del portal presentes en Fundanet | **587 / 589** | El CRIS replica el portal |
+| Conflictos de ORCID | **2** (uno ya corregido) | Hernández Mijares e Íñiguez Hernández: portal y CRIS discrepan |
 | ORCID recuperados presentes en Fundanet | **0 / 80** | **Fundanet no puede validar lo inferido** |
 | Personas sin centro que ganan uno | **179** | De 184 |
 | Centros externos (universidades, empresas) | **24** | No se inventan: se listan |

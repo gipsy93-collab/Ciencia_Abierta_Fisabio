@@ -23,7 +23,7 @@ DB = ROOT / "data" / "rip_osiris.sqlite"
 XLSX = Path(r"C:\Users\gipsy\Downloads\qtkfmbyx.hzt.xlsx")
 SALIDA = ROOT / "data" / "cruce_fundanet_completo.csv"
 
-CABECERA = 3  # fila 4 del Excel (0-indexed 3)
+CABECERA = 4  # fila 4 del Excel (1-based): el encabezado está ahí, los datos empiezan en la 5
 
 
 def norm(s: str) -> str:
