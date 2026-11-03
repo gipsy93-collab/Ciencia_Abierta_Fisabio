@@ -250,4 +250,4 @@ No se tocan: **156 personas con centro distinto** (centro del grupo ≠ centro d
 
 Es la primera vez que una corrección de datos **invalida una afirmación previa** del mapa. La brecha de los cuatro centros se mantiene; la excelencia de Alcoi, no.
 
-**Estado:** dataset y mapa regenerados en local (`data/mapa_orcid_v2.html`, `data/mapa_orcid_dataset_v2.json`). Copias previas en `*.pre-fundanet.*`. **No publicado en Pages.**
+**Estado:** dataset y mapa regenerados y **publicados** el 03-11-2026 (commit `aca68ce` en `main`, <https://gipsy93-collab.github.io/Ciencia_Abierta_Fisabio/mapa-orcid/>). El pie del mapa lleva la nota de corrección. Copias previas en `*.pre-fundanet.*`.

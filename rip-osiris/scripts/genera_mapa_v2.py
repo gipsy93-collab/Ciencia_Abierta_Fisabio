@@ -178,6 +178,9 @@ HTML = r"""<!DOCTYPE html>
 
     <div class="foot">
       Fuente: fichas del portal FISABIO + ORCID declarado y recuperado + publicaciones del portal + OpenAlex.<br>
+      <strong>Adscripción corregida el 03-11-2026</strong> con el export del CRIS Fundanet:
+      «sin centro» pasa de 184 a 29 personas. Las coberturas bajan en los centros que
+      ganan personal sin ORCID; la mediana de Alcoi cae de 15 a 6,5.<br>
       <span class="adv-only">__COBERTURA_RECUPERADOS__<br>
       Mediana unión = personas con obras por cualquiera de las dos vías.<br></span>
       El punto cian marca la coordenada exacta; la burbuja solo se separa cuando dos centros coinciden.

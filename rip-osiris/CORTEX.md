@@ -137,7 +137,7 @@ En `scripts/`:
 - [ ] **Resolver los 3 conflictos de ORCID** (Galbis Caravajal, Hernández Mijares, Íñiguez Hernández): decidir cuál de las dos fuentes vale.
 - [ ] **Decidir los 24 centros externos** (universidades, empresas): ¿`orgs kind='externo'` + `affiliation_type='adscripcion'`?
 - [ ] **Revisar los 19 fuera del roster** (17 personas reales + `PRUEBA` y `SEMICROL, S.L`).
-- [ ] **Regenerar y publicar el mapa** con los denominadores corregidos.
+- [x] **Regenerar y publicar el mapa** con los denominadores corregidos (03-11-2026, commit `aca68ce` en `main`).
 - [x] **Taxonomía de verificación ORCID** (02-11-2026): `orcid_source` sigue siendo **procedencia**; la tabla nueva `orcid_verifications` guarda **quién confirmó** (`metodo`: `oauth` 1,00 · `persona` 0,95 · `institucion` 0,80), con `fuente`, `evidencia`, `confianza` y `fecha`. Cargadas **9 verificaciones institucionales** (Fundanet); **0 OAuth**. `importa_confirmaciones.py` ya escribe en la tabla.
 - [x] **Mapa v3** (02-11-2026): regenerado con «sin centro» 184 y «ORCID confirmado» en el tooltip; publicado en `main` (`5e11bf5`).
 - [ ] 19 grupos sin centro declarado: Fundanet o sede de la GVA.
