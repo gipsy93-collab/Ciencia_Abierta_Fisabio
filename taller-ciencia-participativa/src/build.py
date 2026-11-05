@@ -82,6 +82,20 @@ if os.path.isdir(fotos_src):
             copied += 1
     print("fotos:", len(os.listdir(fotos_dst)), "en dist/assets/fotos/", f"({copied} copiadas)")
 
+# imágenes del informe (página 4): se copian junto a dist para que el HTML
+# publicable las encuentre en assets/informe/
+informe_src = os.path.join(assets, "informe")
+if os.path.isdir(informe_src):
+    informe_dst = os.path.join(dist, "assets", "informe")
+    os.makedirs(informe_dst, exist_ok=True)
+    copied = 0
+    for fn in sorted(os.listdir(informe_src)):
+        s, d = os.path.join(informe_src, fn), os.path.join(informe_dst, fn)
+        if not os.path.exists(d) or os.path.getsize(s) != os.path.getsize(d):
+            shutil.copy2(s, d)
+            copied += 1
+    print("informe:", len(os.listdir(informe_dst)), "en dist/assets/informe/", f"({copied} copiadas)")
+
 out2 = os.path.join(dist, "Taller-Ciencia-Participativa.html")
 open(out2, "w", encoding="utf-8").write(public)
 print("wrote", out2, round(os.path.getsize(out2)/1024), "KB")

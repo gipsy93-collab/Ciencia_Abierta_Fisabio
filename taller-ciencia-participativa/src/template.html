@@ -124,8 +124,8 @@ body{font-family:'Outfit',system-ui,sans-serif}
 .navbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .navbtn[disabled]{opacity:.25;pointer-events:none}
 .pager{
-  position:absolute;left:42px;bottom:30px;color:#fff;font-size:14px;letter-spacing:.14em;
-  font-weight:500;opacity:.8;z-index:20;
+  position:absolute;left:42px;bottom:12px;color:#fff;font-size:14px;letter-spacing:.14em;
+  font-weight:500;opacity:.85;z-index:20;text-shadow:0 1px 6px rgba(26,13,114,.45);
 }
 
 /* ---------- modal ---------- */
@@ -192,7 +192,7 @@ body{font-family:'Outfit',system-ui,sans-serif}
 .gtitle{position:absolute;left:103px;top:76px;font-size:44px;line-height:1.05;font-weight:700;color:var(--navy);letter-spacing:-.4px}
 .gsub{position:absolute;left:103px;top:132px;font-size:18px;line-height:1.3;font-weight:400;color:var(--navy);opacity:.56;max-width:950px}
 .shot{position:absolute;border-radius:9px;overflow:hidden;background:#fff;box-shadow:0 2px 10px rgba(20,10,70,.12)}
-.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
 .shot figcaption{
   position:absolute;left:0;right:0;bottom:0;padding:20px 14px 9px;font-size:13.5px;
   font-weight:600;color:#fff;background:linear-gradient(transparent,rgba(26,13,114,.74));
@@ -205,6 +205,36 @@ body{font-family:'Outfit',system-ui,sans-serif}
 .closing h2{font-size:76px;font-weight:700;letter-spacing:-2px;line-height:1}
 .closing p{font-size:22px;font-weight:500;opacity:.95}
 .closing .credits{font-size:14px;letter-spacing:.18em;text-transform:uppercase;opacity:.8;margin-top:6px}
+
+/* page 4: documental */
+.doclogos{position:absolute;z-index:4;opacity:.94}
+body.modal-open .page .gfoot,
+body.modal-open .page .doclogos{opacity:0;pointer-events:none;transition:opacity .2s ease}
+
+/* tablas de modales */
+.tablemode #mbody{position:absolute;left:60px;right:60px;top:205px;bottom:58px;overflow:auto}
+.mtable{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.25;color:var(--navy)}
+.mtable th{text-align:left;font-weight:700;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:#fff;background:var(--navy);padding:6px 9px;position:sticky;top:0;z-index:1}
+.mtable td{padding:4px 9px;border-bottom:1px solid rgba(26,13,114,.1);vertical-align:top}
+.mtable tr:nth-child(even) td{background:rgba(98,152,241,.05)}
+.mtable td.num{font-weight:700;color:var(--accent);width:38px}
+.mtable td.votes{font-weight:700;text-align:center;width:58px}
+.mtable.compact td{font-size:11.5px;padding:2px 8px}
+.mtable .inst{font-size:11.5px;opacity:.85}
+.mtable tr.prio td{background:rgba(240,176,216,.16)}
+.mtable tr.prio td.num{color:var(--navy)}
+
+/* botones dentro de modales */
+.morebtn{position:absolute;z-index:9;border:0;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.01em;color:#fff;background:var(--navy);padding:9px 15px;border-radius:999px;box-shadow:0 6px 14px rgba(20,10,70,.16);transition:transform .2s ease,background .2s ease}
+.morebtn:hover{transform:translateY(-1px);background:#241B6B}
+.backbtn{position:absolute;left:800px;top:88px;height:34px;padding:0 14px;border-radius:999px;border:1.6px solid var(--accent);background:#fff;color:var(--navy);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;display:none;z-index:12}
+.backbtn:hover{background:var(--accent)}
+
+/* lightbox */
+.lightbox{position:absolute;inset:0;z-index:80;background:rgba(20,10,70,.88);display:none;align-items:center;justify-content:center;padding:42px;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 24px 70px rgba(0,0,0,.45)}
+.lightbox .lbhint{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);color:#fff;font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
 
 /* entrance animation for page content */
 .page.active .anim{animation:rise .55s cubic-bezier(.2,.7,.3,1) both}
@@ -333,12 +363,56 @@ body.editing .plus,body.editing .ibadge{pointer-events:none;opacity:.5}
     </div>
   </section>
 
+  <!-- ================= PAGE 4 ================= -->
+  <section class="page" data-page="4">
+    <div class="card">
+      <h2 class="gtitle anim">El diagnóstico, en imágenes</h2>
+      <p class="gsub anim">Mapa de relevancia, panel de votación y las cuatro plantillas · 20 de octubre de 2026.</p>
+
+      <figure class="shot anim" data-foto="mapa" style="left:60px;top:172px;width:566px;height:230px">
+        <img src="assets/informe/mapa-relevancia.jpg" alt="Mapa de relevancia con las tarjetas de necesidades sobre la mesa" style="object-position:50% 55%">
+        <figcaption>Mapa de relevancia</figcaption>
+      </figure>
+      <figure class="shot anim" data-foto="panel" style="left:654px;top:172px;width:566px;height:230px">
+        <img src="assets/informe/panel-grupal.jpg" alt="Panel grupal de priorización con las tarjetas y los votos" style="object-position:50% 50%">
+        <figcaption>Panel grupal de priorización</figcaption>
+      </figure>
+
+      <figure class="shot anim" data-foto="financiacion" style="left:60px;top:420px;width:270px;height:188px">
+        <img src="assets/informe/plantilla-financiacion.jpg" alt="Plantilla de caracterización: financiación estable">
+        <figcaption>Financiación estable</figcaption>
+      </figure>
+      <figure class="shot anim" data-foto="estrategia" style="left:350px;top:420px;width:270px;height:188px">
+        <img src="assets/informe/plantilla-estrategia.jpg" alt="Plantilla de caracterización: estrategia institucional">
+        <figcaption>Estrategia institucional</figcaption>
+      </figure>
+      <figure class="shot anim" data-foto="infraestructuras" style="left:640px;top:420px;width:270px;height:188px">
+        <img src="assets/informe/plantilla-infraestructuras.jpg" alt="Plantilla de caracterización: infraestructuras tecnológicas">
+        <figcaption>Infraestructuras tecnológicas</figcaption>
+      </figure>
+      <figure class="shot anim" data-foto="gobernanza" style="left:930px;top:420px;width:270px;height:188px">
+        <img src="assets/informe/plantilla-gobernanza.jpg" alt="Plantilla de caracterización: gobernanza compartida">
+        <figcaption>Gobernanza compartida</figcaption>
+      </figure>
+    </div>
+
+    <div class="gfoot">
+      <span class="gthx" data-edit="close.title">Gracias</span>
+      <span class="gsub2" data-edit="close.sub">OpenScience4Health · FCT-25-22602</span>
+      <span class="credits" data-edit="close.credits">Fisabio · UPV · UV · FECYT</span>
+    </div>
+
+    <img class="doclogos" src="assets/informe/logos-institucionales.jpg" alt="Logos de Generalitat Valenciana, Fisabio, Metodologías Participativas y FECYT" style="left:60px;top:622px;height:26px">
+    <img class="doclogos" src="assets/informe/logos-fecit.png" alt="Logos del Gobierno de España y FECYT" style="right:60px;top:616px;height:32px">
+  </section>
+
   <!-- ================= MODAL ================= -->
   <div class="modal" id="modal" role="dialog" aria-modal="true">
     <div class="card" id="modalCard">
       <button class="close" id="close" aria-label="Cerrar">
         <svg viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
       </button>
+      <button class="backbtn" id="mback">← Volver</button>
       <div class="mbadge" id="mbadge"></div>
       <div class="mtitle"><span id="mtitle"></span></div>
       <p class="mtext" id="mtext"></p>
@@ -346,6 +420,12 @@ body.editing .plus,body.editing .ibadge{pointer-events:none;opacity:.5}
       <svg class="wires" id="mwires" viewBox="0 0 1280 720" preserveAspectRatio="none"></svg>
       <div id="mbody"></div>
     </div>
+  </div>
+
+  <!-- ================= LIGHTBOX ================= -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <img id="lbimg" alt="">
+    <span class="lbhint">Clic o Esc para cerrar</span>
   </div>
 
   <!-- EDITOR:INICIO -->
@@ -377,13 +457,13 @@ body.editing .plus,body.editing .ibadge{pointer-events:none;opacity:.5}
 <script>
 /* ======================= datos ======================= */
 const TXT = {
-  proyecto: 'OpenScience4Health (FCT-25-22602) es un programa de capacitación, asesoramiento científico y transferencia de conocimiento a la Conselleria de Sanitat para incorporar la ciencia abierta y los compromisos CoARA en las políticas, estrategias y planes de I+D+i en salud.',
-  taller: '¿Qué necesitamos para que la Ciencia Abierta avance en la investigación sanitaria? Reunimos a investigadores/as, gestores/as y responsables de la toma de decisiones en una sesión participativa para analizar necesidades, identificar prioridades y explorar las condiciones del cambio.',
-  participantes: 'Siete entidades interesadas en pensar estrategias de ciencia abierta que puedan impactar a la sociedad. Participaron investigadores/as, gestores/as de la investigación y responsables de la toma de decisiones.',
-  necesidades: 'Diseñamos un conjunto de necesidades y las llevamos a tarjetas distinguidas por colores: 25 necesidades organizadas en seis clústeres.',
-  prioridades: 'De las 25 necesidades, los participantes seleccionaron 13 prioridades. Cuatro se trabajaron en profundidad con cuatro preguntas: qué está pasando, quién es clave, qué tendría que cambiar y por qué ocurre.',
-  conclusiones: 'Entre las principales conclusiones destacaron la necesidad de contar con estrategias institucionales de Ciencia Abierta, financiación estable, infraestructuras tecnológicas adecuadas y mecanismos que favorezcan la adopción de prácticas abiertas en la investigación sanitaria.',
-  pasos: 'Las aportaciones recogidas contribuirán al desarrollo de una estrategia y una hoja de ruta compartidas para fortalecer la Ciencia Abierta en salud.'
+  proyecto: 'OpenScience4Health (FCT-25-22602) es un programa de capacitación, asesoramiento científico y transferencia de conocimiento a la Conselleria de Sanitat para incorporar la ciencia abierta y los compromisos CoARA en las políticas, estrategias y planes de I+D+i en salud. Coordina Fisabio, con la UPV y la UV como socios, y cuenta con la colaboración de FECYT (convocatoria I+P 2025).',
+  taller: 'El 20 de octubre de 2026, en la Jornada de Ciencia Abierta y la Semana del Acceso Abierto, reunimos a 19 personas en cuatro mesas multidisciplinares. Trabajamos con 25 tarjetas de necesidades en seis ejes: primero un mapa de relevancia y después una votación individual con cinco gomets por persona. La jornada incluyó la ponencia de Enrique Orduña-Malea (UPV) y la participación del grupo DOCA.',
+  participantes: '19 personas de nueve instituciones: personal investigador, gestores/as de investigación y responsables de la toma de decisiones. Participaron la DGII y la EVES, cinco fundaciones e institutos de investigación sanitaria, y se sumaron dos observadoras de la UV y el ponente de la UPV.',
+  necesidades: 'Un catálogo de 25 necesidades (N01–N25) agrupadas en seis ejes: gobernanza y cultura, recursos y capacidades, formación e infraestructuras, aspectos legales y éticos, incentivos y evaluación, y participación ciudadana. Cada mesa las ordenó en un mapa de relevancia y seleccionó cinco prioridades.',
+  prioridades: 'De las 25 necesidades, 13 quedaron priorizadas. Las cuatro más votadas —estrategia institucional (19), gobernanza compartida (13), infraestructuras tecnológicas (11) y financiación estable (10)— se caracterizaron con cuatro preguntas: qué está pasando, quién es clave, qué tendría que cambiar y por qué ocurre.',
+  conclusiones: 'El diagnóstico confirma que la Ciencia Abierta no depende solo de cuestiones técnicas: exige financiación sostenible, estrategia y capacidad institucional, coordinación e infraestructuras compartidas, y gobernanza inclusiva con pacientes y ciudadanía. Las cuatro líneas están interrelacionadas y deben abordarse de forma transversal.',
+  pasos: 'El diagnóstico continuará con la caracterización de las demás necesidades priorizadas y con la incorporación del resto del ecosistema. Los resultados alimentarán la estrategia y la hoja de ruta de Ciencia Abierta, con el grupo DOCA y las instituciones participantes en las próximas sesiones de codiseño.'
 };
 
 const SECTIONS = {
@@ -398,33 +478,34 @@ const SECTIONS = {
     ],
     arrows: [[246, 306, 246, 447], [1072, 306, 1072, 447]],
     plus: { x: 615, y: 300 },
-    callouts: [{ x: 660, y: 280, w: 390, text: 'Objetivo: estandarizar las prácticas de ciencia abierta en la I+D+i en salud.' }]
+    callouts: [{ x: 405, y: 350, w: 470, text: 'Objetivo: estandarizar las prácticas de ciencia abierta en la I+D+i en salud.' }]
   },
   m2: {
     color: 'var(--red)', num: 2, title: 'Contexto del taller', text: TXT.taller,
     brain: '@@brain_m2@@',
     pills: [
-      { x: 103, y: 250, w: 286, h: 56, num: 1, padLeft: 40, fs: 15, text: 'Análisis de<br>necesidades' },
-      { x: 103, y: 447, w: 286, h: 56, num: 2, padLeft: 40, fs: 15, text: 'Identificación de<br>prioridades' },
-      { x: 929, y: 250, w: 286, h: 56, num: 3, padLeft: 40, fs: 15, text: 'Condiciones<br>del cambio' },
-      { x: 929, y: 447, w: 286, h: 56, num: 4, padLeft: 40, fs: 15, text: 'Visión compartida<br>de futuro' }
+      { x: 103, y: 250, w: 286, h: 56, num: 1, padLeft: 40, fs: 15, text: '20-10-2026<br>Jornada de Ciencia Abierta' },
+      { x: 103, y: 447, w: 286, h: 56, num: 2, padLeft: 40, fs: 15, text: '19 personas<br>4 mesas multidisciplinares' },
+      { x: 929, y: 250, w: 286, h: 56, num: 3, padLeft: 40, fs: 15, text: '25 tarjetas<br>6 ejes temáticos' },
+      { x: 929, y: 447, w: 286, h: 56, num: 4, padLeft: 40, fs: 15, text: 'Mapa de relevancia<br>+ 5 votos por persona' }
     ],
     arrows: [[246, 306, 246, 447], [1072, 306, 1072, 447]],
     plus: { x: 615, y: 300 },
-    callouts: [{ x: 660, y: 280, w: 390, text: 'Una cultura más abierta, colaborativa y transparente.' }]
+    callouts: [{ x: 405, y: 350, w: 470, text: 'Dos fases: mapa de relevancia grupal y votación individual con cinco gomets por persona. La jornada incluyó la ponencia de Enrique Orduña-Malea (UPV) y la participación del grupo DOCA.' }]
   },
   m3: {
     color: 'var(--purple)', num: 3, title: 'Participantes', text: TXT.participantes,
     brain: '@@brain_m3@@',
     pills: [
-      { x: 103, y: 250, w: 286, h: 56, num: 1, padLeft: 40, fs: 15, text: 'Siete entidades<br>del ecosistema' },
-      { x: 103, y: 447, w: 286, h: 56, num: 2, padLeft: 40, fs: 15, text: 'Investigadores/as' },
-      { x: 929, y: 250, w: 286, h: 56, num: 3, padLeft: 40, fs: 15, text: 'Gestores/as de<br>investigación' },
-      { x: 929, y: 447, w: 286, h: 56, num: 4, padLeft: 40, fs: 15, text: 'Responsables de<br>la toma de decisiones' }
+      { x: 103, y: 250, w: 286, h: 56, num: 1, padLeft: 40, fs: 15, text: '9 instituciones<br>del ecosistema' },
+      { x: 103, y: 447, w: 286, h: 56, num: 2, padLeft: 40, fs: 15, text: '19 personas<br>4 mesas' },
+      { x: 929, y: 250, w: 286, h: 56, num: 3, padLeft: 40, fs: 15, text: 'Investigadores/as,<br>gestores/as y decisores' },
+      { x: 929, y: 447, w: 286, h: 56, num: 4, padLeft: 40, fs: 15, text: 'UV y UPV:<br>observadoras y ponente' }
     ],
     arrows: [[246, 306, 246, 447], [1072, 306, 1072, 447]],
     plus: { x: 757, y: 293 },
-    callouts: [{ x: 800, y: 270, w: 360, text: 'Listado de entidades: pendiente de incorporar (7).' }]
+    callouts: [{ x: 405, y: 350, w: 470, text: 'DGII · EVES · Fisabio · FHGUV · FHPC · F. Príncipe Felipe · IIS La Fe · Incliva · Isabial, más dos observadoras de la UV y el ponente de la UPV.' }],
+    more: { x: 97, y: 214, text: 'Ver las 19 personas →', target: 'm3b' }
   },
   m4: {
     color: 'var(--pink)', num: 4, title: 'De barreras a necesidades', text: TXT.necesidades,
@@ -439,46 +520,104 @@ const SECTIONS = {
     ],
     arrows: [[235, 417, 235, 540], [1060, 417, 1060, 540]],
     plus: { x: 826, y: 406 },
-    callouts: [{ x: 870, y: 380, w: 340, text: '25 necesidades identificadas en 6 clústeres.' }]
+    callouts: [{ x: 420, y: 330, w: 380, text: '25 necesidades · 6 ejes · 13 priorizadas. En la página 04, las cuatro plantillas de caracterización.' }],
+    more: { x: 97, y: 220, text: 'Ver el ranking completo →', target: 'm4b' }
   },
   m5: {
     color: 'var(--green)', num: 5, title: 'Temáticas priorizadas', text: TXT.prioridades,
     brain: '@@brain_m5@@',
     pills: [
-      { x: 103, y: 257, w: 286, h: 40, fs: 16, text: 'Estrategia institucional' },
-      { x: 103, y: 446, w: 286, h: 40, fs: 16, text: 'Financiación estable' },
-      { x: 929, y: 257, w: 286, h: 40, fs: 16, text: 'Infraestructuras tecnológicas' },
-      { x: 929, y: 446, w: 286, h: 40, fs: 16, text: 'Gobernanza compartida' }
+      { x: 103, y: 257, w: 286, h: 40, fs: 15.5, text: 'Estrategia institucional · 19' },
+      { x: 103, y: 446, w: 286, h: 40, fs: 15.5, text: 'Financiación estable · 10' },
+      { x: 929, y: 257, w: 286, h: 40, fs: 15.5, text: 'Infraestructuras tecnológicas · 11' },
+      { x: 929, y: 446, w: 286, h: 40, fs: 15.5, text: 'Gobernanza compartida · 13' }
     ],
     arrows: [[246, 446, 246, 297], [1072, 446, 1072, 297]],
     plus: { x: 612, y: 465 },
-    callouts: [{ x: 405, y: 543, w: 470, big: true, text: 'También priorizadas: acceso equitativo a recursos, interoperabilidad, apoyo técnico, orientación legal, confidencialidad, procesos ágiles, reconocimiento, incentivos y participación ciudadana.' }]
+    callouts: [
+      { x: 405, y: 535, w: 470, big: true, text: 'Las cuatro más votadas: estrategia (19), gobernanza (13), infraestructuras (11) y financiación (10). Se caracterizaron con cuatro preguntas: qué pasa, quién es clave, qué debe cambiar y por qué ocurre.' },
+      { x: 405, y: 250, w: 470, big: true, text: 'También priorizadas: participación (8), interoperabilidad (7), protección de datos (7), acceso equitativo (6), procesos éticos (4), apoyo técnico (3), reconocimiento (3), confidencialidad (2) e incentivos (1).' }
+    ]
   },
   p2m1: {
     color: 'var(--orange)', num: 6, title: 'Comentarios y conclusiones', text: TXT.conclusiones,
     brain: '@@brain_p2m1@@', brainBox: [466, 216, 335, 417],
     pills: [
-      { x: 103, y: 258, w: 286, h: 40, num: 1, padLeft: 20, fs: 16, text: 'Estrategias institucionales' },
-      { x: 103, y: 449, w: 286, h: 40, num: 2, padLeft: 20, fs: 16, text: 'Financiación estable' },
-      { x: 929, y: 258, w: 286, h: 40, num: 3, padLeft: 20, fs: 16, text: 'Infraestructuras adecuadas' },
-      { x: 929, y: 449, w: 286, h: 40, num: 4, padLeft: 20, fs: 16, text: 'Mecanismos de adopción' }
+      { x: 103, y: 258, w: 286, h: 40, num: 1, padLeft: 20, fs: 16, text: 'Financiación sostenible' },
+      { x: 103, y: 449, w: 286, h: 40, num: 2, padLeft: 20, fs: 16, text: 'Estrategia y capacidad' },
+      { x: 929, y: 258, w: 286, h: 40, num: 3, padLeft: 20, fs: 15.5, text: 'Infraestructuras compartidas' },
+      { x: 929, y: 449, w: 286, h: 40, num: 4, padLeft: 20, fs: 16, text: 'Gobernanza inclusiva' }
     ],
     arrows: [[246, 449, 246, 298], [1072, 449, 1072, 298]],
     plus: { x: 526, y: 381 },
-    callouts: [{ x: 560, y: 350, w: 370, text: 'Una política de ciencia abierta deconstruye impedimentos legales y límites estructurales.' }]
+    callouts: [{ x: 560, y: 350, w: 370, text: 'Las cuatro líneas están interrelacionadas y deben abordarse de forma transversal, con las particularidades de cada institución.' }]
   },
   p2m2: {
     color: 'var(--pink)', num: 7, title: 'Pasos siguientes', text: TXT.pasos,
     brain: '@@brain_p2m2@@', brainBox: [466, 216, 335, 417],
     pills: [
-      { x: 103, y: 258, w: 286, h: 40, num: 1, padLeft: 20, fs: 16, text: 'Estrategia y hoja de ruta' },
-      { x: 103, y: 449, w: 286, h: 40, num: 2, padLeft: 20, fs: 16, text: 'Grupo de Documentación' },
-      { x: 929, y: 258, w: 286, h: 40, num: 3, padLeft: 20, fs: 16, text: 'Validación con las entidades' },
-      { x: 929, y: 449, w: 286, h: 40, num: 4, padLeft: 20, fs: 16, text: 'Comunicación y formación' }
+      { x: 103, y: 258, w: 286, h: 40, num: 1, padLeft: 20, fs: 14.5, text: 'Caracterizar las demás necesidades' },
+      { x: 103, y: 449, w: 286, h: 40, num: 2, padLeft: 20, fs: 14.5, text: 'Incorporar al resto del ecosistema' },
+      { x: 929, y: 258, w: 286, h: 40, num: 3, padLeft: 20, fs: 14.5, text: 'Definir estrategia y hoja de ruta' },
+      { x: 929, y: 449, w: 286, h: 40, num: 4, padLeft: 20, fs: 14.5, text: 'Sesiones de codiseño con DOCA' }
     ],
     arrows: [[246, 449, 246, 298], [1072, 449, 1072, 298]],
     plus: { x: 739, y: 466 },
-    callouts: [{ x: 500, y: 500, w: 400, text: 'Propuesta: cerrar el diagnóstico con las entidades y publicar la hoja de ruta.' }]
+    callouts: [{ x: 500, y: 500, w: 400, text: 'El diagnóstico es la base: las próximas actividades definirán objetivos, actuaciones y prioridades compartidas con las instituciones y el grupo DOCA.' }]
+  },
+  m3b: {
+    color: 'var(--purple)', num: 3, title: 'Las 19 personas participantes', text: 'Personal investigador, gestores/as y responsables de decisión de nueve instituciones. Se sumaron dos observadoras de la UV y el ponente de la UPV.',
+    noBrain: true, back: 'm3',
+    table: {
+      compact: true,
+      head: ['Nombre', 'Institución', 'Rol'],
+      rows: [
+        ['Ana Peiró', 'DGII – Conselleria de Sanitat', 'Participante'],
+        ['Lucía Soler', 'DGII – Conselleria de Sanitat', 'Participante'],
+        ['Pura Navarro', 'EVES', 'Participante'],
+        ['Marisa Caparrós', 'Fisabio', 'Participante'],
+        ['Jacobo Martínez Santamaría', 'Fisabio', 'Participante'],
+        ['Llúcia Martínez Priego', 'Fisabio', 'Participante'],
+        ['Lucas Donat Castellón', 'Fisabio', 'Participante'],
+        ['Teresa de Pablo', 'Fisabio', 'Participante'],
+        ['Mari Carmen Navarro Plaza', 'Fundación Hospital General de Valencia', 'Participante'],
+        ['Celia Montaner', 'Fundación Hospital General de Valencia', 'Participante'],
+        ['Mª Nieves Prieto Colodrero', 'Fundación Hospital General de Valencia', 'Participante'],
+        ['Lola Martínez Biot', 'Fundación Hospital General de Valencia', 'Participante'],
+        ['Berta Segura Tomás', 'Fundación Hospital Provincial de Castellón', 'Participante'],
+        ['Joan Ruescas Raga', 'Fundación Príncipe Felipe', 'Participante'],
+        ['Christian Vidal Cabo', 'IIS La Fe', 'Participante'],
+        ['Tania Tolego Ajilla', 'IIS La Fe', 'Participante'],
+        ['Lorena López García', 'Incliva', 'Participante'],
+        ['Irene Cañigal', 'Incliva', 'Participante'],
+        ['Héctor Sebastián Tari', 'Isabial', 'Participante'],
+        ['Francisca Abad', 'Universitat de València', 'Observadora'],
+        ['Aurora González-Teruel', 'Universitat de València', 'Observadora'],
+        ['Enrique Orduña-Malea', 'Universitat Politècnica de València', 'Ponente']
+      ]
+    }
+  },
+  m4b: {
+    color: 'var(--pink)', num: 4, title: 'Ranking de necesidades priorizadas', text: 'Votación individual con cinco gomets por persona. Las cuatro primeras (en color) se caracterizaron en profundidad; las demás completan el mapa de prioridades.',
+    noBrain: true, back: 'm4',
+    table: {
+      head: ['#', 'Necesidad', 'Votos', 'Por qué importa'],
+      rows: [
+        { prio: true, cells: [1, 'Estrategia institucional de Ciencia Abierta', 19, 'Marcos generales sin adaptación operativa a cada institución.'] },
+        { prio: true, cells: [2, 'Gobernanza compartida y toma de decisiones colaborativas', 13, 'Proyectos sin consulta formal a pacientes y asociaciones.'] },
+        { prio: true, cells: [3, 'Infraestructuras tecnológicas adecuadas', 11, 'Esfuerzos aislados, duplicidad y gestión fragmentada.'] },
+        { prio: true, cells: [4, 'Financiación estable para impulsar la Ciencia Abierta', 10, 'Demanda creciente sin partidas específicas ni continuidad.'] },
+        { prio: false, cells: [5, 'Estructuras estables de participación ciudadana', 8, 'Iniciativas puntuales y falta de canales permanentes.'] },
+        { prio: false, cells: [6, 'Interoperabilidad y estandarización de datos y sistemas', 7, 'Sistemas y repositorios que no se comunican entre sí.'] },
+        { prio: false, cells: [7, 'Orientación sobre protección de datos, propiedad intelectual y derechos de explotación', 7, 'Criterios legales dispersos y dudas sobre titularidad.'] },
+        { prio: false, cells: [8, 'Acceso equitativo a recursos e infraestructuras', 6, 'Brechas de acceso entre entidades y servicios.'] },
+        { prio: false, cells: [9, 'Procesos éticos y administrativos ágiles', 4, 'Trámites lentos y poco adaptados a la ciencia abierta.'] },
+        { prio: false, cells: [10, 'Apoyo técnico para la preparación y anonimización de datos', 3, 'Falta de personal especializado y soporte técnico.'] },
+        { prio: false, cells: [11, 'Reconocimiento de la Ciencia Abierta en la evaluación investigadora', 3, 'La práctica abierta no se reconoce en la carrera.'] },
+        { prio: false, cells: [12, 'Garantías para proteger la confidencialidad', 2, 'Dudas sobre datos sensibles y acuerdos de uso.'] },
+        { prio: false, cells: [13, 'Incentivos para compartir resultados y recursos', 1, 'Ausencia de estímulos económicos y de carrera.'] }
+      ]
+    }
   }
 };
 
@@ -543,20 +682,60 @@ function openModal(key) {
   badge.textContent = s.num;
   badge.style.background = s.color;
 
+  mCard.classList.toggle('tablemode', !!s.table);
   mCard.style.setProperty('--accent', s.color);
   textEl(document.getElementById('mtitle'), `sec.${key}.title`, s.title);
   textEl(document.getElementById('mtext'), `sec.${key}.text`, s.text);
 
+  const back = document.getElementById('mback');
+  back.style.display = s.back ? 'block' : 'none';
+  if (s.back) back.dataset.open = s.back;
+  else delete back.dataset.open;
+
   const brain = document.getElementById('mbrain');
-  brain.src = s.brain;
+  brain.src = s.brain || '';
+  brain.style.display = s.noBrain ? 'none' : '';
+  document.getElementById('mwires').style.display = s.noBrain ? 'none' : '';
   if (s.brainBox) {
     brain.style.cssText = `left:${s.brainBox[0]}px;top:${s.brainBox[1]}px;width:${s.brainBox[2]}px;height:${s.brainBox[3]}px`;
   } else {
     brain.style.cssText = 'left:389px;top:209px;width:516px;height:433px';
   }
+  if (s.noBrain) brain.style.display = 'none';
 
   const body = document.getElementById('mbody');
   body.innerHTML = '';
+
+  if (s.table) {
+    const table = document.createElement('table');
+    table.className = 'mtable' + (s.table.compact ? ' compact' : '');
+    const thead = document.createElement('thead');
+    const htr = document.createElement('tr');
+    (s.table.head || []).forEach(h => {
+      const th = document.createElement('th');
+      th.textContent = h;
+      htr.appendChild(th);
+    });
+    thead.appendChild(htr);
+    table.appendChild(thead);
+    const tbody = document.createElement('tbody');
+    (s.table.rows || []).forEach(row => {
+      const tr = document.createElement('tr');
+      const cells = Array.isArray(row) ? row : row.cells;
+      if (!Array.isArray(row) && row.prio) tr.className = 'prio';
+      (cells || []).forEach((val, ci) => {
+        const td = document.createElement('td');
+        td.textContent = val;
+        if ((s.table.head || [])[ci] === '#') td.className = 'num';
+        if ((s.table.head || [])[ci] === 'Votos') td.className = 'votes';
+        if ((s.table.head || [])[ci] === 'Institución') td.className = 'inst';
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    body.appendChild(table);
+  }
 
   (s.pills || []).forEach((p, i) => {
     const d = el('div', 'pill small' + (p.num ? ' numbered' : ''), `left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px`);
@@ -610,6 +789,13 @@ function openModal(key) {
     });
   }
 
+  if (s.more) {
+    const b = el('button', 'morebtn', `left:${s.more.x}px;top:${s.more.y}px`);
+    b.dataset.open = s.more.target;
+    b.textContent = s.more.text;
+    body.appendChild(b);
+  }
+
   /* conectores del modal */
   const wires = document.getElementById('mwires');
   wires.innerHTML = '';
@@ -628,14 +814,32 @@ function openModal(key) {
   });
 
   modal.classList.add('open');
+  document.body.classList.add('modal-open');
   if (onRender) onRender(mCard);
 }
 function closeModal() {
   modal.classList.remove('open');
+  document.body.classList.remove('modal-open');
   openKey = null;
 }
 document.getElementById('close').addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+const lightbox = document.getElementById('lightbox');
+const lbimg = document.getElementById('lbimg');
+function openLightbox(src, alt) {
+  lbimg.src = src;
+  lbimg.alt = alt || '';
+  lightbox.classList.add('open');
+}
+function closeLightbox() {
+  lightbox.classList.remove('open');
+  lbimg.removeAttribute('src');
+}
+document.querySelectorAll('.shot img').forEach(img => {
+  img.addEventListener('click', () => openLightbox(img.currentSrc || img.src, img.alt));
+});
+lightbox.addEventListener('click', closeLightbox);
 
 /* ======================= eventos ======================= */
 document.addEventListener('click', e => {
@@ -649,6 +853,7 @@ document.getElementById('prev').addEventListener('click', () => showPage(current
 document.getElementById('next').addEventListener('click', () => showPage(current + 1));
 
 addEventListener('keydown', e => {
+  if (e.key === 'Escape' && lightbox.classList.contains('open')) return closeLightbox();
   if (e.key === 'Escape' && openKey) return closeModal();
   if (editing) return;
   if (openKey) return;
@@ -748,12 +953,15 @@ function exportFinal() {
   clear('mwires', n => { n.innerHTML = ''; });
   clear('mbadge', n => { n.textContent = ''; n.removeAttribute('style'); });
   clear('mbrain', n => { n.removeAttribute('src'); n.removeAttribute('style'); });
-  clear('modalCard', n => n.removeAttribute('style'));
+  clear('modalCard', n => { n.removeAttribute('style'); n.classList.remove('tablemode'); });
+  clear('mback', n => { n.style.display = 'none'; n.removeAttribute('data-open'); });
   clear('modal', n => n.classList.remove('open'));
   clear('stage', n => n.removeAttribute('style'));
-  clear('pager', n => { n.textContent = '01 / 03'; });
+  clear('pager', n => { n.textContent = '01 / 04'; });
   clear('prev', n => n.setAttribute('disabled', ''));
   clear('next', n => n.removeAttribute('disabled'));
+  clear('lightbox', n => n.classList.remove('open'));
+  clear('lbimg', n => n.removeAttribute('src'));
 
   let html = '<!doctype html>\n' + clone.outerHTML;
   html = html.replace(MARK, '');
@@ -776,11 +984,14 @@ document.querySelectorAll('.page .subtitle').forEach(n => textEl(n, 'head.subtit
 document.querySelectorAll('.page button.pill[data-open] > span').forEach(n => {
   textEl(n, 'cover.' + n.parentElement.dataset.open, n.innerHTML);
 });
-document.querySelectorAll('.page .gtitle').forEach(n => textEl(n, 'gallery.title', n.innerHTML));
-document.querySelectorAll('.page .gsub').forEach(n => textEl(n, 'gallery.sub', n.innerHTML));
+document.querySelectorAll('.page[data-page="3"] .gtitle').forEach(n => textEl(n, 'gallery.title', n.innerHTML));
+document.querySelectorAll('.page[data-page="3"] .gsub').forEach(n => textEl(n, 'gallery.sub', n.innerHTML));
+document.querySelectorAll('.page[data-page="4"] .gtitle').forEach(n => textEl(n, 'doc.title', n.innerHTML));
+document.querySelectorAll('.page[data-page="4"] .gsub').forEach(n => textEl(n, 'doc.sub', n.innerHTML));
 document.querySelectorAll('.shot figcaption').forEach(n => {
   textEl(n, 'foto.' + n.parentElement.dataset.foto + '.cap', n.innerHTML);
 });
+document.querySelectorAll('.gfoot [data-edit]').forEach(n => textEl(n, n.dataset.edit, n.innerHTML));
 
 edittoggle.addEventListener('click', () => setEditing(!editing));
 document.getElementById('editexport').addEventListener('click', exportStore);
