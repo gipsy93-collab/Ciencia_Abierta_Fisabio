@@ -117,13 +117,26 @@ with sync_playwright() as p:
     page.evaluate("openModal('m4')")
     page.wait_for_timeout(300)
     check("m4: texto 25 necesidades", "25 necesidades" in page.locator("#mtext").inner_text())
-    check("m4: botón ranking", page.locator("#mbody .morebtn").inner_text().startswith("Ver el ranking"))
-    page.locator("#mbody .morebtn").click()
+    check("m4: sin botón ranking", page.locator("#mbody .morebtn").count() == 0)
+    check("m4: sin callout", page.locator("#mbody .callout").count() == 0)
+    check("m4: 6 recuadros", page.locator("#mbody .pill").count() == 6)
+    check("m4: recuadros sin solape", page.evaluate("""() => {
+        const r = [...document.querySelectorAll('#mbody .pill')].map(n => n.getBoundingClientRect());
+        for (let i = 0; i < r.length; i++) for (let j = i + 1; j < r.length; j++) {
+            if (r[i].left < r[j].right - 1 && r[j].left < r[i].right - 1 &&
+                r[i].top < r[j].bottom - 1 && r[j].top < r[i].bottom - 1) return false;
+        }
+        return true;
+    }"""))
+    page.screenshot(path=str(shots / "m4_necesidades.png"))
+    page.locator("#mbody .plus").click()
     page.wait_for_timeout(300)
     check("m4b: tabla", page.locator("#mbody table").count() == 1)
     check("m4b: 13 filas", page.locator("#mbody table tbody tr").count() == 13)
     check("m4b: votos 19", "19" in page.locator("#mbody table").inner_text())
     check("m4b: 4 priorizadas", page.locator("#mbody table tr.prio").count() == 4)
+    check("m4b: foto del panel", page.locator("#mbody .mphoto img").count() == 1)
+    check("m4b: foto cargada", page.evaluate("document.querySelector('#mbody .mphoto img').naturalWidth > 0"))
     check("m4b: sin scroll", page.evaluate("(() => { const b=document.getElementById('mbody'); return b.scrollHeight <= b.clientHeight + 2; })()"))
     page.screenshot(path=str(shots / "m4b_ranking.png"))
 

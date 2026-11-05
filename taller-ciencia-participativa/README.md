@@ -7,6 +7,7 @@ Pieza divulgativa del taller de diagnóstico de necesidades del proyecto **OpenS
 - **El taller (zona 1):** objetivo general y los cuatro objetivos específicos, con una fotografía del proceso en el botón sobre el cerebro.
 - **Metodología (zona 2):** dinámica cualitativa de validación y priorización, materiales de trabajo y el cuadro de las 25 necesidades agrupadas en seis ejes (N01–N25).
 - **Participantes (zona 3):** el botón «+» sobre el cerebro abre la tabla de las 22 personas (19 participantes + 2 observadoras + ponente) acompañada de una fotografía del grupo.
+- **Necesidades (zona 4):** los seis ejes (N01–N25) distribuidos en tarjetas alrededor del cerebro; el botón «+» abre el ranking de las 13 necesidades priorizadas con la imagen del panel grupal.
 - **Página 2:** Comentarios y conclusiones · Pasos siguientes (con las 4 conclusiones del informe: financiación continuada, estrategia y estructura, coordinación e interoperabilidad, gobernanza inclusiva; y el insumo directo a la Conselleria de Sanitat / CoARA).
 - **Página 3:** galería del taller en 5 fotografías (con pies editables) y cierre con créditos.
 - **Página 4:** «El diagnóstico, en imágenes»: mapa de relevancia, panel de votación, las cuatro plantillas de caracterización y las bandas de logos.
@@ -29,7 +30,7 @@ Taller-Ciencia-Participativa/
     ├── template.html              ← plantilla con los textos y la composición
     ├── textos.json                ← capa de overrides de textos (build la incrusta)
     ├── build.py                   ← genera el HTML final (Pillow) y sincroniza fotos e informe a dist/
-    ├── verificar_informe.py       ← QA Playwright de la pieza (60 comprobaciones)
+    ├── verificar_informe.py       ← QA Playwright de la pieza (65 comprobaciones)
     └── verificar_textos.py        ← QA de textos, editor y salida publicable (61 comprobaciones)
 ```
 
@@ -43,4 +44,4 @@ Taller-Ciencia-Participativa/
 
 - Comentarios literales del tramo final del taller (`CONTEXTO TALLER PROYECTO_.md.crdownload`, cortado en «Conclusiones/Comentarios»): se añadirán cuando coordinación disponga del texto (así lo indica Gipsy).
 - Crédito genérico de fotos en pie de galería; fotos sin personas identificables (no requiere consentimiento).
-- Revisión de las secciones 4-5 (Necesidades, Prioridades) para la siguiente tanda de ajustes.
+- Revisión de la sección 5 (Prioridades) para la siguiente tanda de ajustes.

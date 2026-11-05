@@ -627,17 +627,15 @@ const SECTIONS = {
     color: 'var(--pink)', num: 4, title: 'De barreras a necesidades', text: TXT.necesidades,
     brain: '@@brain_m4@@',
     pills: [
-      { x: 103, y: 261, w: 265, h: 76, fs: 15, text: 'Gobernanza y cultura<br>N01–N03' },
-      { x: 103, y: 330, w: 265, h: 87, fs: 15, text: 'Recursos y capacidades<br>N04–N06' },
-      { x: 103, y: 540, w: 265, h: 44, fs: 15, text: 'Formación e infraestructuras<br>N07–N10' },
-      { x: 928, y: 261, w: 265, h: 76, fs: 15, text: 'Aspectos legales y éticos<br>N11–N14' },
-      { x: 928, y: 330, w: 265, h: 87, fs: 15, text: 'Incentivos y evaluación<br>N15–N18' },
-      { x: 928, y: 540, w: 265, h: 44, fs: 15, text: 'Participación ciudadana<br>N19–N25' }
+      { x: 90, y: 270, w: 280, h: 64, fs: 15, text: 'Gobernanza y cultura<br>N01–N03' },
+      { x: 90, y: 384, w: 280, h: 64, fs: 15, text: 'Recursos y capacidades<br>N04–N06' },
+      { x: 90, y: 498, w: 280, h: 64, fs: 15, text: 'Formación e infraestructuras<br>N07–N10' },
+      { x: 910, y: 270, w: 280, h: 64, fs: 15, text: 'Aspectos legales y éticos<br>N11–N14' },
+      { x: 910, y: 384, w: 280, h: 64, fs: 15, text: 'Incentivos y evaluación<br>N15–N18' },
+      { x: 910, y: 498, w: 280, h: 64, fs: 15, text: 'Participación ciudadana<br>N19–N25' }
     ],
-    arrows: [[235, 417, 235, 540], [1060, 417, 1060, 540]],
-    plus: { x: 826, y: 406 },
-    callouts: [{ x: 420, y: 330, w: 380, text: '25 necesidades · 6 ejes · 13 priorizadas. En la página 04, las cuatro plantillas de caracterización.' }],
-    more: { x: 97, y: 220, text: 'Ver el ranking completo →', target: 'm4b' }
+    arrows: [],
+    plus: { x: 826, y: 406, open: 'm4b' }
   },
   m5: {
     color: 'var(--green)', num: 5, title: 'Temáticas priorizadas', text: TXT.prioridades,
@@ -717,6 +715,7 @@ const SECTIONS = {
   m4b: {
     color: 'var(--pink)', num: 4, title: 'Ranking de necesidades priorizadas', text: 'Votación individual con cinco gomets por persona. Las cuatro primeras (en color) se caracterizaron en profundidad; las demás completan el mapa de prioridades.',
     noBrain: true, back: 'm4',
+    photo: { src: 'assets/informe/panel-grupal.jpg', alt: 'Panel grupal con las 25 necesidades y la votación', caption: 'Panel grupal · 25 necesidades y votación' },
     table: {
       head: ['#', 'Necesidad', 'Votos', 'Por qué importa'],
       rows: [
