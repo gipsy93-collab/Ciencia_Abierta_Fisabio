@@ -1,9 +1,14 @@
 ﻿import os, io, re, json, base64, shutil
 from PIL import Image
 
+import compone_cerebro
+
 base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 assets = os.path.join(base, "assets")
 tpl = open(os.path.join(base, "src", "template.html"), encoding="utf-8").read()
+
+# el arte del cerebro (SVG con la línea original de Genially) se recompone antes
+compone_cerebro.main(verboso=False)
 
 def data_uri(path, quality=90, maxw=None, lossless=False):
     src = Image.open(path)
@@ -18,22 +23,23 @@ def data_uri(path, quality=90, maxw=None, lossless=False):
         im.save(buf, "WEBP", quality=quality, method=6)
     return "data:image/webp;base64," + base64.b64encode(buf.getvalue()).decode()
 
+def svg_uri(path):
+    with open(path, "rb") as f:
+        return "data:image/svg+xml;base64," + base64.b64encode(f.read()).decode()
+
 items = {
-    "brain_cover": ("brain_cover.png", 92, None),
-    "brain_p2": ("brain_p2.png", 92, None),
-    "brain_m1": ("brain_m1.png", 92, None),
-    "brain_m2": ("brain_m2.png", 92, None),
-    "brain_m3": ("brain_m3.png", 92, None),
-    "brain_m4": ("brain_m4.png", 92, None),
-    "brain_m5": ("brain_m5.png", 92, None),
-    "brain_p2m1": ("brain_p2m1.png", 92, None),
-    "brain_p2m2": ("brain_p2m2.png", 92, None),
     "card_a": ("card_a.png", 82, 550),
     "card_b": ("card_b.png", 82, 550),
 }
 
 for token, (fn, q, mw) in items.items():
     uri = data_uri(os.path.join(assets, fn), q, mw, lossless=token.startswith("res_"))
+    tpl = tpl.replace(f"@@{token}@@", uri)
+    print(token, round(len(uri)/1024), "KB")
+
+# láminas del cerebro: SVG vectorial + línea original
+for token, _, _ in compone_cerebro.LAMINAS:
+    uri = svg_uri(os.path.join(assets, "cerebro", token + ".svg"))
     tpl = tpl.replace(f"@@{token}@@", uri)
     print(token, round(len(uri)/1024), "KB")
 
