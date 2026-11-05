@@ -243,6 +243,66 @@ body.modal-open .page .doclogos{opacity:0;pointer-events:none;transition:opacity
 .page.active .hot{animation:pop .45s cubic-bezier(.2,.9,.3,1.2) both}
 @keyframes pop{from{opacity:0;transform:translate(-50%,-50%) scale(.5)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 
+/* ---------- portada nueva ---------- */
+.page[data-page="1"] .card::before{
+  background:
+    radial-gradient(46vw 46vw at 82% 44%,rgba(98,152,241,.20),rgba(98,152,241,0) 68%),
+    radial-gradient(30vw 30vw at 96% 88%,rgba(255,100,125,.14),rgba(255,100,125,0) 70%),
+    linear-gradient(118deg,#FCF8EE 0%,#F8F2E6 54%,#ECE8FA 100%);
+}
+.cover-kicker{position:absolute;left:95px;top:72px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:#C4002E}
+.cover-title{position:absolute;left:92px;top:98px;width:480px;font-size:50px;line-height:1.02;font-weight:700;color:#1D0F44;letter-spacing:-1.4px}
+.cover-sub{position:absolute;left:95px;top:224px;width:470px;font-size:16.5px;line-height:1.32;font-weight:600;color:#3B2A6B;opacity:.82}
+.cover-rule{position:absolute;left:95px;top:266px;width:68px;height:3px;border-radius:2px;background:#FF647D}
+.cover-lede{position:absolute;left:95px;top:286px;width:452px;font-size:14.4px;line-height:1.5;color:#3B2A6B}
+.cover-lede b{font-weight:700;color:#1D0F44}
+.cover-index{position:absolute;left:95px;top:420px;width:300px}
+.cover-index .idxhead{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:#8A7FA8;margin-bottom:3px}
+.idx{display:flex;align-items:center;gap:11px;width:100%;padding:6.5px 2px;border:0;border-bottom:1px solid rgba(29,15,68,.10);background:transparent;font-family:inherit;cursor:pointer;text-align:left;color:#1D0F44;font-size:15.5px;font-weight:600;transition:color .2s ease,transform .2s ease}
+.idx:hover{color:#C4002E;transform:translateX(3px)}
+.idx .n{font-size:10.5px;font-weight:700;letter-spacing:.05em;color:var(--c,#1D0F44);min-width:21px}
+.idx .t{flex:1;white-space:nowrap}
+.idx .go{opacity:0;transition:opacity .2s ease;color:#C4002E;font-size:13px}
+.idx:hover .go{opacity:1}
+.cover-logos{position:absolute;left:95px;top:624px;display:flex;align-items:center;gap:15px;background:#fff;padding:7px 10px;border-radius:10px;box-shadow:0 2px 12px rgba(20,10,70,.07)}
+.cover-logos img{display:block;width:auto}
+.cover-logos .inst{height:29px}
+.cover-logos .fecit{height:23px}
+.cover-halo{position:absolute;left:592px;top:112px;width:636px;height:552px;border-radius:50%;background:radial-gradient(circle at 50% 46%,rgba(98,152,241,.30),rgba(255,100,125,.13) 47%,rgba(255,100,125,0) 71%);filter:blur(5px);animation:halo 6.5s ease-in-out infinite}
+@keyframes halo{0%,100%{opacity:.78}50%{opacity:1}}
+.cover-brain{position:absolute;left:640px;top:150px;width:580px;height:487px;mix-blend-mode:multiply;z-index:2}
+.syn{position:absolute;left:640px;top:150px;width:580px;height:487px;overflow:visible;pointer-events:none;z-index:3}
+.syn path{fill:none;stroke-linecap:round}
+.syn .base{stroke:rgba(255,255,255,.68);stroke-width:1.5}
+.syn .glow{stroke:rgba(255,100,125,.46);stroke-width:6;filter:url(#sglow)}
+.syn .flow{stroke:#fff;stroke-width:2.4;stroke-dasharray:2 20;animation:flow 2.6s linear infinite;filter:url(#sglow)}
+.syn .flow.b{stroke:#FF647D;stroke-width:2.6;stroke-dasharray:1 27;animation-duration:3.5s;animation-delay:-1.4s}
+.syn .flow.c{stroke:#8FE8FF;stroke-width:2.8;stroke-dasharray:2 34;animation-duration:4.2s;animation-delay:-2.1s;opacity:.9}
+@keyframes flow{to{stroke-dashoffset:-88}}
+.syn .nodo{fill:#fff;stroke:#FF647D;stroke-width:2;transform-box:fill-box;transform-origin:center;animation:nodePulse 2.4s ease-in-out infinite}
+.syn .nodo.g2{animation-delay:-.8s}
+.syn .nodo.g3{animation-delay:-1.6s}
+@keyframes nodePulse{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.3)}}
+.page[data-page="1"] .hot{border:3px solid var(--c,transparent);box-shadow:0 6px 18px rgba(20,10,70,.26),0 0 0 7px rgba(255,255,255,.55)}
+.page[data-page="1"] .hot.pulse{animation:pulseCover 2.8s ease-in-out infinite}
+@keyframes pulseCover{0%,100%{box-shadow:0 6px 18px rgba(20,10,70,.26),0 0 0 7px rgba(255,255,255,.55)}50%{box-shadow:0 6px 18px rgba(20,10,70,.26),0 0 0 7px rgba(255,255,255,.55),0 0 0 16px rgba(255,100,125,.18)}}
+
+/* extra: foto del proceso */
+.photobtn{position:absolute;border-radius:50%;border:3px solid #fff;background-size:cover;background-position:center;cursor:zoom-in;z-index:9;transform:translate(-50%,-50%);box-shadow:0 0 0 4px rgba(255,255,255,.55),0 10px 26px rgba(20,10,70,.30);transition:transform .2s ease,box-shadow .2s ease;animation:photoPulse 2.8s ease-in-out infinite;padding:0}
+.photobtn:hover{transform:translate(-50%,-50%) scale(1.08);box-shadow:0 0 0 4px rgba(255,255,255,.8),0 14px 30px rgba(20,10,70,.4)}
+.photobtn::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:1.6px solid rgba(255,255,255,.9);animation:photoRing 2.6s ease-out infinite}
+@keyframes photoPulse{0%,100%{box-shadow:0 0 0 4px rgba(255,255,255,.55),0 10px 26px rgba(20,10,70,.30)}50%{box-shadow:0 0 0 4px rgba(255,255,255,.55),0 10px 26px rgba(20,10,70,.30),0 0 0 13px rgba(240,112,112,.20)}}
+@keyframes photoRing{0%{transform:scale(.92);opacity:.9}100%{transform:scale(1.32);opacity:0}}
+
+/* cuadro de categorías en el callout */
+.callout .ctable{width:100%;border-collapse:collapse;margin-top:9px;font-size:11.6px;line-height:1.26;color:#fff}
+.callout .ctable th{text-align:left;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;padding:4px 6px;border-bottom:1.5px solid rgba(255,255,255,.7);white-space:nowrap}
+.callout .ctable td{padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.24);vertical-align:top}
+.callout .ctable td.code{white-space:nowrap;font-weight:700;width:74px}
+.callout .ctable td.cat{font-weight:700;width:150px}
+.callout .ctable tr:last-child td{border-bottom:0}
+.callout .ctable-lead{font-size:12.4px;line-height:1.35;margin-bottom:2px}
+
 /* ---------- editor de textos ---------- */
 /* EDITOR:INICIO */
 .editbar{position:absolute;left:96px;top:16px;z-index:60;display:flex;align-items:center;gap:8px}
@@ -275,31 +335,83 @@ body.editing .plus,body.editing .ibadge{pointer-events:none;opacity:.5}
   <!-- ================= PAGE 1 ================= -->
   <section class="page active" data-page="1">
     <div class="card">
-      <h1 class="title">Estamos pensando la ciencia abierta</h1>
-      <p class="subtitle">Diagnóstico de necesidades para impulsar la Ciencia Abierta en la investigación sanitaria</p>
+      <p class="cover-kicker">Fisabio · Unidad de Ciencia Abierta</p>
+      <h1 class="cover-title">Estamos pensando la ciencia abierta</h1>
+      <p class="cover-sub">Taller de diagnóstico participativo · 20 de octubre de 2026</p>
+      <span class="cover-rule"></span>
+      <p class="cover-lede"><b>OpenScience4Health</b> (FCT-25-22602) es un programa de Fisabio, con la UPV y la UV, para incorporar la Ciencia Abierta y los compromisos CoARA en las políticas, estrategias y planes de I+D+i en salud de la Conselleria de Sanitat. En la Semana del Acceso Abierto, 19 personas de nueve instituciones construimos un diagnóstico compartido de necesidades.</p>
 
-      <svg class="wires" viewBox="0 0 1280 720" preserveAspectRatio="none">
-        <line x1="406" y1="280" x2="589" y2="277" pathLength="120" class="draw"/>
-        <line x1="373" y1="421" x2="500" y2="392" pathLength="120" class="draw"/>
-        <line x1="455" y1="563" x2="593" y2="449" pathLength="120" class="draw"/>
-        <line x1="903" y1="288" x2="789" y2="289" pathLength="120" class="draw"/>
-        <line x1="921" y1="459" x2="852" y2="412" pathLength="120" class="draw"/>
+      <div class="cover-index">
+        <p class="idxhead">Recorre el diagnóstico</p>
+        <button class="idx" data-open="m1" style="--c:var(--orange)"><span class="n">01</span><span class="t">El taller</span><span class="go">→</span></button>
+        <button class="idx" data-open="m2" style="--c:var(--red)"><span class="n">02</span><span class="t">Metodología</span><span class="go">→</span></button>
+        <button class="idx" data-open="m3" style="--c:var(--purple)"><span class="n">03</span><span class="t">Participantes</span><span class="go">→</span></button>
+        <button class="idx" data-open="m4" style="--c:var(--pink)"><span class="n">04</span><span class="t">Necesidades</span><span class="go">→</span></button>
+        <button class="idx" data-open="m5" style="--c:var(--green)"><span class="n">05</span><span class="t">Prioridades</span><span class="go">→</span></button>
+      </div>
+
+      <div class="cover-logos">
+        <img class="inst" src="assets/informe/logos-institucionales.jpg" alt="Generalitat Valenciana, Fundació Fisabio, Universitat de València y Universitat Politècnica de València">
+        <img class="fecit" src="assets/informe/logos-fecit.png" alt="Gobierno de España, Ministerio de Ciencia, Innovación y Universidades y FECYT">
+      </div>
+
+      <div class="cover-halo"></div>
+      <img class="brain cover-brain" src="@@brain_cover@@" alt="Cerebro con las cinco áreas del taller conectadas por sinapsis">
+
+      <svg class="syn" viewBox="0 0 580 487" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <filter id="sglow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="2.4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g>
+          <path class="glow" d="M94,200 C150,120 200,82 254,75"/>
+          <path class="glow" d="M254,75 C330,60 380,72 420,93"/>
+          <path class="glow" d="M420,93 C470,120 495,165 491,219"/>
+          <path class="glow" d="M491,219 C460,255 330,275 252,260"/>
+          <path class="glow" d="M252,260 C170,250 120,230 94,200"/>
+          <path class="glow" d="M254,75 C240,150 240,210 252,260"/>
+          <path class="glow" d="M420,93 C380,190 320,240 252,260"/>
+        </g>
+        <g>
+          <path class="base" d="M94,200 C150,120 200,82 254,75"/>
+          <path class="base" d="M254,75 C330,60 380,72 420,93"/>
+          <path class="base" d="M420,93 C470,120 495,165 491,219"/>
+          <path class="base" d="M491,219 C460,255 330,275 252,260"/>
+          <path class="base" d="M252,260 C170,250 120,230 94,200"/>
+          <path class="base" d="M254,75 C240,150 240,210 252,260"/>
+          <path class="base" d="M420,93 C380,190 320,240 252,260"/>
+        </g>
+        <g>
+          <path class="flow" d="M94,200 C150,120 200,82 254,75"/>
+          <path class="flow b" d="M254,75 C330,60 380,72 420,93"/>
+          <path class="flow" d="M420,93 C470,120 495,165 491,219"/>
+          <path class="flow b" d="M491,219 C460,255 330,275 252,260"/>
+          <path class="flow" d="M252,260 C170,250 120,230 94,200"/>
+          <path class="flow b" d="M254,75 C240,150 240,210 252,260"/>
+          <path class="flow" d="M420,93 C380,190 320,240 252,260"/>
+        </g>
+        <g>
+          <path class="flow c" d="M94,200 C150,120 200,82 254,75"/>
+          <path class="flow c" d="M420,93 C470,120 495,165 491,219"/>
+          <path class="flow c" d="M254,75 C240,150 240,210 252,260"/>
+          <path class="flow c" d="M491,219 C460,255 330,275 252,260"/>
+        </g>
+        <g>
+          <circle class="nodo" cx="94" cy="200" r="4.5"/>
+          <circle class="nodo g2" cx="254" cy="75" r="4.5"/>
+          <circle class="nodo g3" cx="420" cy="93" r="4.5"/>
+          <circle class="nodo g2" cx="491" cy="219" r="4.5"/>
+          <circle class="nodo g3" cx="252" cy="260" r="4.5"/>
+        </g>
       </svg>
 
-      <img class="brain" src="@@brain_cover@@" alt="Cerebro con las cinco áreas destacadas"
-           style="left:389px;top:209px;width:516px;height:433px">
-
-      <button class="pill anim" data-open="m2" style="left:101px;top:258px;width:305px;height:44px;--accent:var(--red)"><span>El taller</span></button>
-      <button class="pill anim" data-open="m1" style="left:75px;top:399px;width:298px;height:44px;--accent:var(--orange)"><span>Contexto</span></button>
-      <button class="pill anim" data-open="m5" style="left:185px;top:542px;width:270px;height:43px;--accent:var(--green)"><span>Prioridades</span></button>
-      <button class="pill anim" data-open="m3" style="left:903px;top:266px;width:296px;height:43px;--accent:var(--purple)"><span>Participantes</span></button>
-      <button class="pill anim" data-open="m4" style="left:921px;top:437px;width:296px;height:44px;--accent:var(--pink)"><span>Necesidades</span></button>
-
-      <button class="hot pulse" data-open="m1" style="left:473px;top:387px">1</button>
-      <button class="hot pulse" data-open="m2" style="left:615px;top:276px">2</button>
-      <button class="hot pulse" data-open="m3" style="left:763px;top:292px">3</button>
-      <button class="hot pulse" data-open="m4" style="left:826px;top:404px">4</button>
-      <button class="hot pulse" data-open="m5" style="left:613px;top:440px">5</button>
+      <button class="hot pulse" data-open="m1" style="left:734px;top:350px;--c:var(--orange)">1</button>
+      <button class="hot pulse" data-open="m2" style="left:894px;top:225px;--c:var(--red)">2</button>
+      <button class="hot pulse" data-open="m3" style="left:1060px;top:243px;--c:var(--purple)">3</button>
+      <button class="hot pulse" data-open="m4" style="left:1131px;top:369px;--c:var(--pink)">4</button>
+      <button class="hot pulse" data-open="m5" style="left:892px;top:410px;--c:var(--green)">5</button>
     </div>
   </section>
 
@@ -468,30 +580,31 @@ const TXT = {
 
 const SECTIONS = {
   m1: {
-    color: 'var(--orange)', num: 1, title: 'Contexto del proyecto', text: TXT.proyecto,
+    color: 'var(--orange)', num: 1, title: 'El taller',
+    text: 'El taller tuvo como objetivo general construir un diagnóstico compartido entre los diversos actores del sistema sobre las necesidades prioritarias para implementar la Ciencia Abierta en sus F/IIS biosanitarias.',
     brain: '@@brain_m1@@',
     pills: [
-      { x: 103, y: 250, w: 286, h: 56, num: 1, padLeft: 40, fs: 15, text: 'Fisabio, UPV y UV<br>coordinación y socios' },
-      { x: 103, y: 447, w: 286, h: 56, num: 2, padLeft: 40, fs: 15, text: 'FECYT · convocatoria I+P<br>financiación' },
-      { x: 929, y: 250, w: 286, h: 56, num: 3, padLeft: 40, fs: 15, text: 'Conselleria de Sanitat<br>transferencia' },
-      { x: 929, y: 447, w: 286, h: 56, num: 4, padLeft: 40, fs: 15, text: 'CoARA<br>reforma de la evaluación' }
+      { x: 103, y: 244, w: 292, h: 78, num: 1, padLeft: 36, fs: 12.6, text: 'Identificar necesidades existentes y emergentes en la gestión del conocimiento biomédico y sanitario.' },
+      { x: 103, y: 352, w: 292, h: 78, num: 2, padLeft: 36, fs: 12.6, text: 'Establecer prioridades compartidas entre el personal investigador, gestores y decisores públicos.' },
+      { x: 916, y: 244, w: 292, h: 78, num: 3, padLeft: 36, fs: 12.6, text: 'Analizar las necesidades prioritarias: cómo se manifiestan y explorar los factores causales que las explican.' },
+      { x: 916, y: 352, w: 292, h: 78, num: 4, padLeft: 36, fs: 12.6, text: 'Definir las condiciones indispensables para el cambio organizativo e identificar a los actores clave y alianzas estratégicas necesarias.' }
     ],
-    arrows: [[246, 306, 246, 447], [1072, 306, 1072, 447]],
-    plus: { x: 615, y: 300 },
-    callouts: [{ x: 405, y: 350, w: 470, text: 'Objetivo: estandarizar las prácticas de ciencia abierta en la I+D+i en salud.' }]
+    arrows: [[395, 283, 433, 283], [395, 391, 433, 391], [916, 283, 868, 283], [916, 391, 868, 391]],
+    photoExtra: { x: 473, y: 387, size: 66, src: 'assets/informe/mapa-relevancia.jpg', alt: 'Mapa de relevancia del taller: tarjetas de necesidades sobre la mesa' }
   },
   m2: {
-    color: 'var(--red)', num: 2, title: 'Contexto del taller', text: TXT.taller,
+    color: 'var(--red)', num: 2, title: 'Metodología y diagnóstico de necesidades',
+    text: 'La metodología se estructuró como una dinámica cualitativa de validación y priorización. Como materiales se usaron 25 tarjetas de necesidades por mesa, elementos de votación (gomets) y paneles para la recogida de aportaciones, que facilitaron la sistematización de la información y la organización de los resultados.',
     brain: '@@brain_m2@@',
     pills: [
-      { x: 103, y: 250, w: 286, h: 56, num: 1, padLeft: 40, fs: 15, text: '20-10-2026<br>Jornada de Ciencia Abierta' },
-      { x: 103, y: 447, w: 286, h: 56, num: 2, padLeft: 40, fs: 15, text: '19 personas<br>4 mesas multidisciplinares' },
-      { x: 929, y: 250, w: 286, h: 56, num: 3, padLeft: 40, fs: 15, text: '25 tarjetas<br>6 ejes temáticos' },
-      { x: 929, y: 447, w: 286, h: 56, num: 4, padLeft: 40, fs: 15, text: 'Mapa de relevancia<br>+ 5 votos por persona' }
+      { x: 103, y: 244, w: 292, h: 78, num: 1, padLeft: 36, fs: 12.6, text: 'Valoración grupal de las necesidades de las 25 tarjetas y construcción del mapa de relevancia.' },
+      { x: 103, y: 352, w: 292, h: 78, num: 2, padLeft: 36, fs: 12.6, text: 'Trabajo en grupos para seleccionar las cinco necesidades prioritarias.' },
+      { x: 916, y: 244, w: 292, h: 78, num: 3, padLeft: 36, fs: 12.6, text: 'Priorización global por impacto e identificación de las cuatro necesidades más votadas.' },
+      { x: 916, y: 352, w: 292, h: 78, num: 4, padLeft: 36, fs: 12.6, text: 'Caracterización y puesta en común en plenario, con portavoces, para contrastar visiones y buscar convergencias.' }
     ],
-    arrows: [[246, 306, 246, 447], [1072, 306, 1072, 447]],
-    plus: { x: 615, y: 300 },
-    callouts: [{ x: 405, y: 350, w: 470, text: 'Dos fases: mapa de relevancia grupal y votación individual con cinco gomets por persona. La jornada incluyó la ponencia de Enrique Orduña-Malea (UPV) y la participación del grupo DOCA.' }]
+    arrows: [[395, 283, 433, 283], [395, 391, 433, 391], [916, 283, 868, 283], [916, 391, 868, 391]],
+    plus: { x: 615, y: 276 },
+    callouts: [{ x: 296, y: 318, w: 690, text: '<p class="ctable-lead">Como punto de partida, se preparó un catálogo de 25 necesidades, agrupadas en seis ejes temáticos y presentadas mediante tarjetas codificadas por colores.</p><table class="ctable"><thead><tr><th>Categoría temática</th><th>Código de tarjetas</th><th>Descripción de enfoque</th></tr></thead><tbody><tr><td class="cat">Gobernanza y cultura</td><td class="code">N01–N03</td><td>Liderazgo y cambio de paradigma institucional, planes estratégicos.</td></tr><tr><td class="cat">Recursos y capacidades</td><td class="code">N04–N06</td><td>Financiación dedicada y asignación de personal especializado.</td></tr><tr><td class="cat">Formación e infraestructuras</td><td class="code">N07–N10</td><td>Capacitación, repositorios, plataformas e interoperabilidad.</td></tr><tr><td class="cat">Aspectos legales y éticos</td><td class="code">N11–N14</td><td>Protección y gobernanza de datos, propiedad intelectual, confidencialidad y ética.</td></tr><tr><td class="cat">Incentivos y evaluación</td><td class="code">N15–N18</td><td>Reconocimiento en la carrera científica e indicadores cualitativos CoARA.</td></tr><tr><td class="cat">Participación ciudadana</td><td class="code">N19–N25</td><td>Gobernanza compartida, inclusión de pacientes y ciencia ciudadana.</td></tr></tbody></table>' }]
   },
   m3: {
     color: 'var(--purple)', num: 3, title: 'Participantes', text: TXT.participantes,
@@ -768,6 +881,16 @@ function openModal(key) {
     body.append(a, b);
   }
 
+  if (s.photoExtra) {
+    const ph = s.photoExtra;
+    const p = el('button', 'photobtn', `left:${ph.x}px;top:${ph.y}px;width:${ph.size}px;height:${ph.size}px`);
+    p.style.backgroundImage = `url("${ph.src}")`;
+    p.setAttribute('aria-label', ph.alt || 'Ver la imagen del proceso');
+    p.title = ph.alt || '';
+    p.addEventListener('click', e => { e.stopPropagation(); openLightbox(ph.src, ph.alt); });
+    body.appendChild(p);
+  }
+
   if (s.plus) {
     const p = el('button', 'plus', `left:${s.plus.x}px;top:${s.plus.y}px`);
     p.setAttribute('aria-label', 'Mostrar dato destacado');
@@ -863,7 +986,7 @@ addEventListener('keydown', e => {
 
 /* ======================= editor de textos ======================= */
 /* EDITOR:INICIO */
-const STORE_KEY = 'fisabio-infografia-textos-v1';
+const STORE_KEY = 'fisabio-infografia-textos-v2';
 const editbar = document.getElementById('editbar');
 const edittoggle = document.getElementById('edittoggle');
 
@@ -983,6 +1106,14 @@ document.querySelectorAll('.page .title').forEach(n => textEl(n, 'head.title', n
 document.querySelectorAll('.page .subtitle').forEach(n => textEl(n, 'head.subtitle', n.innerHTML));
 document.querySelectorAll('.page button.pill[data-open] > span').forEach(n => {
   textEl(n, 'cover.' + n.parentElement.dataset.open, n.innerHTML);
+});
+document.querySelectorAll('.page[data-page="1"] .cover-kicker').forEach(n => textEl(n, 'cover.kicker', n.innerHTML));
+document.querySelectorAll('.page[data-page="1"] .cover-title').forEach(n => textEl(n, 'cover.title', n.innerHTML));
+document.querySelectorAll('.page[data-page="1"] .cover-sub').forEach(n => textEl(n, 'cover.sub', n.innerHTML));
+document.querySelectorAll('.page[data-page="1"] .cover-lede').forEach(n => textEl(n, 'cover.lede', n.innerHTML));
+document.querySelectorAll('.page[data-page="1"] .idx').forEach(n => {
+  const t = n.querySelector('.t');
+  if (t) textEl(t, 'cover.idx.' + n.dataset.open, t.innerHTML);
 });
 document.querySelectorAll('.page[data-page="3"] .gtitle').forEach(n => textEl(n, 'gallery.title', n.innerHTML));
 document.querySelectorAll('.page[data-page="3"] .gsub').forEach(n => textEl(n, 'gallery.sub', n.innerHTML));

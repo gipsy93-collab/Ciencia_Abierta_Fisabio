@@ -27,6 +27,17 @@ with sync_playwright() as p:
     check("portada: 4 páginas", page.locator(".page").count() == 4)
     check("portada: paginador 01/04", page.locator("#pager").inner_text().strip() == "01 / 04")
     check("portada: 5 zonas", page.locator(".page.active .hot").count() == 5)
+    check("portada: 5 accesos", page.locator(".page.active .idx").count() == 5)
+    check("portada: título", "Estamos pensando" in page.locator(".cover-title").inner_text())
+    check("portada: cerebro cargado", page.evaluate("document.querySelector('.cover-brain').naturalWidth > 0"))
+    check("portada: logos cargados", page.evaluate("[...document.querySelectorAll('.cover-logos img')].every(i => i.naturalWidth > 0)"))
+    check("portada: sinapsis animadas", page.locator(".syn path.flow").count() >= 7)
+    check("portada: sin desbordamiento", page.evaluate("""() => {
+        const st = document.getElementById('stage').getBoundingClientRect();
+        return [...document.querySelectorAll('.cover-title, .cover-lede, .cover-index, .cover-logos')]
+          .every(n => { const r = n.getBoundingClientRect();
+            return r.left >= st.left - 1 && r.top >= st.top - 1 && r.right <= st.right + 1 && r.bottom <= st.bottom + 1; });
+    }"""))
     page.screenshot(path=str(shots / "p1_portada.png"))
 
     page.evaluate("showPage(1)")
@@ -53,12 +64,32 @@ with sync_playwright() as p:
     }"""))
     page.screenshot(path=str(shots / "p4_documental.png"))
 
+    page.evaluate("openModal('m1')")
+    page.wait_for_timeout(300)
+    check("m1: título El taller", page.locator("#mtitle").inner_text().strip() == "El taller")
+    check("m1: objetivo general", "diagnóstico compartido" in page.locator("#mtext").inner_text())
+    check("m1: 4 objetivos específicos", page.locator("#mbody .pill").count() == 4)
+    check("m1: foto del proceso", page.locator("#mbody .photobtn").count() == 1)
+    check("m1: foto cargada", page.evaluate("getComputedStyle(document.querySelector('#mbody .photobtn')).backgroundImage.includes('mapa-relevancia')"))
+    page.locator("#mbody .photobtn").click()
+    page.wait_for_timeout(300)
+    check("m1: lightbox del proceso", page.locator("#lightbox").evaluate("n => n.classList.contains('open')"))
+    check("m1: imagen del proceso cargada", page.evaluate("document.getElementById('lbimg').naturalWidth > 0"))
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(200)
+    page.screenshot(path=str(shots / "m1_taller.png"))
+    page.evaluate("closeModal()")
+
     page.evaluate("openModal('m2')")
     page.wait_for_timeout(300)
-    check("m2: texto 19 personas", "19 personas" in page.locator("#mtext").inner_text())
+    check("m2: metodología", "validación y priorización" in page.locator("#mtext").inner_text())
+    check("m2: 4 pasos", page.locator("#mbody .pill").count() == 4)
     page.locator("#mbody .plus").click()
-    page.wait_for_timeout(200)
-    check("m2: callout ponencia", "Orduña-Malea" in page.locator("#mbody .callout").first.inner_text())
+    page.wait_for_timeout(250)
+    check("m2: cuadro de categorías", page.locator("#mbody table").count() == 1)
+    check("m2: 6 ejes", page.locator("#mbody table tbody tr").count() == 6)
+    check("m2: gobernanza", "Gobernanza y cultura" in page.locator("#mbody table").inner_text())
+    check("m2: participación", "Participación ciudadana" in page.locator("#mbody table").inner_text())
     page.screenshot(path=str(shots / "m2_taller.png"))
 
     page.evaluate("openModal('m3')")
