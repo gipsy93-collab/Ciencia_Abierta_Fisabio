@@ -6,12 +6,12 @@ Pieza divulgativa del taller de diagnóstico de necesidades del proyecto **OpenS
 - **Portada:** presentación del taller y de su contexto (OpenScience4Health, Semana del Acceso Abierto, 20-10-2026), con el cerebro a la derecha, la energía neuronal entre sus áreas y los logos institucionales. Accesos: El taller · Metodología · Participantes · Necesidades · Prioridades.
 - **El taller (zona 1):** objetivo general y los cuatro objetivos específicos, con una fotografía del proceso en el botón sobre el cerebro.
 - **Metodología (zona 2):** dinámica cualitativa de validación y priorización, materiales de trabajo y el cuadro de las 25 necesidades agrupadas en seis ejes (N01–N25).
+- **Proceso en imágenes (m2b):** galería de las cinco fotografías del taller (tarjetas N15/N19, votación y mesas), con pies editables y lightbox.
 - **Participantes (zona 3):** el botón «+» sobre el cerebro abre la tabla de las 22 personas (19 participantes + 2 observadoras + ponente) acompañada de una fotografía del grupo.
 - **Necesidades (zona 4):** los seis ejes (N01–N25) distribuidos en tarjetas alrededor del cerebro; el botón «+» abre el ranking de las 13 necesidades priorizadas con la imagen del panel grupal.
 - **Prioridades (zona 5):** cuatro botones de categoría (Estrategia 19, Gobernanza 13, Infraestructuras 11 y Financiación 10); cada uno abre su ventana con la plantilla de caracterización y cuatro pestañas: diagnóstico actual, actores clave, transformación requerida y causas subyacentes.
 - **Página 2:** Comentarios y conclusiones · Pasos siguientes (con las 4 conclusiones del informe: financiación continuada, estrategia y estructura, coordinación e interoperabilidad, gobernanza inclusiva; y el insumo directo a la Conselleria de Sanitat / CoARA).
-- **Página 3:** galería del taller en 5 fotografías (con pies editables) y cierre con créditos.
-- **Página 4:** «El diagnóstico, en imágenes»: mapa de relevancia, panel de votación, las cuatro plantillas de caracterización y las bandas de logos.
+- **Agradecimientos (página 3):** cierre con el texto de agradecimiento, la referencia del proyecto y las bandas de logos. Las fotografías ya viven en sus apartados correspondientes (m1, m2b, m3b, m4b y m5a–m5d).
 
 ## Cómo abrirla
 
@@ -31,8 +31,8 @@ Taller-Ciencia-Participativa/
     ├── template.html              ← plantilla con los textos y la composición
     ├── textos.json                ← capa de overrides de textos (build la incrusta)
     ├── build.py                   ← genera el HTML final (Pillow) y sincroniza fotos e informe a dist/
-    ├── verificar_informe.py       ← QA Playwright de la pieza (88 comprobaciones)
-    └── verificar_textos.py        ← QA de textos, editor y salida publicable (71 comprobaciones)
+    ├── verificar_informe.py       ← QA Playwright de la pieza (90 comprobaciones)
+    └── verificar_textos.py        ← QA de textos, editor y salida publicable (75 comprobaciones)
 ```
 
 ## Origen y contenido
@@ -44,5 +44,5 @@ Taller-Ciencia-Participativa/
 ## Pendiente
 
 - Comentarios literales del tramo final del taller (`CONTEXTO TALLER PROYECTO_.md.crdownload`, cortado en «Conclusiones/Comentarios»): se añadirán cuando coordinación disponga del texto (así lo indica Gipsy).
-- Crédito genérico de fotos en pie de galería; fotos sin personas identificables (no requiere consentimiento). Valorar autoría por imagen si Gipsy la aporta.
+- Crédito de las fotografías en sus ventanas; no hay personas identificables (no requiere consentimiento). Valorar autoría por imagen si Gipsy la aporta.
 - Revisión final de textos y contraste antes de la difusión.

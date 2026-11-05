@@ -214,6 +214,32 @@ body{font-family:'Outfit',system-ui,sans-serif}
 body.modal-open .page .gfoot,
 body.modal-open .page .doclogos{opacity:0;pointer-events:none;transition:opacity .2s ease}
 
+/* ---------- cierre y agradecimientos (página 3) ---------- */
+.page[data-page="3"] .card::before{
+  background:
+    radial-gradient(40vw 40vw at 84% 30%,rgba(98,152,241,.16),rgba(98,152,241,0) 70%),
+    radial-gradient(26vw 26vw at 10% 92%,rgba(255,100,125,.12),rgba(255,100,125,0) 72%),
+    linear-gradient(118deg,#FCF8EE 0%,#F8F2E6 54%,#ECE8FA 100%);
+}
+.page[data-page="3"] .closing{color:var(--navy);gap:12px}
+.page[data-page="3"] .closing h2{font-size:84px;color:var(--navy)}
+.page[data-page="3"] .closing p{opacity:1}
+.close-kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:#C4002E}
+.close-lede{font-size:19px;line-height:1.45;max-width:760px;color:var(--navy);opacity:.85;font-weight:500}
+.close-ref{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);opacity:.55;font-weight:600}
+.closelogos{display:flex;align-items:center;gap:18px;background:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 2px 14px rgba(20,10,70,.08);margin-top:2px}
+.closelogos img{display:block;width:auto}
+.closelogos .inst{height:30px}
+.closelogos .fecit{height:24px}
+.close-credit{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--navy);opacity:.55}
+
+/* ---------- galería del proceso (m2b) ---------- */
+.photogrid{position:absolute;left:60px;right:60px;top:205px;bottom:58px;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:190px;gap:14px;overflow:auto}
+.pcell{position:relative;border-radius:9px;overflow:hidden;background:#fff;box-shadow:0 2px 10px rgba(20,10,70,.12);cursor:zoom-in}
+.photogrid .pcell:first-child{grid-column:span 2}
+.pcell img{width:100%;height:100%;object-fit:cover;display:block}
+.pcell figcaption{position:absolute;left:0;right:0;bottom:0;padding:18px 12px 8px;font-size:12.5px;font-weight:600;color:#fff;background:linear-gradient(transparent,rgba(26,13,114,.78))}
+
 /* tablas de modales */
 .tablemode #mbody{position:absolute;left:60px;right:60px;top:205px;bottom:58px;overflow:auto}
 .tablemode #mbody.withphoto{display:flex;gap:26px;align-items:flex-start}
@@ -475,79 +501,18 @@ body.editing .plus,body.editing .ibadge{pointer-events:none;opacity:.5}
   <!-- ================= PAGE 3 ================= -->
   <section class="page" data-page="3">
     <div class="card">
-      <h2 class="gtitle anim">El taller, en imágenes</h2>
-      <p class="gsub anim">Jornada del 20 de octubre de 2026 · Semana del Acceso Abierto.</p>
-
-      <figure class="shot anim" data-foto="mesa" style="left:60px;top:172px;width:378px;height:238px">
-        <img src="assets/fotos/20261020_111352.jpg" alt="Mesa de trabajo con las tarjetas de necesidades desplegadas" style="object-position:50% 62%">
-        <figcaption>Las tarjetas de necesidades en las mesas</figcaption>
-      </figure>
-      <figure class="shot anim" data-foto="n15" style="left:454px;top:172px;width:378px;height:238px">
-        <img src="assets/fotos/20261020_103441.jpg" alt="Tarjeta N15: reconocimiento de la ciencia abierta en la evaluación investigadora">
-        <figcaption>Tarjeta N15 · incentivos y evaluación</figcaption>
-      </figure>
-      <figure class="shot anim" data-foto="n19" style="left:848px;top:172px;width:372px;height:238px">
-        <img src="assets/fotos/20261020_112202.jpg" alt="Tarjeta N19: estructuras estables de participación ciudadana" style="object-position:50% 45%">
-        <figcaption>Tarjeta N19 · participación ciudadana</figcaption>
-      </figure>
-      <figure class="shot anim" data-foto="pizarra" style="left:60px;top:426px;width:570px;height:180px">
-        <img src="assets/fotos/20261020_112557.jpg" alt="Pizarra con las 25 necesidades y la votación con puntos" style="object-position:50% 55%">
-        <figcaption>Las 25 necesidades y la votación con puntos</figcaption>
-      </figure>
-      <figure class="shot anim" data-foto="votos" style="left:646px;top:426px;width:574px;height:180px">
-        <img src="assets/fotos/20261020_112303.jpg" alt="Participante contrastando la votación en la pizarra" style="object-position:50% 58%">
-        <figcaption>Contrastando prioridades en la pizarra</figcaption>
-      </figure>
+      <div class="closing">
+        <p class="close-kicker" data-edit="close.kicker">Agradecimientos</p>
+        <h2 data-edit="close.title">Gracias</h2>
+        <p class="close-lede" data-edit="close.lede">A las 19 personas de las nueve instituciones que participaron en el taller, y a la Conselleria de Sanitat, la EVES, Fisabio, la UPV, la UV y FECYT por hacerlo posible.</p>
+        <p class="close-ref" data-edit="close.ref">Jornada de Ciencia Abierta · Semana del Acceso Abierto · 20 de octubre de 2026</p>
+        <div class="closelogos">
+          <img class="inst" src="assets/informe/logos-institucionales.jpg" alt="Generalitat Valenciana, Fundació Fisabio, Universitat de València y Universitat Politècnica de València">
+          <img class="fecit" src="assets/informe/logos-fecit.png" alt="Gobierno de España, Ministerio de Ciencia, Innovación y Universidades y FECYT">
+        </div>
+        <p class="close-credit" data-edit="close.credit">Fisabio · UPV · UV · FECYT</p>
+      </div>
     </div>
-
-    <div class="gfoot">
-      <span class="gthx" data-edit="close.title">Gracias</span>
-      <span class="gsub2" data-edit="close.sub">OpenScience4Health · FCT-25-22602</span>
-      <span class="credits" data-edit="close.credits">Fisabio · UPV · UV · FECYT</span>
-    </div>
-  </section>
-
-  <!-- ================= PAGE 4 ================= -->
-  <section class="page" data-page="4">
-    <div class="card">
-      <h2 class="gtitle anim">El diagnóstico, en imágenes</h2>
-      <p class="gsub anim">Mapa de relevancia, panel de votación y las cuatro plantillas · 20 de octubre de 2026.</p>
-
-      <figure class="shot anim" data-foto="mapa" style="left:60px;top:172px;width:566px;height:230px">
-        <img src="assets/informe/mapa-relevancia.jpg" alt="Mapa de relevancia con las tarjetas de necesidades sobre la mesa" style="object-position:50% 55%">
-        <figcaption>Mapa de relevancia</figcaption>
-      </figure>
-      <figure class="shot anim" data-foto="panel" style="left:654px;top:172px;width:566px;height:230px">
-        <img src="assets/informe/panel-grupal.jpg" alt="Panel grupal de priorización con las tarjetas y los votos" style="object-position:50% 50%">
-        <figcaption>Panel grupal de priorización</figcaption>
-      </figure>
-
-      <figure class="shot anim" data-foto="financiacion" style="left:60px;top:420px;width:270px;height:188px">
-        <img src="assets/informe/plantilla-financiacion.jpg" alt="Plantilla de caracterización: financiación estable">
-        <figcaption>Financiación estable</figcaption>
-      </figure>
-      <figure class="shot anim" data-foto="estrategia" style="left:350px;top:420px;width:270px;height:188px">
-        <img src="assets/informe/plantilla-estrategia.jpg" alt="Plantilla de caracterización: estrategia institucional">
-        <figcaption>Estrategia institucional</figcaption>
-      </figure>
-      <figure class="shot anim" data-foto="infraestructuras" style="left:640px;top:420px;width:270px;height:188px">
-        <img src="assets/informe/plantilla-infraestructuras.jpg" alt="Plantilla de caracterización: infraestructuras tecnológicas">
-        <figcaption>Infraestructuras tecnológicas</figcaption>
-      </figure>
-      <figure class="shot anim" data-foto="gobernanza" style="left:930px;top:420px;width:270px;height:188px">
-        <img src="assets/informe/plantilla-gobernanza.jpg" alt="Plantilla de caracterización: gobernanza compartida">
-        <figcaption>Gobernanza compartida</figcaption>
-      </figure>
-    </div>
-
-    <div class="gfoot">
-      <span class="gthx" data-edit="close.title">Gracias</span>
-      <span class="gsub2" data-edit="close.sub">OpenScience4Health · FCT-25-22602</span>
-      <span class="credits" data-edit="close.credits">Fisabio · UPV · UV · FECYT</span>
-    </div>
-
-    <img class="doclogos" src="assets/informe/logos-institucionales.jpg" alt="Logos de Generalitat Valenciana, Fisabio, Metodologías Participativas y FECYT" style="left:60px;top:622px;height:26px">
-    <img class="doclogos" src="assets/informe/logos-fecit.png" alt="Logos del Gobierno de España y FECYT" style="right:60px;top:616px;height:32px">
   </section>
 
   <!-- ================= MODAL ================= -->
@@ -636,7 +601,20 @@ const SECTIONS = {
     ],
     arrows: [[395, 283, 433, 283], [395, 391, 433, 391], [916, 283, 868, 283], [916, 391, 868, 391]],
     plus: { x: 615, y: 276 },
-    callouts: [{ x: 296, y: 318, w: 690, text: '<p class="ctable-lead">Como punto de partida, se preparó un catálogo de 25 necesidades, agrupadas en seis ejes temáticos y presentadas mediante tarjetas codificadas por colores.</p><table class="ctable"><thead><tr><th>Categoría temática</th><th>Código de tarjetas</th><th>Descripción de enfoque</th></tr></thead><tbody><tr><td class="cat">Gobernanza y cultura</td><td class="code">N01–N03</td><td>Liderazgo y cambio de paradigma institucional, planes estratégicos.</td></tr><tr><td class="cat">Recursos y capacidades</td><td class="code">N04–N06</td><td>Financiación dedicada y asignación de personal especializado.</td></tr><tr><td class="cat">Formación e infraestructuras</td><td class="code">N07–N10</td><td>Capacitación, repositorios, plataformas e interoperabilidad.</td></tr><tr><td class="cat">Aspectos legales y éticos</td><td class="code">N11–N14</td><td>Protección y gobernanza de datos, propiedad intelectual, confidencialidad y ética.</td></tr><tr><td class="cat">Incentivos y evaluación</td><td class="code">N15–N18</td><td>Reconocimiento en la carrera científica e indicadores cualitativos CoARA.</td></tr><tr><td class="cat">Participación ciudadana</td><td class="code">N19–N25</td><td>Gobernanza compartida, inclusión de pacientes y ciencia ciudadana.</td></tr></tbody></table>' }]
+    callouts: [{ x: 296, y: 318, w: 690, text: '<p class="ctable-lead">Como punto de partida, se preparó un catálogo de 25 necesidades, agrupadas en seis ejes temáticos y presentadas mediante tarjetas codificadas por colores.</p><table class="ctable"><thead><tr><th>Categoría temática</th><th>Código de tarjetas</th><th>Descripción de enfoque</th></tr></thead><tbody><tr><td class="cat">Gobernanza y cultura</td><td class="code">N01–N03</td><td>Liderazgo y cambio de paradigma institucional, planes estratégicos.</td></tr><tr><td class="cat">Recursos y capacidades</td><td class="code">N04–N06</td><td>Financiación dedicada y asignación de personal especializado.</td></tr><tr><td class="cat">Formación e infraestructuras</td><td class="code">N07–N10</td><td>Capacitación, repositorios, plataformas e interoperabilidad.</td></tr><tr><td class="cat">Aspectos legales y éticos</td><td class="code">N11–N14</td><td>Protección y gobernanza de datos, propiedad intelectual, confidencialidad y ética.</td></tr><tr><td class="cat">Incentivos y evaluación</td><td class="code">N15–N18</td><td>Reconocimiento en la carrera científica e indicadores cualitativos CoARA.</td></tr><tr><td class="cat">Participación ciudadana</td><td class="code">N19–N25</td><td>Gobernanza compartida, inclusión de pacientes y ciencia ciudadana.</td></tr></tbody></table>' }],
+    more: { x: 97, y: 620, text: 'Ver el proceso en imágenes →', target: 'm2b' }
+  },
+  m2b: {
+    color: 'var(--red)', num: 2, title: 'El proceso, en imágenes',
+    text: 'Cinco fotografías del taller: las tarjetas de necesidades, la votación y el trabajo en las mesas.',
+    noBrain: true, back: 'm2',
+    photos: [
+      { src: 'assets/fotos/20261020_111352.jpg', alt: 'Mesa de trabajo con las tarjetas de necesidades desplegadas', caption: 'Las tarjetas de necesidades en las mesas' },
+      { src: 'assets/fotos/20261020_103441.jpg', alt: 'Tarjeta N15: reconocimiento de la ciencia abierta en la evaluación investigadora', caption: 'Tarjeta N15 · incentivos y evaluación' },
+      { src: 'assets/fotos/20261020_112202.jpg', alt: 'Tarjeta N19: estructuras estables de participación ciudadana', caption: 'Tarjeta N19 · participación ciudadana' },
+      { src: 'assets/fotos/20261020_112557.jpg', alt: 'Pizarra con las 25 necesidades y la votación con puntos', caption: 'Las 25 necesidades y la votación con puntos' },
+      { src: 'assets/fotos/20261020_112303.jpg', alt: 'Participante contrastando la votación en la pizarra', caption: 'Contrastando prioridades en la pizarra' }
+    ]
   },
   m3: {
     color: 'var(--purple)', num: 3, title: 'Participantes', text: TXT.participantes,
@@ -984,6 +962,23 @@ function openModal(key) {
     show(0);
   }
 
+  if (s.photos) {
+    const grid = el('div', 'photogrid');
+    s.photos.forEach((ph, i) => {
+      const fig = el('figure', 'pcell');
+      const im = el('img');
+      im.src = ph.src;
+      im.alt = ph.alt || '';
+      im.title = 'Ampliar imagen';
+      im.addEventListener('click', () => openLightbox(ph.src, ph.alt));
+      const cap = el('figcaption');
+      textEl(cap, `sec.${key}.foto.${i}.cap`, ph.caption || '');
+      fig.append(im, cap);
+      grid.appendChild(fig);
+    });
+    body.appendChild(grid);
+  }
+
   (s.pills || []).forEach((p, i) => {
     const d = el(p.open ? 'button' : 'div', 'pill small' + (p.num ? ' numbered' : '') + (p.open ? ' link' : ''), `left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px`);
     if (p.open) { d.type = 'button'; d.dataset.open = p.open; }
@@ -1220,7 +1215,7 @@ function exportFinal() {
   clear('mback', n => { n.style.display = 'none'; n.removeAttribute('data-open'); });
   clear('modal', n => n.classList.remove('open'));
   clear('stage', n => n.removeAttribute('style'));
-  clear('pager', n => { n.textContent = '01 / 04'; });
+  clear('pager', n => { n.textContent = '01 / 03'; });
   clear('prev', n => n.setAttribute('disabled', ''));
   clear('next', n => n.removeAttribute('disabled'));
   clear('lightbox', n => n.classList.remove('open'));
@@ -1255,14 +1250,9 @@ document.querySelectorAll('.page[data-page="1"] .idx').forEach(n => {
   const t = n.querySelector('.t');
   if (t) textEl(t, 'cover.idx.' + n.dataset.open, t.innerHTML);
 });
-document.querySelectorAll('.page[data-page="3"] .gtitle').forEach(n => textEl(n, 'gallery.title', n.innerHTML));
-document.querySelectorAll('.page[data-page="3"] .gsub').forEach(n => textEl(n, 'gallery.sub', n.innerHTML));
-document.querySelectorAll('.page[data-page="4"] .gtitle').forEach(n => textEl(n, 'doc.title', n.innerHTML));
-document.querySelectorAll('.page[data-page="4"] .gsub').forEach(n => textEl(n, 'doc.sub', n.innerHTML));
-document.querySelectorAll('.shot figcaption').forEach(n => {
-  textEl(n, 'foto.' + n.parentElement.dataset.foto + '.cap', n.innerHTML);
+document.querySelectorAll('.page[data-page="3"] .closing [data-edit]').forEach(n => {
+  textEl(n, n.dataset.edit, n.innerHTML);
 });
-document.querySelectorAll('.gfoot [data-edit]').forEach(n => textEl(n, n.dataset.edit, n.innerHTML));
 
 edittoggle.addEventListener('click', () => setEditing(!editing));
 document.getElementById('editexport').addEventListener('click', exportStore);

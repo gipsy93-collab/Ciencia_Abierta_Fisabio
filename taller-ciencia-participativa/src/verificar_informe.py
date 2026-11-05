@@ -24,8 +24,8 @@ with sync_playwright() as p:
     page.on("pageerror", lambda e: errs.append(str(e)))
     page.goto(url, wait_until="networkidle")
 
-    check("portada: 4 páginas", page.locator(".page").count() == 4)
-    check("portada: paginador 01/04", page.locator("#pager").inner_text().strip() == "01 / 04")
+    check("portada: 3 páginas", page.locator(".page").count() == 3)
+    check("portada: paginador 01/03", page.locator("#pager").inner_text().strip() == "01 / 03")
     check("portada: 5 zonas", page.locator(".page.active .hot").count() == 5)
     check("portada: 5 accesos", page.locator(".page.active .idx").count() == 5)
     check("portada: título", "Estamos pensando" in page.locator(".cover-title").inner_text())
@@ -45,24 +45,18 @@ with sync_playwright() as p:
     check("p2: 2 zonas", page.locator(".page.active .hot").count() == 2)
     page.evaluate("showPage(2)")
     page.wait_for_timeout(700)
-    check("p3: 5 fotos", page.locator(".page.active .shot").count() == 5)
-    check("p3: fotos cargadas", page.evaluate("[...document.querySelectorAll('.page.active .shot img')].every(i => i.naturalWidth > 0)"))
-    page.screenshot(path=str(shots / "p3_galeria.png"))
-
-    page.evaluate("showPage(3)")
-    page.wait_for_timeout(700)
-    check("p4: 6 imágenes", page.locator(".page.active .shot").count() == 6)
-    check("p4: imágenes cargadas", page.evaluate("[...document.querySelectorAll('.page.active .shot img')].every(i => i.naturalWidth > 0)"))
-    check("p4: 2 logos", page.locator(".page.active .doclogos").count() == 2)
-    check("p4: logos cargados", page.evaluate("[...document.querySelectorAll('.page.active .doclogos')].every(i => i.naturalWidth > 0)"))
-    check("p4: título", page.locator(".page.active .gtitle").inner_text().strip() == "El diagnóstico, en imágenes")
-    check("p4: sin desbordamiento", page.evaluate("""() => {
+    check("p3: cierre", page.locator(".page.active .closing h2").inner_text().strip() == "Gracias")
+    check("p3: agradecimientos", page.locator(".page.active .close-kicker").inner_text().strip().lower() == "agradecimientos")
+    check("p3: 2 logos", page.locator(".page.active .closelogos img").count() == 2)
+    check("p3: logos cargados", page.evaluate("[...document.querySelectorAll('.page.active .closelogos img')].every(i => i.naturalWidth > 0)"))
+    check("p3: paginador oculto", page.evaluate("getComputedStyle(document.getElementById('pager')).opacity") == "0")
+    check("p3: sin desbordamiento", page.evaluate("""() => {
         const st = document.getElementById('stage').getBoundingClientRect();
-        return [...document.querySelectorAll('.page.active .shot, .page.active .doclogos, .page.active .gfoot')]
+        return [...document.querySelectorAll('.page.active .closing, .page.active .closelogos, .page.active .close-lede')]
           .every(n => { const r = n.getBoundingClientRect();
             return r.left >= st.left - 1 && r.top >= st.top - 1 && r.right <= st.right + 1 && r.bottom <= st.bottom + 1; });
     }"""))
-    page.screenshot(path=str(shots / "p4_documental.png"))
+    page.screenshot(path=str(shots / "p3_agradecimientos.png"))
 
     page.evaluate("openModal('m1')")
     page.wait_for_timeout(300)
@@ -91,6 +85,24 @@ with sync_playwright() as p:
     check("m2: gobernanza", "Gobernanza y cultura" in page.locator("#mbody table").inner_text())
     check("m2: participación", "Participación ciudadana" in page.locator("#mbody table").inner_text())
     page.screenshot(path=str(shots / "m2_taller.png"))
+
+    page.locator("#mbody .morebtn").click()
+    page.wait_for_timeout(400)
+    check("m2b: galería del proceso", page.locator("#mbody .pcell").count() == 5)
+    check("m2b: fotos cargadas", page.evaluate("[...document.querySelectorAll('#mbody .pcell img')].every(i => i.naturalWidth > 0)"))
+    check("m2b: pies", page.locator("#mbody .pcell figcaption").count() == 5)
+    check("m2b: tarjeta N15", "N15" in page.locator("#mbody .pcell figcaption").nth(1).inner_text())
+    page.screenshot(path=str(shots / "m2b_proceso.png"))
+    page.locator("#mbody .pcell img").first.click()
+    page.wait_for_timeout(300)
+    check("m2b: lightbox", page.locator("#lightbox").evaluate("n => n.classList.contains('open')"))
+    check("m2b: imagen lightbox", page.evaluate("document.getElementById('lbimg').naturalWidth > 0"))
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(200)
+    page.locator("#mback").click()
+    page.wait_for_timeout(300)
+    check("m2b: volver a m2", page.locator("#mtitle").inner_text().strip() == "Metodología y diagnóstico de necesidades")
+    page.evaluate("closeModal()")
 
     page.evaluate("openModal('m3')")
     page.wait_for_timeout(300)
@@ -197,16 +209,6 @@ with sync_playwright() as p:
     check("p2m2: pasos", "codiseño" in page.locator("#mtext").inner_text())
     page.screenshot(path=str(shots / "p2m2_pasos.png"))
 
-    page.evaluate("closeModal(); showPage(3)")
-    page.wait_for_timeout(300)
-    page.locator(".page.active .shot img").first.click()
-    page.wait_for_timeout(250)
-    check("lightbox: abierto", page.locator("#lightbox").evaluate("n => n.classList.contains('open')"))
-    check("lightbox: imagen cargada", page.evaluate("document.getElementById('lbimg').naturalWidth > 0"))
-    page.keyboard.press("Escape")
-    page.wait_for_timeout(200)
-    check("lightbox: cerrado con Esc", page.locator("#lightbox").evaluate("n => !n.classList.contains('open')"))
-
     check("0 errores de consola", len(errs) == 0, str(errs[:2]))
     page.close()
     b.close()
@@ -217,3 +219,4 @@ if fallos:
     print("FALLOS:", ", ".join(fallos))
     raise SystemExit(1)
 print("INFORME INTEGRADO TODO OK")
+
