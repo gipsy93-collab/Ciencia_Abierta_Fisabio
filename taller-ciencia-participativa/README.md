@@ -19,6 +19,8 @@ Doble clic en `Taller-Ciencia-Participativa.html` (requiere las carpetas `assets
 
 Navegación: flechas inferiores o teclado (`←` `→`); las ventanas se cierran con la `X`, `Esc` o el marco azul.
 
+**Teclado:** `←`/`A` y `→`/`D` cambian de página; `↑`/`↓` recorren las zonas; `W` abre la zona enfocada; `X` vuelve o cierra; en Prioridades, `A`/`D` cambian de categoría o de pestaña; `Tab` mantiene el foco dentro de la ventana; `Esc` cierra. Las fotos son enfocables y se amplían con `W` o `Enter`.
+
 ## Estructura
 
 ```
@@ -32,7 +34,8 @@ Taller-Ciencia-Participativa/
     ├── textos.json                ← capa de overrides de textos (build la incrusta)
     ├── build.py                   ← genera el HTML final (Pillow) y sincroniza fotos e informe a dist/
     ├── verificar_informe.py       ← QA Playwright de la pieza (90 comprobaciones)
-    └── verificar_textos.py        ← QA de textos, editor y salida publicable (75 comprobaciones)
+    ├── verificar_textos.py        ← QA de textos, editor y salida publicable (75 comprobaciones)
+    └── verificar_teclado.py       ← QA de navegación por teclado y foco (31 comprobaciones)
 ```
 
 ## Origen y contenido

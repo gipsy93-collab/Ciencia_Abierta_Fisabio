@@ -64,6 +64,8 @@ body{font-family:'Outfit',system-ui,sans-serif}
   transition:opacity .25s ease,transform .25s ease;
 }
 .hot:hover{transform:translate(-50%,-50%) scale(1.12);box-shadow:0 10px 24px rgba(20,10,70,.3);filter:saturate(1.08)}
+.hot:focus-visible,.hot.keyfocus,.pill:focus-visible,.pill.link.keyfocus,.idx:focus-visible,.dimtab:focus-visible,.morebtn:focus-visible,.photobtn:focus-visible{outline:3px solid #1D0F44;outline-offset:4px}
+.mphoto img:focus-visible,.pcell img:focus-visible{outline:3px solid #1D0F44;outline-offset:3px;border-radius:9px}
 .hot:hover::after{opacity:.55;transform:scale(1.18)}
 .hot:active{transform:translate(-50%,-50%) scale(.96)}
 .hot.pulse{animation:pulse 2.8s ease-in-out infinite}
@@ -516,9 +518,9 @@ body.editing .plus,body.editing .ibadge{pointer-events:none;opacity:.5}
   </section>
 
   <!-- ================= MODAL ================= -->
-  <div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="modal" id="modal" role="dialog" aria-modal="true" inert aria-hidden="true">
     <div class="card" id="modalCard">
-      <button class="close" id="close" aria-label="Cerrar">
+      <button class="close" id="close" aria-label="Cerrar" aria-keyshortcuts="Escape X">
         <svg viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
       </button>
       <button class="backbtn" id="mback">← Volver</button>
@@ -554,10 +556,10 @@ body.editing .plus,body.editing .ibadge{pointer-events:none;opacity:.5}
 
   <div class="pager" id="pager">01 / 03</div>
   <nav class="nav">
-    <button class="navbtn" id="prev" aria-label="Página anterior">
+    <button class="navbtn" id="prev" aria-label="Página anterior" aria-keyshortcuts="ArrowLeft A">
       <svg viewBox="0 0 24 24"><polyline points="15 5 8 12 15 19"/></svg>
     </button>
-    <button class="navbtn" id="next" aria-label="Página siguiente">
+    <button class="navbtn" id="next" aria-label="Página siguiente" aria-keyshortcuts="ArrowRight D">
       <svg viewBox="0 0 24 24"><polyline points="9 5 16 12 9 19"/></svg>
     </button>
   </nav>
@@ -811,7 +813,7 @@ const stage = document.getElementById('stage');
 const pages = [...document.querySelectorAll('.page')];
 const modal = document.getElementById('modal');
 const mCard = document.getElementById('modalCard');
-let current = 0, openKey = null;
+let current = 0, openKey = null, hotIndex = -1;
 
 function resize() {
   const s = Math.min(innerWidth / 1280, innerHeight / 720);
@@ -826,6 +828,7 @@ function showPage(i) {
   document.getElementById('next').disabled = current === pages.length - 1;
   document.getElementById('pager').textContent = `0${current + 1} / 0${pages.length}`;
   document.getElementById('pager').style.opacity = current === pages.length - 1 ? 0 : '';
+  resetHotFocus();
 }
 
 /* ======================= modal ======================= */
@@ -842,7 +845,13 @@ function photoFigure(ph) {
   im.src = ph.src;
   im.alt = ph.alt || '';
   im.title = 'Ampliar imagen';
+  im.tabIndex = 0;
+  im.setAttribute('role', 'button');
+  im.setAttribute('aria-label', 'Ampliar: ' + (ph.alt || ph.caption || 'imagen'));
   im.addEventListener('click', () => openLightbox(ph.src, ph.alt));
+  im.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); im.click(); }
+  });
   const cap = el('figcaption');
   cap.textContent = ph.caption || '';
   fig.append(im, cap);
@@ -970,7 +979,13 @@ function openModal(key) {
       im.src = ph.src;
       im.alt = ph.alt || '';
       im.title = 'Ampliar imagen';
+      im.tabIndex = 0;
+      im.setAttribute('role', 'button');
+      im.setAttribute('aria-label', 'Ampliar: ' + (ph.alt || ph.caption || 'imagen'));
       im.addEventListener('click', () => openLightbox(ph.src, ph.alt));
+      im.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); im.click(); }
+      });
       const cap = el('figcaption');
       textEl(cap, `sec.${key}.foto.${i}.cap`, ph.caption || '');
       fig.append(im, cap);
@@ -1071,12 +1086,26 @@ function openModal(key) {
     wires.appendChild(line);
   });
 
+  modal.inert = false;
+  modal.setAttribute('aria-hidden', 'false');
   modal.classList.add('open');
   document.body.classList.add('modal-open');
   if (onRender) onRender(mCard);
+  const focusTarget = mCard.querySelector('.dimtab.on') ||
+    mCard.querySelector('#mbody .pill.link') ||
+    mCard.querySelector('#mbody .pcell img') ||
+    mCard.querySelector('#mbody .photobtn') ||
+    mCard.querySelector('#mbody .plus') ||
+    mCard.querySelector('#mbody .morebtn') ||
+    (s.back ? back : document.getElementById('close'));
+  if (focusTarget) setTimeout(() => {
+    try { focusTarget.focus({ preventScroll: true }); } catch (err) {}
+  }, 30);
 }
 function closeModal() {
   modal.classList.remove('open');
+  modal.inert = true;
+  modal.setAttribute('aria-hidden', 'true');
   document.body.classList.remove('modal-open');
   openKey = null;
 }
@@ -1088,10 +1117,12 @@ const lbimg = document.getElementById('lbimg');
 function openLightbox(src, alt) {
   lbimg.src = src;
   lbimg.alt = alt || '';
+  lightbox.setAttribute('aria-hidden', 'false');
   lightbox.classList.add('open');
 }
 function closeLightbox() {
   lightbox.classList.remove('open');
+  lightbox.setAttribute('aria-hidden', 'true');
   lbimg.removeAttribute('src');
 }
 document.querySelectorAll('.shot img').forEach(img => {
@@ -1110,13 +1141,117 @@ document.addEventListener('click', e => {
 document.getElementById('prev').addEventListener('click', () => showPage(current - 1));
 document.getElementById('next').addEventListener('click', () => showPage(current + 1));
 
+/* ======================= teclado ======================= */
+function pageHotspots() {
+  return [...document.querySelectorAll('.page.active .hot')];
+}
+
+function resetHotFocus() {
+  hotIndex = -1;
+  document.querySelectorAll('.hot.keyfocus').forEach(n => n.classList.remove('keyfocus'));
+  const ae = document.activeElement;
+  if (ae && ae.closest && ae.closest('.page') && !ae.closest('.nav')) ae.blur();
+}
+
+function focusHot(dir) {
+  const hs = pageHotspots();
+  if (!hs.length) return;
+  hotIndex = hotIndex < 0 ? (dir > 0 ? 0 : hs.length - 1) : (hotIndex + dir + hs.length) % hs.length;
+  hs.forEach(h => h.classList.remove('keyfocus'));
+  hs[hotIndex].classList.add('keyfocus');
+  hs[hotIndex].focus({ preventScroll: true });
+}
+
+function cyclePanel(dir) {
+  const tabs = [...document.querySelectorAll('#mbody .dimtab')];
+  if (tabs.length) {
+    const i = Math.max(0, tabs.findIndex(t => t.classList.contains('on')));
+    const next = tabs[(i + dir + tabs.length) % tabs.length];
+    next.click();
+    next.focus({ preventScroll: true });
+    return true;
+  }
+  const items = [...document.querySelectorAll('#mbody .pill.link, #mbody .pcell img')];
+  if (!items.length) return false;
+  const at = items.indexOf(document.activeElement);
+  const next = items[at < 0 ? (dir > 0 ? 0 : items.length - 1) : (at + dir + items.length) % items.length];
+  next.focus({ preventScroll: true });
+  return true;
+}
+
+function modalFocusables() {
+  return [...document.querySelectorAll('#modal button, #modal [data-open], #modal [role="button"], #modal [tabindex="0"]')]
+    .filter(n => !n.disabled && n.tabIndex !== -1 && n.getClientRects().length);
+}
+
+function trapFocus(e) {
+  const f = modalFocusables();
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  const ae = document.activeElement;
+  if (e.shiftKey && ae === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && ae === last) { e.preventDefault(); first.focus(); }
+  else if (!ae || !ae.closest || !ae.closest('#modal')) { e.preventDefault(); first.focus(); }
+}
+
+function activateFocused() {
+  const ae = document.activeElement;
+  if (ae && ae !== document.body && typeof ae.click === 'function' && ae.closest &&
+      (ae.closest('#modal') || ae.closest('.page.active'))) {
+    ae.click();
+    return true;
+  }
+  if (!openKey) {
+    const first = document.querySelector('.page.active .hot');
+    if (first) { first.click(); return true; }
+  }
+  return false;
+}
+
+function goBack() {
+  if (openKey) {
+    const back = document.getElementById('mback');
+    if (back && back.dataset.open) { back.click(); return; }
+    closeModal();
+    return;
+  }
+  showPage(current - 1);
+}
+
 addEventListener('keydown', e => {
-  if (e.key === 'Escape' && lightbox.classList.contains('open')) return closeLightbox();
-  if (e.key === 'Escape' && openKey) return closeModal();
+  if (lightbox.classList.contains('open')) {
+    if (e.key === 'Tab') { e.preventDefault(); return; }
+    if (['Escape','x','X','ArrowDown','ArrowUp','ArrowLeft','ArrowRight','a','A','d','D','w','W'].includes(e.key)) {
+      e.preventDefault();
+      closeLightbox();
+    }
+    return;
+  }
   if (editing) return;
-  if (openKey) return;
-  if (e.key === 'ArrowRight') showPage(current + 1);
-  if (e.key === 'ArrowLeft') showPage(current - 1);
+
+  const k = e.key;
+  if (openKey && k === 'Tab') { trapFocus(e); return; }
+  const isA = k === 'a' || k === 'A';
+  const isD = k === 'd' || k === 'D';
+  const isW = k === 'w' || k === 'W';
+  const isX = k === 'x' || k === 'X';
+
+  if (openKey) {
+    if (k === 'Escape') { e.preventDefault(); closeModal(); return; }
+    if (isX) { e.preventDefault(); goBack(); return; }
+    if (k === 'ArrowLeft' || isA) { if (cyclePanel(-1)) { e.preventDefault(); return; } }
+    if (k === 'ArrowRight' || isD) { if (cyclePanel(1)) { e.preventDefault(); return; } }
+    if (k === 'ArrowUp' || isW) { if (activateFocused()) { e.preventDefault(); return; } }
+    return;
+  }
+
+  if (k === 'Escape') return;
+  if (k === 'ArrowLeft' || isA) { e.preventDefault(); showPage(current - 1); return; }
+  if (k === 'ArrowRight' || isD) { e.preventDefault(); showPage(current + 1); return; }
+  if (k === 'ArrowUp') { e.preventDefault(); focusHot(-1); return; }
+  if (k === 'ArrowDown') { e.preventDefault(); focusHot(1); return; }
+  if (isW) { e.preventDefault(); activateFocused(); return; }
+  if (isX) { e.preventDefault(); goBack(); return; }
 });
 
 /* ======================= editor de textos ======================= */
