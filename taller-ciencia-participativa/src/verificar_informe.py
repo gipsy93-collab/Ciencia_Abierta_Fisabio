@@ -142,12 +142,50 @@ with sync_playwright() as p:
 
     page.evaluate("openModal('m5')")
     page.wait_for_timeout(300)
-    check("m5: texto prioridades", "13 quedaron priorizadas" in page.locator("#mtext").inner_text())
-    page.locator("#mbody .plus").click()
-    page.wait_for_timeout(250)
-    check("m5: dos callouts", page.locator("#mbody .callout.show").count() == 2)
-    check("m5: callout votos", "estrategia (19)" in page.locator("#mbody .callout").first.inner_text())
+    check("m5: texto prioridades", "cuatro dimensiones" in page.locator("#mtext").inner_text())
+    check("m5: sin plus", page.locator("#mbody .plus").count() == 0)
+    check("m5: sin callouts", page.locator("#mbody .callout").count() == 0)
+    check("m5: 4 categorías", page.locator("#mbody .pill.link").count() == 4)
+    check("m5: accesos correctos", page.evaluate("[...document.querySelectorAll('#mbody .pill.link')].map(n => n.dataset.open).join(',')") == "m5a,m5d,m5b,m5c")
+    check("m5: categorías sin solape", page.evaluate("""() => {
+        const r = [...document.querySelectorAll('#mbody .pill')].map(n => n.getBoundingClientRect());
+        for (let i = 0; i < r.length; i++) for (let j = i + 1; j < r.length; j++) {
+            if (r[i].left < r[j].right - 1 && r[j].left < r[i].right - 1 &&
+                r[i].top < r[j].bottom - 1 && r[j].top < r[i].bottom - 1) return false;
+        }
+        return true;
+    }"""))
     page.screenshot(path=str(shots / "m5_prioridades.png"))
+
+    page.locator("#mbody .pill.link").first.click()
+    page.wait_for_timeout(350)
+    check("m5a: título", page.locator("#mtitle").inner_text().strip() == "Estrategia institucional")
+    check("m5a: 4 dimensiones", page.locator("#mbody .dimtab").count() == 4)
+    check("m5a: diagnóstico", "ENCA" in page.locator("#mbody .dimcontent p[data-edit]").inner_text())
+    check("m5a: pregunta", "¿Qué está pasando?" in page.locator("#mbody .dq").inner_text())
+    check("m5a: foto plantilla", page.evaluate("document.querySelector('#mbody .mphoto img').naturalWidth > 0"))
+    page.locator("#mbody .dimtab").nth(2).click()
+    page.wait_for_timeout(250)
+    check("m5a: pestaña transformación", "Transformación requerida" in page.locator("#mbody .dimcontent h3").inner_text())
+    check("m5a: texto transformación", "intercambio" in page.locator("#mbody .dimcontent p[data-edit]").inner_text())
+    page.screenshot(path=str(shots / "m5a_estrategia.png"))
+    page.locator("#mback").click()
+    page.wait_for_timeout(300)
+    check("m5a: volver a m5", page.locator("#mtitle").inner_text().strip() == "Temáticas priorizadas")
+
+    for key, title, needle in [
+        ("m5b", "Gobernanza compartida", "asociaciones"),
+        ("m5c", "Infraestructuras tecnológicas", "esfuerzos aislados"),
+        ("m5d", "Financiación estable", "partidas"),
+    ]:
+        page.evaluate(f"openModal('{key}')")
+        page.wait_for_timeout(250)
+        check(f"{key}: título", page.locator("#mtitle").inner_text().strip() == title)
+        check(f"{key}: 4 dimensiones", page.locator("#mbody .dimtab").count() == 4)
+        check(f"{key}: diagnóstico", needle in page.locator("#mbody .dimcontent p[data-edit]").inner_text())
+        check(f"{key}: foto", page.evaluate("document.querySelector('#mbody .mphoto img').naturalWidth > 0"))
+        page.evaluate("closeModal()")
+        page.wait_for_timeout(150)
 
     page.evaluate("openModal('p2m1')")
     page.wait_for_timeout(300)

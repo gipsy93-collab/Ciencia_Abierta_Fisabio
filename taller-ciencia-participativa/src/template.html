@@ -19,6 +19,8 @@
   --purple:#B8B0E8;
   --pink:#F0B0D8;
   --green:#B0E080;
+  --cyan:#8FD3E8;
+  --yellow:#E8C547;
   --accent:var(--orange);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -44,6 +46,7 @@ body{font-family:'Outfit',system-ui,sans-serif}
   font-weight:400;color:var(--navy);opacity:.56;max-width:880px;
 }
 .brain{position:absolute;user-select:none;pointer-events:none}
+#mbrain{clip-path:inset(0 4px)}
 
 /* ---------- hotspot numbers ---------- */
 .hot{
@@ -307,6 +310,30 @@ body.modal-open .page .doclogos{opacity:0;pointer-events:none;transition:opacity
 .callout .ctable td.cat{font-weight:700;width:150px}
 .callout .ctable tr:last-child td{border-bottom:0}
 .callout .ctable-lead{font-size:12.4px;line-height:1.35;margin-bottom:2px}
+
+/* m5: categorias priorizadas interactivas */
+.pill.link{cursor:pointer;padding:4px 12px;transition:transform .2s ease,box-shadow .2s ease,background .2s ease}
+.pill.link:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(20,10,70,.14);background:#fff}
+.pill.link:active{transform:translateY(0) scale(.995)}
+.pill .meta{display:block;font-size:12px;font-weight:600;line-height:1.2;opacity:.85;margin-top:4px;letter-spacing:.01em;color:#5B4B7E}
+.pill .meta .go{color:var(--accent);font-weight:700}
+.mphoto img{cursor:zoom-in}
+
+/* ventana de dimensiones (m5a-m5d) */
+.dimpanel{flex:1;min-width:0;align-self:stretch;display:flex;flex-direction:column;gap:12px}
+.dimtabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dimtab{display:flex;align-items:center;gap:8px;border:1.4px solid rgba(26,13,114,.16);background:#fff;border-radius:10px;padding:8px 10px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--navy);text-align:left;transition:border-color .18s ease,box-shadow .18s ease,color .18s ease}
+.dimtab .dn{font-size:10px;letter-spacing:.08em;color:var(--accent);font-weight:700}
+.dimtab:hover{border-color:var(--accent)}
+.dimtab.on{border-color:var(--accent);box-shadow:inset 5px 0 0 var(--accent),0 4px 12px rgba(20,10,70,.08)}
+.dimtab.on .dn{color:var(--accent)}
+.dimcontent{border-top:1px solid rgba(26,13,114,.12);padding-top:14px;min-height:200px}
+.dimcontent h3{font-size:21px;line-height:1.1;color:var(--navy);letter-spacing:-.3px;margin-bottom:6px;border-left:4px solid var(--accent);padding-left:12px}
+.dimcontent .dq{font-size:12.5px;line-height:1.2;font-weight:700;color:var(--accent);margin:0 0 9px 16px}
+.dimcontent p{font-size:15.4px;line-height:1.5;color:var(--navy);opacity:.9}
+.dimsource{margin-top:auto;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);opacity:.45;font-weight:600}
+.dimcontent.fade{animation:dimfade .28s ease both}
+@keyframes dimfade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
 /* ---------- editor de textos ---------- */
 /* EDITOR:INICIO */
@@ -578,7 +605,7 @@ const TXT = {
   taller: 'El 20 de octubre de 2026, en la Jornada de Ciencia Abierta y la Semana del Acceso Abierto, reunimos a 19 personas en cuatro mesas multidisciplinares. Trabajamos con 25 tarjetas de necesidades en seis ejes: primero un mapa de relevancia y después una votación individual con cinco gomets por persona. La jornada incluyó la ponencia de Enrique Orduña-Malea (UPV) y la participación del grupo DOCA.',
   participantes: '19 personas de nueve instituciones: personal investigador, gestores/as de investigación y responsables de la toma de decisiones. Participaron la DGII y la EVES, cinco fundaciones e institutos de investigación sanitaria, y se sumaron dos observadoras de la UV y el ponente de la UPV.',
   necesidades: 'Un catálogo de 25 necesidades (N01–N25) agrupadas en seis ejes: gobernanza y cultura, recursos y capacidades, formación e infraestructuras, aspectos legales y éticos, incentivos y evaluación, y participación ciudadana. Cada mesa las ordenó en un mapa de relevancia y seleccionó cinco prioridades.',
-  prioridades: 'De las 25 necesidades, 13 quedaron priorizadas. Las cuatro más votadas —estrategia institucional (19), gobernanza compartida (13), infraestructuras tecnológicas (11) y financiación estable (10)— se caracterizaron con cuatro preguntas: qué está pasando, quién es clave, qué tendría que cambiar y por qué ocurre.',
+  prioridades: 'De las 25 necesidades, 13 quedaron priorizadas. Las cuatro más votadas —estrategia institucional (19), gobernanza compartida (13), infraestructuras tecnológicas (11) y financiación estable (10)— se caracterizaron en cuatro dimensiones: diagnóstico actual, actores clave, transformación requerida y causas subyacentes.',
   conclusiones: 'El diagnóstico confirma que la Ciencia Abierta no depende solo de cuestiones técnicas: exige financiación sostenible, estrategia y capacidad institucional, coordinación e infraestructuras compartidas, y gobernanza inclusiva con pacientes y ciudadanía. Las cuatro líneas están interrelacionadas y deben abordarse de forma transversal.',
   pasos: 'El diagnóstico continuará con la caracterización de las demás necesidades priorizadas y con la incorporación del resto del ecosistema. Los resultados alimentarán la estrategia y la hoja de ruta de Ciencia Abierta, con el grupo DOCA y las instituciones participantes en las próximas sesiones de codiseño.'
 };
@@ -641,16 +668,58 @@ const SECTIONS = {
     color: 'var(--green)', num: 5, title: 'Temáticas priorizadas', text: TXT.prioridades,
     brain: '@@brain_m5@@',
     pills: [
-      { x: 103, y: 257, w: 286, h: 40, fs: 15.5, text: 'Estrategia institucional · 19' },
-      { x: 103, y: 446, w: 286, h: 40, fs: 15.5, text: 'Financiación estable · 10' },
-      { x: 929, y: 257, w: 286, h: 40, fs: 15.5, text: 'Infraestructuras tecnológicas · 11' },
-      { x: 929, y: 446, w: 286, h: 40, fs: 15.5, text: 'Gobernanza compartida · 13' }
-    ],
-    arrows: [[246, 446, 246, 297], [1072, 446, 1072, 297]],
-    plus: { x: 612, y: 465 },
-    callouts: [
-      { x: 405, y: 535, w: 470, big: true, text: 'Las cuatro más votadas: estrategia (19), gobernanza (13), infraestructuras (11) y financiación (10). Se caracterizaron con cuatro preguntas: qué pasa, quién es clave, qué debe cambiar y por qué ocurre.' },
-      { x: 405, y: 250, w: 470, big: true, text: 'También priorizadas: participación (8), interoperabilidad (7), protección de datos (7), acceso equitativo (6), procesos éticos (4), apoyo técnico (3), reconocimiento (3), confidencialidad (2) e incentivos (1).' }
+      { x: 90, y: 300, w: 290, h: 74, fs: 15.5, open: 'm5a', accent: 'var(--pink)', text: 'Estrategia institucional<span class="meta">19 votos · <span class="go">Ver análisis →</span></span>' },
+      { x: 90, y: 470, w: 290, h: 74, fs: 15.5, open: 'm5d', accent: 'var(--cyan)', text: 'Financiación estable<span class="meta">10 votos · <span class="go">Ver análisis →</span></span>' },
+      { x: 900, y: 300, w: 290, h: 74, fs: 15.5, open: 'm5b', accent: 'var(--yellow)', text: 'Gobernanza compartida<span class="meta">13 votos · <span class="go">Ver análisis →</span></span>' },
+      { x: 900, y: 470, w: 290, h: 74, fs: 15.5, open: 'm5c', accent: 'var(--green)', text: 'Infraestructuras tecnológicas<span class="meta">11 votos · <span class="go">Ver análisis →</span></span>' }
+    ]
+  },
+  m5a: {
+    color: 'var(--pink)', num: 5, title: 'Estrategia institucional',
+    text: '19 votos · Necesidad priorizada. Caracterización en cuatro dimensiones.',
+    noBrain: true, back: 'm5',
+    photo: { src: 'assets/informe/plantilla-estrategia.jpg', alt: 'Plantilla de caracterización de la estrategia institucional', caption: 'Plantilla de caracterización · Estrategia institucional' },
+    dims: [
+      { label: 'Diagnóstico actual', text: 'Existen marcos de referencia generales, como la Estrategia Nacional de Ciencia Abierta (ENCA), pero hay una brecha en la adaptación e implementación concreta de sus objetivos a la realidad operativa de cada institución; en algunos casos se quedan en una declaración de intenciones.' },
+      { label: 'Actores clave', text: 'Equipos dedicados exclusivamente a Ciencia Abierta y responsables institucionales con capacidad de decisión, trabajando coordinadamente en aspectos estratégicos, definición de indicadores, medición, formación, incentivos, gestión de talento y participación ciudadana.' },
+      { label: 'Transformación requerida', text: 'Fomentar el intercambio de buenas prácticas e información entre las entidades más avanzadas y el resto de instituciones. Capacitar a todos los estamentos implicados y mantener un trabajo colaborativo continuo entre personal especializado y directivo. Involucrar a la ciudadanía en la creación de la estrategia y alinear a todas las instituciones.' },
+      { label: 'Causas subyacentes', text: 'Dificultades para trasladar las políticas a la práctica; ausencia de roles responsables claramente asignados por falta de personal especializado y elevadas cargas de trabajo; carencia de formación en cultura de apertura e incentivos dirigidos al personal investigador.' }
+    ]
+  },
+  m5b: {
+    color: 'var(--yellow)', num: 5, title: 'Gobernanza compartida',
+    text: '13 votos · Necesidad priorizada. Caracterización en cuatro dimensiones.',
+    noBrain: true, back: 'm5',
+    photo: { src: 'assets/informe/plantilla-gobernanza.jpg', alt: 'Plantilla de caracterización de la gobernanza compartida', caption: 'Plantilla de caracterización · Gobernanza compartida' },
+    dims: [
+      { label: 'Diagnóstico actual', text: 'Los grupos de investigación suelen plantear sus proyectos y líneas de trabajo sin consultar formalmente con pacientes o asociaciones representativas para identificar sus prioridades y necesidades reales. Falta gobernanza, conocimiento y sensibilización.' },
+      { label: 'Actores clave', text: 'Investigadores/as, agencias evaluadoras de la investigación, asociaciones de pacientes, instituciones sanitarias y el Sistema Español de Ciencia y Tecnología.' },
+      { label: 'Transformación requerida', text: 'Promover la investigación colaborativa desde sus fases iniciales, con apoyo institucional y presupuestario, estableciendo puntos de contacto estables y espacios de diálogo con las asociaciones de pacientes.' },
+      { label: 'Causas subyacentes', text: 'Inexistencia de marcos formales de gobernanza compartida, falta de concienciación y conocimiento sobre metodología participativa, y ausencia de estructuras organizativas consolidadas.' }
+    ]
+  },
+  m5c: {
+    color: 'var(--green)', num: 5, title: 'Infraestructuras tecnológicas',
+    text: '11 votos · Necesidad priorizada. Caracterización en cuatro dimensiones.',
+    noBrain: true, back: 'm5',
+    photo: { src: 'assets/informe/plantilla-infraestructuras.jpg', alt: 'Plantilla de caracterización de las infraestructuras tecnológicas', caption: 'Plantilla de caracterización · Infraestructuras tecnológicas' },
+    dims: [
+      { label: 'Diagnóstico actual', text: 'Predominan los esfuerzos aislados en la adquisición de infraestructuras tecnológicas, lo que genera capacidades dispares, duplicidad de recursos y una gestión fragmentada y no compartida entre centros de investigación. Las instituciones avanzan a distintas velocidades por diferencias de financiación y apoyos, lo que condiciona la colaboración.' },
+      { label: 'Actores clave', text: 'Decisores de políticas públicas, direcciones de organizaciones y fundaciones de investigación, personal técnico e investigadores/as.' },
+      { label: 'Transformación requerida', text: 'Definir directrices institucionales que incorporen planes de inversión y sostenibilidad a largo plazo. Promover un cambio cultural desde el enfoque individualista hacia uno colectivo, garantizando financiación para participar en foros colaborativos. Las infraestructuras no deben orientarse solo a la gestión de datos, sino a todo el ciclo de investigación.' },
+      { label: 'Causas subyacentes', text: 'Avances institucionales a distintas velocidades por falta de directrices o estrategias colectivas estandarizadas, junto con inercias de trabajo individualistas.' }
+    ]
+  },
+  m5d: {
+    color: 'var(--cyan)', num: 5, title: 'Financiación estable',
+    text: '10 votos · Necesidad priorizada. Caracterización en cuatro dimensiones.',
+    noBrain: true, back: 'm5',
+    photo: { src: 'assets/informe/plantilla-financiacion.jpg', alt: 'Plantilla de caracterización de la financiación estable', caption: 'Plantilla de caracterización · Financiación estable' },
+    dims: [
+      { label: 'Diagnóstico actual', text: 'Existe una demanda creciente de implementación de Ciencia Abierta que no está respaldada por partidas presupuestarias específicas: requiere financiación adicional no contemplada en las partidas tradicionales. Los requerimientos de ciencia abierta y/o ciencia ciudadana se realizan con la voluntad y el tiempo del personal investigador, y todavía no se pueden elegir gastos vinculados a ciencia abierta como elegibles en convocatorias competitivas.' },
+      { label: 'Actores clave', text: 'Conselleria de Sanitat, unidades de ciencia abierta, direcciones de institutos y fundaciones, gerencias sanitarias, equipos de gestión e instancias de gobierno.' },
+      { label: 'Transformación requerida', text: 'Consolidar un modelo de financiación sostenible con continuidad en el tiempo. Se requiere financiación directa y plural para desarrollar estrategias institucionales y contratar equipos técnicos especializados.' },
+      { label: 'Causas subyacentes', text: 'Falta de prioridad política e institucional en la asignación de recursos económicos específicos para este ámbito.' }
     ]
   },
   p2m1: {
@@ -789,6 +858,19 @@ function el(tag, cls, css) {
   return e;
 }
 
+function photoFigure(ph) {
+  const fig = el('figure', 'mphoto');
+  const im = el('img');
+  im.src = ph.src;
+  im.alt = ph.alt || '';
+  im.title = 'Ampliar imagen';
+  im.addEventListener('click', () => openLightbox(ph.src, ph.alt));
+  const cap = el('figcaption');
+  cap.textContent = ph.caption || '';
+  fig.append(im, cap);
+  return fig;
+}
+
 function openModal(key) {
   const s = SECTIONS[key];
   if (!s) return;
@@ -798,7 +880,7 @@ function openModal(key) {
   badge.textContent = s.num;
   badge.style.background = s.color;
 
-  mCard.classList.toggle('tablemode', !!s.table);
+  mCard.classList.toggle('tablemode', !!s.table || !!s.dims);
   mCard.style.setProperty('--accent', s.color);
   textEl(document.getElementById('mtitle'), `sec.${key}.title`, s.title);
   textEl(document.getElementById('mtext'), `sec.${key}.text`, s.text);
@@ -853,14 +935,7 @@ function openModal(key) {
     table.appendChild(tbody);
     if (s.photo) {
       body.classList.add('withphoto');
-      const fig = el('figure', 'mphoto');
-      const im = el('img');
-      im.src = s.photo.src;
-      im.alt = s.photo.alt || '';
-      const cap = el('figcaption');
-      cap.textContent = s.photo.caption || '';
-      fig.append(im, cap);
-      body.appendChild(fig);
+      body.appendChild(photoFigure(s.photo));
       const wrap = el('div', 'tablewrap');
       wrap.appendChild(table);
       body.appendChild(wrap);
@@ -869,8 +944,50 @@ function openModal(key) {
     }
   }
 
+  if (s.dims) {
+    const DQ = {
+      'Diagnóstico actual': '¿Qué está pasando?',
+      'Actores clave': '¿Quién es clave para el cambio?',
+      'Transformación requerida': '¿Qué tendría que cambiar?',
+      'Causas subyacentes': '¿Por qué ocurre?'
+    };
+    body.classList.add('withphoto');
+    body.appendChild(photoFigure(s.photo));
+    const panel = el('div', 'dimpanel');
+    const tabs = el('div', 'dimtabs');
+    const content = el('div', 'dimcontent');
+    const h = el('h3');
+    const q = el('p', 'dq');
+    const p = el('p');
+    content.append(h, q, p);
+    const show = (i) => {
+      const d = s.dims[i];
+      tabs.querySelectorAll('.dimtab').forEach((b, k) => b.classList.toggle('on', k === i));
+      h.textContent = d.label;
+      q.textContent = DQ[d.label] || '';
+      textEl(p, `sec.${key}.dim.${i}`, d.text);
+      content.classList.remove('fade');
+      void content.offsetWidth;
+      content.classList.add('fade');
+      if (onRender) onRender(content);
+    };
+    s.dims.forEach((d, i) => {
+      const b = el('button', 'dimtab' + (i === 0 ? ' on' : ''));
+      b.type = 'button';
+      b.innerHTML = `<span class="dn">0${i + 1}</span>${d.label}`;
+      b.addEventListener('click', () => show(i));
+      tabs.appendChild(b);
+    });
+    const src = el('p', 'dimsource', 'Fuente: Informe de Resultados OpenScience4Health · 20 de octubre de 2026');
+    panel.append(tabs, content, src);
+    body.appendChild(panel);
+    show(0);
+  }
+
   (s.pills || []).forEach((p, i) => {
-    const d = el('div', 'pill small' + (p.num ? ' numbered' : ''), `left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px`);
+    const d = el(p.open ? 'button' : 'div', 'pill small' + (p.num ? ' numbered' : '') + (p.open ? ' link' : ''), `left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px`);
+    if (p.open) { d.type = 'button'; d.dataset.open = p.open; }
+    if (p.accent) d.style.setProperty('--accent', p.accent);
     if (p.padLeft) d.style.paddingLeft = p.padLeft + 'px';
     if (p.num) {
       const n = el('span', 'num' + (p.light ? ' light' : ''), `font-size:${p.light ? 34.7 : 34.7}px;color:${s.color}`);
