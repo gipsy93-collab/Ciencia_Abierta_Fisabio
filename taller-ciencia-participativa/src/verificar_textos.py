@@ -7,7 +7,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 base = pathlib.Path(__file__).parent.parent
 files = {
     "taller": base / "Taller-Ciencia-Participativa.html",
-    "dist": base / "dist" / "Taller-Ciencia-Participativa.html",
+    "dist": base / "dist" / "Ciencia-abierta.html",
 }
 
 resultado = []
@@ -87,7 +87,7 @@ with sync_playwright() as p:
         check(f"{nombre}: m3 sin botón listado", page.locator("#mbody .morebtn").count() == 0)
         page.locator("#mbody .plus").click()
         page.wait_for_timeout(300)
-        check(f"{nombre}: m3 tabla 22", page.locator("#mbody table tbody tr").count() == 22)
+        check(f"{nombre}: m3 tabla 21", page.locator("#mbody table tbody tr").count() == 21)
         check(f"{nombre}: m3 foto grupo", page.locator("#mbody .mphoto img").count() == 1)
         check(f"{nombre}: m3 foto cargada", page.evaluate("document.querySelector('#mbody .mphoto img').naturalWidth > 0"))
 
@@ -98,12 +98,10 @@ with sync_playwright() as p:
         check(f"{nombre}: m5 4 categorías", page.locator("#mbody .pill.link").count() == 4)
         page.locator("#mbody .pill.link").first.click()
         page.wait_for_timeout(300)
-        check(f"{nombre}: m5a 4 pestañas", page.locator("#mbody .dimtab").count() == 4)
-        check(f"{nombre}: m5a texto", "ENCA" in page.locator("#mbody .dimcontent p[data-edit]").inner_text())
-        check(f"{nombre}: m5a foto", page.evaluate("document.querySelector('#mbody .mphoto img').naturalWidth > 0"))
-        page.locator("#mbody .dimtab").nth(3).click()
-        page.wait_for_timeout(200)
-        check(f"{nombre}: m5a causas", "Dificultades" in page.locator("#mbody .dimcontent p[data-edit]").inner_text())
+        check(f"{nombre}: m5a 4 cuadrantes", page.locator("#mbody .dimcell").count() == 4)
+        check(f"{nombre}: m5a texto", "ENCA" in page.locator("#mbody .dimcell").first.inner_text())
+        check(f"{nombre}: m5a sin foto", page.locator("#mbody .mphoto").count() == 0)
+        check(f"{nombre}: m5a causas", "Dificultades" in page.locator("#mbody .dimcell").nth(3).inner_text())
         page.locator("#close").click()
         page.wait_for_timeout(150)
         page.keyboard.press("ArrowRight")

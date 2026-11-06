@@ -64,7 +64,7 @@ body{font-family:'Outfit',system-ui,sans-serif}
   transition:opacity .25s ease,transform .25s ease;
 }
 .hot:hover{transform:translate(-50%,-50%) scale(1.12);box-shadow:0 10px 24px rgba(20,10,70,.3);filter:saturate(1.08)}
-.hot:focus-visible,.hot.keyfocus,.pill:focus-visible,.pill.link.keyfocus,.idx:focus-visible,.dimtab:focus-visible,.morebtn:focus-visible,.photobtn:focus-visible{outline:3px solid #1D0F44;outline-offset:4px}
+.hot:focus-visible,.hot.keyfocus,.pill:focus-visible,.pill.link.keyfocus,.idx:focus-visible,.morebtn:focus-visible,.photobtn:focus-visible{outline:3px solid #1D0F44;outline-offset:4px}
 .mphoto img:focus-visible,.pcell img:focus-visible{outline:3px solid #1D0F44;outline-offset:3px;border-radius:9px}
 .hot:hover::after{opacity:.55;transform:scale(1.18)}
 .hot:active{transform:translate(-50%,-50%) scale(.96)}
@@ -347,21 +347,13 @@ body.modal-open .page .doclogos{opacity:0;pointer-events:none;transition:opacity
 .pill .meta .go{color:var(--accent);font-weight:700}
 .mphoto img{cursor:zoom-in}
 
-/* ventana de dimensiones (m5a-m5d) */
-.dimpanel{flex:1;min-width:0;align-self:stretch;display:flex;flex-direction:column;gap:12px}
-.dimtabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.dimtab{display:flex;align-items:center;gap:8px;border:1.4px solid rgba(26,13,114,.16);background:#fff;border-radius:10px;padding:8px 10px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--navy);text-align:left;transition:border-color .18s ease,box-shadow .18s ease,color .18s ease}
-.dimtab .dn{font-size:10px;letter-spacing:.08em;color:var(--accent);font-weight:700}
-.dimtab:hover{border-color:var(--accent)}
-.dimtab.on{border-color:var(--accent);box-shadow:inset 5px 0 0 var(--accent),0 4px 12px rgba(20,10,70,.08)}
-.dimtab.on .dn{color:var(--accent)}
-.dimcontent{border-top:1px solid rgba(26,13,114,.12);padding-top:14px;min-height:200px}
-.dimcontent h3{font-size:21px;line-height:1.1;color:var(--navy);letter-spacing:-.3px;margin-bottom:6px;border-left:4px solid var(--accent);padding-left:12px}
-.dimcontent .dq{font-size:12.5px;line-height:1.2;font-weight:700;color:var(--accent);margin:0 0 9px 16px}
-.dimcontent p{font-size:15.4px;line-height:1.5;color:var(--navy);opacity:.9}
-.dimsource{margin-top:auto;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);opacity:.45;font-weight:600}
-.dimcontent.fade{animation:dimfade .28s ease both}
-@keyframes dimfade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+/* ventana de dimensiones (m5a–m5d): cuatro cuadrantes, siempre visibles */
+#mbody.dimquad{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;column-gap:44px;row-gap:10px;align-content:space-evenly;align-items:start;overflow:hidden}
+.dimcell{min-height:0}
+.dimcell h3{font-size:19px;line-height:1.15;color:var(--navy);letter-spacing:-.2px;margin:0 0 3px;border-left:4px solid var(--accent);padding-left:10px}
+.dimcell .dq{font-size:12px;line-height:1.2;font-weight:700;color:var(--accent);margin:0 0 8px 14px}
+.dimcell .tx{font-size:14.6px;line-height:1.45;color:var(--navy);opacity:.9}
+.dimsource{margin:0;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);opacity:.45;font-weight:600;grid-column:1 / -1}
 
 /* ---------- editor de textos ---------- */
 /* EDITOR:INICIO */
@@ -570,7 +562,7 @@ body.editing .plus,body.editing .ibadge{pointer-events:none;opacity:.5}
 const TXT = {
   proyecto: 'OpenScience4Health (FCT-25-22602) es un programa de capacitación, asesoramiento científico y transferencia de conocimiento a la Conselleria de Sanitat para incorporar la ciencia abierta y los compromisos CoARA en las políticas, estrategias y planes de I+D+i en salud. Coordina Fisabio, con la UPV y la UV como socios, y cuenta con la colaboración de FECYT (convocatoria I+P 2025).',
   taller: 'El 20 de octubre de 2026, en la Jornada de Ciencia Abierta y la Semana del Acceso Abierto, reunimos a 19 personas en cuatro mesas multidisciplinares. Trabajamos con 25 tarjetas de necesidades en seis ejes: primero un mapa de relevancia y después una votación individual con cinco gomets por persona. La jornada incluyó la ponencia de Enrique Orduña-Malea (UPV) y la participación del grupo DOCA.',
-  participantes: '19 personas de nueve instituciones: personal investigador, gestores/as de investigación y responsables de la toma de decisiones. Participaron la DGII y la EVES, cinco fundaciones e institutos de investigación sanitaria, y se sumaron dos observadoras de la UV y el ponente de la UPV.',
+  participantes: '19 personas de nueve instituciones: personal investigador, gestores/as de investigación y responsables de la toma de decisiones. Participaron la DGII y la EVES, cinco fundaciones e institutos de investigación sanitaria, y se sumaron dos observadoras de la UV.',
   necesidades: 'Un catálogo de 25 necesidades (N01–N25) agrupadas en seis ejes: gobernanza y cultura, recursos y capacidades, formación e infraestructuras, aspectos legales y éticos, incentivos y evaluación, y participación ciudadana. Cada mesa las ordenó en un mapa de relevancia y seleccionó cinco prioridades.',
   prioridades: 'De las 25 necesidades, 13 quedaron priorizadas. Las cuatro más votadas —estrategia institucional (19), gobernanza compartida (13), infraestructuras tecnológicas (11) y financiación estable (10)— se caracterizaron en cuatro dimensiones: diagnóstico actual, actores clave, transformación requerida y causas subyacentes.',
   conclusiones: 'El diagnóstico confirma que la Ciencia Abierta no depende solo de cuestiones técnicas: exige financiación sostenible, estrategia y capacidad institucional, coordinación e infraestructuras compartidas, y gobernanza inclusiva con pacientes y ciudadanía. Las cuatro líneas están interrelacionadas y deben abordarse de forma transversal.',
@@ -625,7 +617,7 @@ const SECTIONS = {
       { x: 103, y: 250, w: 286, h: 56, num: 1, padLeft: 40, fs: 15, text: '9 instituciones<br>del ecosistema' },
       { x: 103, y: 447, w: 286, h: 56, num: 2, padLeft: 40, fs: 15, text: '19 personas<br>4 mesas' },
       { x: 929, y: 250, w: 286, h: 56, num: 3, padLeft: 40, fs: 15, text: 'Investigadores/as,<br>gestores/as y decisores' },
-      { x: 929, y: 447, w: 286, h: 56, num: 4, padLeft: 40, fs: 15, text: 'UV y UPV:<br>observadoras y ponente' }
+      { x: 929, y: 447, w: 286, h: 56, num: 4, padLeft: 40, fs: 15, text: 'UV:<br>dos observadoras' }
     ],
     arrows: [[246, 306, 246, 447], [1072, 306, 1072, 447]],
     plus: { x: 757, y: 293, open: 'm3b' }
@@ -658,7 +650,6 @@ const SECTIONS = {
     color: 'var(--pink)', num: 5, title: 'Estrategia institucional',
     text: '19 votos · Necesidad priorizada. Caracterización en cuatro dimensiones.',
     noBrain: true, back: 'm5',
-    photo: { src: 'assets/informe/plantilla-estrategia.jpg', alt: 'Plantilla de caracterización de la estrategia institucional', caption: 'Plantilla de caracterización · Estrategia institucional' },
     dims: [
       { label: 'Diagnóstico actual', text: 'Existen marcos de referencia generales, como la Estrategia Nacional de Ciencia Abierta (ENCA), pero hay una brecha en la adaptación e implementación concreta de sus objetivos a la realidad operativa de cada institución; en algunos casos se quedan en una declaración de intenciones.' },
       { label: 'Actores clave', text: 'Equipos dedicados exclusivamente a Ciencia Abierta y responsables institucionales con capacidad de decisión, trabajando coordinadamente en aspectos estratégicos, definición de indicadores, medición, formación, incentivos, gestión de talento y participación ciudadana.' },
@@ -670,7 +661,6 @@ const SECTIONS = {
     color: 'var(--yellow)', num: 5, title: 'Gobernanza compartida',
     text: '13 votos · Necesidad priorizada. Caracterización en cuatro dimensiones.',
     noBrain: true, back: 'm5',
-    photo: { src: 'assets/informe/plantilla-gobernanza.jpg', alt: 'Plantilla de caracterización de la gobernanza compartida', caption: 'Plantilla de caracterización · Gobernanza compartida' },
     dims: [
       { label: 'Diagnóstico actual', text: 'Los grupos de investigación suelen plantear sus proyectos y líneas de trabajo sin consultar formalmente con pacientes o asociaciones representativas para identificar sus prioridades y necesidades reales. Falta gobernanza, conocimiento y sensibilización.' },
       { label: 'Actores clave', text: 'Investigadores/as, agencias evaluadoras de la investigación, asociaciones de pacientes, instituciones sanitarias y el Sistema Español de Ciencia y Tecnología.' },
@@ -682,7 +672,6 @@ const SECTIONS = {
     color: 'var(--green)', num: 5, title: 'Infraestructuras tecnológicas',
     text: '11 votos · Necesidad priorizada. Caracterización en cuatro dimensiones.',
     noBrain: true, back: 'm5',
-    photo: { src: 'assets/informe/plantilla-infraestructuras.jpg', alt: 'Plantilla de caracterización de las infraestructuras tecnológicas', caption: 'Plantilla de caracterización · Infraestructuras tecnológicas' },
     dims: [
       { label: 'Diagnóstico actual', text: 'Predominan los esfuerzos aislados en la adquisición de infraestructuras tecnológicas, lo que genera capacidades dispares, duplicidad de recursos y una gestión fragmentada y no compartida entre centros de investigación. Las instituciones avanzan a distintas velocidades por diferencias de financiación y apoyos, lo que condiciona la colaboración.' },
       { label: 'Actores clave', text: 'Decisores de políticas públicas, direcciones de organizaciones y fundaciones de investigación, personal técnico e investigadores/as.' },
@@ -694,7 +683,6 @@ const SECTIONS = {
     color: 'var(--cyan)', num: 5, title: 'Financiación estable',
     text: '10 votos · Necesidad priorizada. Caracterización en cuatro dimensiones.',
     noBrain: true, back: 'm5',
-    photo: { src: 'assets/informe/plantilla-financiacion.jpg', alt: 'Plantilla de caracterización de la financiación estable', caption: 'Plantilla de caracterización · Financiación estable' },
     dims: [
       { label: 'Diagnóstico actual', text: 'Existe una demanda creciente de implementación de Ciencia Abierta que no está respaldada por partidas presupuestarias específicas: requiere financiación adicional no contemplada en las partidas tradicionales. Los requerimientos de ciencia abierta y/o ciencia ciudadana se realizan con la voluntad y el tiempo del personal investigador, y todavía no se pueden elegir gastos vinculados a ciencia abierta como elegibles en convocatorias competitivas.' },
       { label: 'Actores clave', text: 'Conselleria de Sanitat, unidades de ciencia abierta, direcciones de institutos y fundaciones, gerencias sanitarias, equipos de gestión e instancias de gobierno.' },
@@ -729,7 +717,7 @@ const SECTIONS = {
     callouts: [{ x: 500, y: 500, w: 400, text: 'El diagnóstico es la base: las próximas actividades definirán objetivos, actuaciones y prioridades compartidas con las instituciones y el grupo DOCA.' }]
   },
   m3b: {
-    color: 'var(--purple)', num: 3, title: 'Las 19 personas participantes', text: 'Personal investigador, gestores/as y responsables de decisión de nueve instituciones. Se sumaron dos observadoras de la UV y el ponente de la UPV.',
+    color: 'var(--purple)', num: 3, title: 'Las 19 personas participantes', text: 'Personal investigador, gestores/as y responsables de decisión de nueve instituciones. Se sumaron dos observadoras de la UV.',
     noBrain: true, back: 'm3',
     photo: { src: 'assets/fotos/20261020_111352.jpg', alt: 'El grupo durante el taller, trabajando en una de las mesas', caption: 'El grupo durante el taller · 20 de octubre de 2026' },
     table: {
@@ -756,8 +744,7 @@ const SECTIONS = {
         ['Irene Cañigal', 'Incliva', 'Participante'],
         ['Héctor Sebastián Tari', 'Isabial', 'Participante'],
         ['Francisca Abad', 'Universitat de València', 'Observadora'],
-        ['Aurora González-Teruel', 'Universitat de València', 'Observadora'],
-        ['Enrique Orduña-Malea', 'Universitat Politècnica de València', 'Ponente']
+        ['Aurora González-Teruel', 'Universitat de València', 'Observadora']
       ]
     }
   },
@@ -890,7 +877,7 @@ function openModal(key) {
 
   const body = document.getElementById('mbody');
   body.innerHTML = '';
-  body.classList.remove('withphoto');
+  body.classList.remove('withphoto', 'dimquad');
 
   if (s.table) {
     const table = document.createElement('table');
@@ -938,37 +925,23 @@ function openModal(key) {
       'Transformación requerida': '¿Qué tendría que cambiar?',
       'Causas subyacentes': '¿Por qué ocurre?'
     };
-    body.classList.add('withphoto');
-    body.appendChild(photoFigure(s.photo));
-    const panel = el('div', 'dimpanel');
-    const tabs = el('div', 'dimtabs');
-    const content = el('div', 'dimcontent');
-    const h = el('h3');
-    const q = el('p', 'dq');
-    const p = el('p');
-    content.append(h, q, p);
-    const show = (i) => {
-      const d = s.dims[i];
-      tabs.querySelectorAll('.dimtab').forEach((b, k) => b.classList.toggle('on', k === i));
+    // cuatro cuadrantes a la vez: diagnóstico / actores arriba,
+    // transformación / causas abajo; sin ejes ni adornos
+    body.classList.add('dimquad');
+    s.dims.forEach((d, i) => {
+      const cell = el('section', 'dimcell');
+      const h = el('h3');
+      const q = el('p', 'dq');
+      const p = el('p', 'tx');
       h.textContent = d.label;
       q.textContent = DQ[d.label] || '';
       textEl(p, `sec.${key}.dim.${i}`, d.text);
-      content.classList.remove('fade');
-      void content.offsetWidth;
-      content.classList.add('fade');
-      if (onRender) onRender(content);
-    };
-    s.dims.forEach((d, i) => {
-      const b = el('button', 'dimtab' + (i === 0 ? ' on' : ''));
-      b.type = 'button';
-      b.innerHTML = `<span class="dn">0${i + 1}</span>${d.label}`;
-      b.addEventListener('click', () => show(i));
-      tabs.appendChild(b);
+      cell.append(h, q, p);
+      body.appendChild(cell);
     });
-    const src = el('p', 'dimsource', 'Fuente: Informe de Resultados OpenScience4Health · 20 de octubre de 2026');
-    panel.append(tabs, content, src);
-    body.appendChild(panel);
-    show(0);
+    const src = el('p', 'dimsource');
+    src.textContent = 'Fuente: Informe de Resultados OpenScience4Health · 20 de octubre de 2026';
+    body.appendChild(src);
   }
 
   if (s.photos) {
@@ -1091,8 +1064,7 @@ function openModal(key) {
   modal.classList.add('open');
   document.body.classList.add('modal-open');
   if (onRender) onRender(mCard);
-  const focusTarget = mCard.querySelector('.dimtab.on') ||
-    mCard.querySelector('#mbody .pill.link') ||
+  const focusTarget = mCard.querySelector('#mbody .pill.link') ||
     mCard.querySelector('#mbody .pcell img') ||
     mCard.querySelector('#mbody .photobtn') ||
     mCard.querySelector('#mbody .plus') ||
@@ -1163,14 +1135,6 @@ function focusHot(dir) {
 }
 
 function cyclePanel(dir) {
-  const tabs = [...document.querySelectorAll('#mbody .dimtab')];
-  if (tabs.length) {
-    const i = Math.max(0, tabs.findIndex(t => t.classList.contains('on')));
-    const next = tabs[(i + dir + tabs.length) % tabs.length];
-    next.click();
-    next.focus({ preventScroll: true });
-    return true;
-  }
   const items = [...document.querySelectorAll('#mbody .pill.link, #mbody .pcell img')];
   if (!items.length) return false;
   const at = items.indexOf(document.activeElement);

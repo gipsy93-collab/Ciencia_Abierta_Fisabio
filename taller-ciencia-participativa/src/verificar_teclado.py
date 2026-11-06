@@ -4,7 +4,7 @@ import sys
 
 sys.stdout.reconfigure(encoding="utf-8")
 base = Path(r"C:\Users\gipsy\Documents\Obsidian Vault\03 Proyectos\FISABIO\Taller-Ciencia-Participativa")
-url = (base / "dist" / "Taller-Ciencia-Participativa.html").as_uri()
+url = (base / "dist" / "Ciencia-abierta.html").as_uri()
 
 errs = []
 checks = []
@@ -70,13 +70,11 @@ with sync_playwright() as p:
 
     page.evaluate("openModal('m5a')")
     page.wait_for_timeout(450)
-    check("m5a: foco en pestaña", page.evaluate("document.activeElement && document.activeElement.classList.contains('dimtab')"))
+    check("m5a: foco en volver", page.evaluate("document.activeElement && document.activeElement.id === 'mback'"))
+    check("m5a: cuatro cuadrantes", page.locator("#mbody .dimcell").count() == 4)
     page.keyboard.press("d")
-    page.wait_for_timeout(250)
-    check("D: pestaña siguiente", page.locator("#mbody .dimtab.on").inner_text().strip().endswith("Actores clave"))
-    page.keyboard.press("a")
-    page.wait_for_timeout(250)
-    check("A: pestaña anterior", page.locator("#mbody .dimtab.on").inner_text().strip().endswith("Diagnóstico actual"))
+    page.wait_for_timeout(200)
+    check("D en m5a: no rompe", page.locator("#mtitle").inner_text().strip() == "Estrategia institucional")
     page.keyboard.press("x")
     page.wait_for_timeout(300)
     check("X: vuelve a m5", page.locator("#mtitle").inner_text().strip() == "Temáticas priorizadas")

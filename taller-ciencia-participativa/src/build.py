@@ -83,6 +83,8 @@ if os.path.isdir(fotos_src):
     copied = 0
     for fn in sorted(os.listdir(fotos_src)):
         s, d = os.path.join(fotos_src, fn), os.path.join(fotos_dst, fn)
+        if not os.path.isfile(s):
+            continue
         if not os.path.exists(d) or os.path.getsize(s) != os.path.getsize(d):
             shutil.copy2(s, d)
             copied += 1
@@ -97,11 +99,26 @@ if os.path.isdir(informe_src):
     copied = 0
     for fn in sorted(os.listdir(informe_src)):
         s, d = os.path.join(informe_src, fn), os.path.join(informe_dst, fn)
+        if not os.path.isfile(s):
+            continue  # las plantillas retiradas viven en una subcarpeta, no se publican
         if not os.path.exists(d) or os.path.getsize(s) != os.path.getsize(d):
             shutil.copy2(s, d)
             copied += 1
     print("informe:", len(os.listdir(informe_dst)), "en dist/assets/informe/", f"({copied} copiadas)")
 
-out2 = os.path.join(dist, "Taller-Ciencia-Participativa.html")
+PUBLICO = "Ciencia-abierta.html"
+out2 = os.path.join(dist, PUBLICO)
 open(out2, "w", encoding="utf-8").write(public)
 print("wrote", out2, round(os.path.getsize(out2)/1024), "KB")
+
+# portada del despliegue: al abrir la carpeta publicada (Pages o un despliegue
+# estático tipo Vercel) el index lleva a la pieza, sin cambiar su URL
+index = ('<!doctype html><html lang="es"><meta charset="utf-8">'
+         f'<meta http-equiv="refresh" content="0; url={PUBLICO}">'
+         f'<link rel="canonical" href="{PUBLICO}">'
+         '<title>Estamos pensando la ciencia abierta</title>'
+         '<p style="font:16px system-ui;padding:2rem">'
+         f'<a href="{PUBLICO}">Abrir la infografía</a></p>'
+         '</html>')
+open(os.path.join(dist, "index.html"), "w", encoding="utf-8").write(index)
+print("wrote", os.path.join(dist, "index.html"))

@@ -10,7 +10,7 @@ Pieza divulgativa del taller de diagnóstico de necesidades del proyecto **OpenS
 
 ## Cómo abrirla
 
-Doble clic en `Taller-Ciencia-Participativa.html`. Funciona sin conexión: el arte, la tipografía y las imágenes del informe van embebidos. Las **fotografías del taller** son referenciadas, así que la carpeta `assets/` debe ir al lado.
+Doble clic en `Ciencia-abierta.html`. Funciona sin conexión: el arte, la tipografía y las imágenes del informe van embebidos. Las **fotografías del taller** son referenciadas, así que la carpeta `assets/` debe ir al lado.
 
 Navegación: flechas inferiores o teclado (`←` `→`), y las ventanas se cierran con la `X`, `Esc` o el velo.
 
@@ -26,7 +26,8 @@ Las nueve láminas son el **arte original de la plantilla** de Genially («Infog
 
 ```
 taller-ciencia-participativa/
-├── Taller-Ciencia-Participativa.html   pieza publicable (fotos referenciadas)
+├── Ciencia-abierta.html                pieza publicable (fotos referenciadas)
+├── index.html                          redirección a la pieza
 ├── assets/
 │   ├── cerebro/                        nueve SVG del cerebro (arte original)
 │   ├── origen/                         manchas de color y capas de línea del original
@@ -46,7 +47,7 @@ taller-ciencia-participativa/
 python src/build.py
 ```
 
-Escribe `Taller-Ciencia-Participativa.html` (con editor de textos) y `dist/Taller-Ciencia-Participativa.html` (publicable, sin editor), y sincroniza `assets/fotos/` y `assets/informe/` a `dist/`.
+Escribe `Taller-Ciencia-Participativa.html` (con editor de textos) y `dist/Ciencia-abierta.html` (publicable, sin editor), y sincroniza `assets/fotos/` y `assets/informe/` a `dist/`.
 
 Verificación: `python src/verificar_informe.py` (90 comprobaciones), `python src/verificar_textos.py` (75) y `python src/verificar_teclado.py` (31).
 
