@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OSIRIS | Catálogo de Fuentes de Información — v2.1</title>
+  <title>OSIRIS | Catálogo de Fuentes de Información — v2.2</title>
   <style>
     :root {
       --primary: #005f73;
@@ -83,6 +83,14 @@
     .legal-body .legal-note { background: #f1f3f5; border-radius: 6px; padding: 10px; }
     .legal-body code { background: #e9ecef; padding: 1px 4px; border-radius: 4px; }
 
+    .fase1-panel table { border-collapse: collapse; width: 100%; font-size: 0.82rem; margin-top: 8px; }
+    .fase1-panel th, .fase1-panel td { border: 1px solid var(--border); padding: 3px 7px; text-align: left; vertical-align: top; }
+    .fase1-panel th { background: #f1f3f5; position: sticky; top: 0; }
+    .fase1-panel .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .matriz-wrap { overflow-x: auto; max-height: 420px; overflow-y: auto; }
+    .fase1-panel summary { cursor: pointer; font-weight: 600; color: var(--primary); }
+    .f1-body { font-size: 0.88rem; }
+    .f1-body p { margin-bottom: 8px; }
     .controls {
       max-width: 1200px;
       margin: 0 auto 16px;
@@ -227,7 +235,7 @@
 <body>
 
 <header>
-  <h1>OSIRIS | Catálogo de Fuentes de Información — v2.1</h1>
+  <h1>OSIRIS | Catálogo de Fuentes de Información — v2.2</h1>
   <p>Identificación, acceso técnico, licencia, base legal y justificación de inclusión para el mapeo de producción científica de FISABIO. Complementa al CRIS propietario (Fundanet) con fuentes no tradicionales, priorizando lo cosechable y legalmente sostenible.</p>
 </header>
 
@@ -254,6 +262,11 @@
   </div>
 </details>
 
+<details class="legal-panel fase1-panel" id="fase1" open>
+  <summary>Fase 1 · Validación de endpoints y censo de resultados por sede (09-11-2026)</summary>
+  <div class="f1-body" id="f1body"></div>
+</details>
+
 <main>
   <div class="controls">
     <input type="text" id="search" placeholder="Buscar por nombre, categoría, protocolo, justificación o base legal...">
@@ -265,7 +278,7 @@
 </main>
 
 <footer>
-  OSIRIS Framework v2.1 · Revisión del catálogo v1 (Qwen, 14-10-2026) · Ampliación con OpenCitations, Unpaywall, Sherpa Romeo, Wikidata, Redalyc, Latindex, REDIB, arXiv y Scimago · Uso interno FISABIO · Reutilización institucional permitida.<br>
+  OSIRIS Framework v2.2 · Fase 1 (09-11-2026): validación de endpoints y censo por sede sobre el perímetro oficial (30 sedes, 2020-2026) · Uso interno FISABIO · Reutilización institucional permitida.<br>
   Las etiquetas «(verificar)» señalan endpoints que deben confirmarse en la Fase 1 del proyecto antes de automatizar la cosecha. La base legal de cada ficha es orientativa: el cierre necesita el visto bueno del servicio jurídico/DPO de FISABIO.
 </footer>
 
@@ -545,7 +558,7 @@
       protocol: "Estándares de metadatos / protocolo", endpoint: "—",
       licMeta: "Abierta", licCont: "—", coste: "Gratis", costeLvl: "bajo",
       riesgo: "Bajo", riesgoLvl: "bajo", oe: "OE5",
-      summary: "Estándares de interoperabilidad. La memoria exige crosstwaks a Dublin Core Qualified y BibTeX; el CRIS expone CERIF-XML por OAI-PMH.",
+      summary: "Estándares de interoperabilidad. La memoria exige crosswalks a Dublin Core Qualified y BibTeX; el CRIS expone CERIF-XML por OAI-PMH.",
       details: "No son fuentes, sino el vocabulario de transformación/exportación. DEBEN estar explícitos en el diseño técnico (E2/E4)." },
 
     // ---------------------- POLÍTICA / OFICIAL ----------------------
@@ -746,6 +759,14 @@
     55: "Datos CC BY-NC (verificar); uso no comercial de investigación (LPI art. 135.1.b y RISP art. 3.bis); no redistribuir con fines comerciales."
   };
 
+  // ---------------------- Fase 1 (nov-2026): validacion y censo ----------------------
+  // estado por id de ficha: ✅ | ⚠️ | ⛔ | ➖  + texto de validacion
+  const VERIF = {"1": "✅ API 200 sin key (presupuesto compartido de red); a escala exige API key y creditos. Snapshot S3 gratis confirmado (uso: censo de 32.375 obras).", "2": "✅ API OK. query.affiliation = desunion de tokens (3,1M hits) → no contable por centro; uso real validado: 1.791 DOI revisados (S113).", "3": "✅ REST OK (hitCount y descarga). 29.208 registros cosechados 2020-2026; consultas AFF calibradas por sede. Ruta OAI sondeada: 404 (el REST cubre la cosecha).", "4": "✅ E-utilities responden de nuevo (S108 daban 500; inestabilidad de red local). Censo por [Organization] medido en esta fase.", "5": "✅ API OK (132 KB de JSON con q=FISABIO). Enlace DOI de datasets/software.", "6": "⚠️ API v1 legacy retirada (404). El Graph se consume por volcado CC BY o API v1 con key+secret (solicitud OpenAIRE).", "7": "⚠️ Host api.cordis.europa.eu sin resolucion DNS; portal vivo. API en reubicacion: confirmar documentacion y pasar a volcado de data.europa.eu.", "8": "✅ REST OK: q=FISABIO → 120 registros (texto completo incluye afiliaciones). Conteo por sede medido en el censo. Ruta OAI clasica 404: el REST basta.", "9": "✅ API OK (busqueda global sin token para lectura).", "10": "✅ API confirmada en segunda ruta: /api/1/origin/search/<termino>/ devuelve JSON (encuentra repositorios FISABIO en GitHub). La variante con ?query= dio 404: usar la del path.", "11": "✅ API details responde 200 por rango de dias (medRxiv, 256 KB de muestra); sin filtro de afiliacion: el conteo por sede pasa por Europe PMC SRC:ppr (medido en el censo).", "12": "⚠️ /v2/search/creativeworks/?q= devuelve 404 ('Not found'): buscar el endpoint de busqueda vigente en la doc de OSF (v2 usa rutas especificas por tipo).", "13": "⛔ API y OAI publicados inaccesibles (404 en rutas RESTO clasicas; api.recolecta.fecyt.es sin DNS). Buscador Drupal sin contador y FISABIO = 0 registros en el indice → HUECO DE AGREGACION: tramitar con FECYT.", "14": "⚠️ API deniega sin key (el error nombra IP y User-Agent): registro gratuito. Portal OK; robots no bloquea la busqueda documentada.", "15": "✅ API v3 responde sin key (totalHits; q=FISABIO → 446). Por centro no es fiable (desunion: 61,8M). Cosecha fina por key gratuita.", "16": "⚠️ 429 sin key (vivo). Graph API sin filtro de afiliacion → no contable por centro.", "17": "✅ API OK; campo bibjson.author.affiliation con rango de fecha funciona. Censo DOAJ medido (OA diamante incluido).", "18": "⚠️ hispana.mcu.es vivo (meta-refresh a /es/); la ruta nueva hispana.cult.gob.es/oai no pudo confirmarse (DNS inestable de la maquina, 2 intentos). Verificar OAI desde red estable.", "19": "⛔ robots.txt Disallow: / total y sin API; el portal '/servlet' responde 404 a clientes no navegador. Via unica: convenio.", "20": "⛔ Portal 403 a clientes automaticos (WAF) y gateway CSUC sin ruta documentada (harinsa/oai.csuc.cat no resuelven). Pedir ruta OAI a CSUC.", "21": "⛔ scielo.es caducado (dominio EN VENTA); scielo.isciii.es 503; oai.scielo.org vivo pero sin coleccion espanola configurada. Confirmar plataforma vigente con ISCIII.", "22": "⚠️ Portal vivo (redirect a aplicaciones.ciencia.gob.es/teseo); sin API; conteo por tribunal/centro solo por formulario.", "23": "✅ OAI-PMH CONFIRMADO (Identify OK: 'TDX (Tesis Doctorals en Xarxa)'). El conteo por sede exige cosecha ListRecords.", "24": "⚠️ Rutas OAI classicas DSpace 404 en RODERIC (UV) y Riunet (UPV): buscar la ruta real de cada plataforma (Roderic es EPrints/DSpace mixto). Como RECOLECTA no indexa a FISABIO (ficha 13), la via directa por repositorio es necesaria.", "25": "⚠️ Portal vivo (370 KB); rutas OAI clasicas 404 (plataforma renovada). Confirmar endpoint con ISCIII.", "26": "✅ CKAN OK: dadesobertes.gva.es/api/3 (datos.gva.es sin DNS → endpoint corregido). Censo datasets por sede medido.", "27": "➖ Licenciada (key a solicitud academica; demo 1.200 documentos ya probada en S112). No se sondea cosecha sin contrato.", "28": "➖ Propietaria; fuera del backbone por diseno.", "29": "➖ Propietaria; prueba 14 dias.", "30": "➖ Licenciadas; WoS probado con descarga propia (4 sedes, 4.331 registros); Scopus por definir convenio.", "31": "➖ Licenciadas.", "32": "✅ API publica OK (perfil de ejemplo 200). Ya en uso: 670 verificaciones ORCID en la base.", "33": "✅ API OK. FISABIO y sedes presentes en ROR: usar como canon de organizaciones.", "34": "➖ CRIS interno (destino). Export 2020-2026 probado: 4.900 registros.", "35": "➖ Formato de salida/entrada; no fuente.", "36": "➖ Estandares; no fuente.", "37": "✅ Portal y volcados XML vivos; API de datos abiertos con contrato (guiasalud no, BOE si: api.boe.es por registro). Dimension centro no aplica.", "38": "✅ Portal vivo; sin API; cosecha por HTML bajo convenio/autopromocion RISP.", "39": "⚠️ Portal sondeado 2 veces sin resolucion DNS desde esta maquina (red local inestable, problema conocido S114). Pendiente de confirmar desde red estable; CC BY-NC-ND: solo metadatos/enlace.", "40": "✅ CIMA responde 200 con reintentos. La dimension centro no aplica: documentos regulatorios (fichas por medicamento).", "41": "✅ API v2 OK (200). query.term por centro es ruido (444 'Hospital de Elche'): conteo por centro no representativo; dimension ensayo, no produccion.", "42": "⚠️ Portal vivo (Identify-style probe: 200 'EU Clinical Trials System'; el repositorio de datos esta en data.europa.eu). La API requiere clave EMA (registro). Reintento de portal con DNS estable pendiente.", "43": "✅ Portal vivo (crd.york.ac.uk). Sin API publica; conteos por formulario.", "44": "⚠️ Mudanza de dominio: eu-citizen.science → citizenscience.eu (200). API/documentacion de cosecha pendiente.", "45": "➖ Suscripcion editorial.", "46": "➖ Interfaz (Overton); no fuente de ingesta.", "47": "⚠️ API antigua retirada (410 con aviso de migracion); portal nuevo api.opencitations.net vivo: documentar rutas nuevas. Dimension citas: no conteo por centro.", "48": "✅ API OK (con email). Por DOI: no aplica centro.", "49": "⛔ 403 a clientes automaticos desde esta red (tambien el portal); usar via solicitud/API con key de Jisc.", "50": "✅ SPARQL OK (ASK 200). Uso: enlazado de PIDs; no fuente de conteo.", "51": "⚠️ Portal vivo (redalyc.org); OAI en ruta clasica 404: localizar ruta nueva o API v1.4.2 con registro.", "52": "✅ Portal vivo; directorio de revistas; sin dimension centro.", "53": "⛔ Portal y OAI 403 (Cloudflare 'Just a moment' incluso con UA de navegador) y robots Disallow: / → cosecha exige convenio/solicitud a REDIB.", "54": "✅ API y OAI-PMH CONFIRMADOS (Identify 'arXiv'). Censo arXiv medido (salud digital/IA; FISABIO 2).", "55": "✅ Portal vivo; sin API: descarga CSV periodica de rankings (uso: cuadros de mando)."};
+  const EST = {"1": "✅", "2": "✅", "3": "✅", "4": "✅", "5": "✅", "6": "⚠️", "7": "⚠️", "8": "✅", "9": "✅", "10": "✅", "11": "✅", "12": "⚠️", "13": "⛔", "14": "⚠️", "15": "✅", "16": "⚠️", "17": "✅", "18": "⚠️", "19": "⛔", "20": "⛔", "21": "⛔", "22": "⚠️", "23": "✅", "24": "⚠️", "25": "⚠️", "26": "✅", "27": "➖", "28": "➖", "29": "➖", "30": "➖", "31": "➖", "32": "✅", "33": "✅", "34": "➖", "35": "➖", "36": "➖", "37": "✅", "38": "✅", "39": "⚠️", "40": "✅", "41": "✅", "42": "⚠️", "43": "✅", "44": "⚠️", "45": "➖", "46": "➖", "47": "⚠️", "48": "✅", "49": "⛔", "50": "✅", "51": "⚠️", "52": "✅", "53": "⛔", "54": "✅", "55": "✅"};
+  const CEN_TOT = {"1": [{"et": "OpenAlex (censo institucional)", "tot": 15186}, {"et": "OpenAlex · autores enlazados", "tot": 2598}], "30": [{"et": "WoS (descarga propia, 4 sedes)", "tot": 5811}], "3": [{"et": "Europe PMC (calibrado)", "tot": 13290}, {"et": "Union OSIRIS (sin doble conteo)", "tot": 25940}], "11": [{"et": "Europe PMC · preprints (SRC:ppr)", "tot": 43}], "4": [{"et": "PubMed [Organization]", "tot": 6073}], "17": [{"et": "DOAJ (afiliacion)", "tot": 1708}], "8": [{"et": "Zenodo (texto)", "tot": 296}], "54": [{"et": "arXiv (texto)", "tot": 3}], "26": [{"et": "Dades Obertes GVA (CKAN)", "tot": 3}], "34": [{"et": "CRIS Fundanet (export)", "tot": 4355}]};
+  const LAB = {"openalex_censo": "OpenAlex (censo institucional)", "wos": "WoS (descarga propia, 4 sedes)", "europepmc": "Europe PMC (calibrado)", "europepmc_preprints": "Europe PMC · preprints (SRC:ppr)", "pubmed_org": "PubMed [Organization]", "doaj": "DOAJ (afiliacion)", "zenodo_texto": "Zenodo (texto)", "arxiv_todo": "arXiv (texto)", "ckan_gva": "Dades Obertes GVA (CKAN)", "cris_fundanet": "CRIS Fundanet (export)", "terceros_enlazados": "OpenAlex · autores enlazados", "union_osiris": "Union OSIRIS (sin doble conteo)"};
+  const CEN = [{"centro": "CENTRO DE TRANSFUSIONES DE VALENCIA", "openalex_censo": "81", "wos": "0", "europepmc": "0", "europepmc_preprints": "0", "pubmed_org": "13", "doaj": "3", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "0", "union_osiris": "103"}, {"centro": "FISABIO SALUD PÚBLICA", "openalex_censo": "2951", "wos": "2366", "europepmc": "2133", "europepmc_preprints": "33", "pubmed_org": "2147", "doaj": "701", "zenodo_texto": "120", "arxiv_todo": "2", "ckan_gva": "0", "cris_fundanet": "1258", "terceros_enlazados": "0", "union_osiris": "4104"}, {"centro": "HOSPITAL ARNAU DE VILANOVA", "openalex_censo": "1396", "wos": "0", "europepmc": "1184", "europepmc_preprints": "10", "pubmed_org": "2705", "doaj": "688", "zenodo_texto": "114", "arxiv_todo": "1", "ckan_gva": "3", "cris_fundanet": "0", "terceros_enlazados": "534", "union_osiris": "2456"}, {"centro": "HOSPITAL COMARCAL DE LLIRIA", "openalex_censo": "219", "wos": "0", "europepmc": "0", "europepmc_preprints": "0", "pubmed_org": "18", "doaj": "0", "zenodo_texto": "1", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "6", "union_osiris": "229"}, {"centro": "HOSPITAL COMARCAL DE VINARÒS", "openalex_censo": "3", "wos": "0", "europepmc": "23", "europepmc_preprints": "0", "pubmed_org": "3", "doaj": "1", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "2", "union_osiris": "34"}, {"centro": "HOSPITAL DE DENIA", "openalex_censo": "226", "wos": "0", "europepmc": "226", "europepmc_preprints": "0", "pubmed_org": "123", "doaj": "30", "zenodo_texto": "3", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "16", "union_osiris": "327"}, {"centro": "HOSPITAL DE REQUENA", "openalex_censo": "80", "wos": "0", "europepmc": "104", "europepmc_preprints": "0", "pubmed_org": "13", "doaj": "2", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "6", "union_osiris": "142"}, {"centro": "HOSPITAL DE SAGUNTO", "openalex_censo": "427", "wos": "0", "europepmc": "309", "europepmc_preprints": "0", "pubmed_org": "183", "doaj": "61", "zenodo_texto": "9", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "72", "union_osiris": "585"}, {"centro": "HOSPITAL DE TORREVIEJA", "openalex_censo": "167", "wos": "0", "europepmc": "218", "europepmc_preprints": "0", "pubmed_org": "24", "doaj": "4", "zenodo_texto": "1", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "3", "union_osiris": "291"}, {"centro": "HOSPITAL DR. MOLINER", "openalex_censo": "9", "wos": "0", "europepmc": "71", "europepmc_preprints": "0", "pubmed_org": "6", "doaj": "6", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "11", "union_osiris": "84"}, {"centro": "HOSPITAL FRANCESC DE BORJA DE GANDÍA", "openalex_censo": "234", "wos": "0", "europepmc": "177", "europepmc_preprints": "0", "pubmed_org": "1", "doaj": "10", "zenodo_texto": "", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "64", "union_osiris": "386"}, {"centro": "HOSPITAL GENERAL DE ONTINYENT", "openalex_censo": "17", "wos": "0", "europepmc": "35", "europepmc_preprints": "0", "pubmed_org": "1", "doaj": "1", "zenodo_texto": "1", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "0", "union_osiris": "41"}, {"centro": "HOSPITAL GENERAL UNIVERSITARIO DE CASTELLÓN", "openalex_censo": "792", "wos": "0", "europepmc": "285", "europepmc_preprints": "0", "pubmed_org": "81", "doaj": "1", "zenodo_texto": "10", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "158", "union_osiris": "1368"}, {"centro": "HOSPITAL GENERAL UNIVERSITARIO DE ELCHE", "openalex_censo": "1651", "wos": "1769", "europepmc": "2455", "europepmc_preprints": "0", "pubmed_org": "54", "doaj": "24", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "1317", "terceros_enlazados": "271", "union_osiris": "3822"}, {"centro": "HOSPITAL GENERAL UNIVERSITARIO DE ELDA (VIRGEN DE LA SALUD)", "openalex_censo": "437", "wos": "0", "europepmc": "309", "europepmc_preprints": "0", "pubmed_org": "9", "doaj": "4", "zenodo_texto": "1", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "28", "union_osiris": "697"}, {"centro": "HOSPITAL LA MAGDALENA", "openalex_censo": "7", "wos": "0", "europepmc": "83", "europepmc_preprints": "0", "pubmed_org": "4", "doaj": "3", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "1", "union_osiris": "221"}, {"centro": "HOSPITAL LA PEDRERA DE DENIA", "openalex_censo": "23", "wos": "0", "europepmc": "0", "europepmc_preprints": "0", "pubmed_org": "8", "doaj": "6", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "4", "union_osiris": "27"}, {"centro": "HOSPITAL LA PLANA", "openalex_censo": "239", "wos": "0", "europepmc": "172", "europepmc_preprints": "0", "pubmed_org": "18", "doaj": "6", "zenodo_texto": "2", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "23", "union_osiris": "490"}, {"centro": "HOSPITAL LA RIBERA DE ALZIRA", "openalex_censo": "754", "wos": "0", "europepmc": "631", "europepmc_preprints": "0", "pubmed_org": "4", "doaj": "1", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "28", "union_osiris": "1142"}, {"centro": "HOSPITAL LLUIS ALCANYIS DE XÁTIVA", "openalex_censo": "245", "wos": "0", "europepmc": "192", "europepmc_preprints": "0", "pubmed_org": "126", "doaj": "10", "zenodo_texto": "9", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "53", "union_osiris": "371"}, {"centro": "HOSPITAL MARINA BAIXA DE LA VILA JOIOSA", "openalex_censo": "464", "wos": "0", "europepmc": "321", "europepmc_preprints": "0", "pubmed_org": "191", "doaj": "41", "zenodo_texto": "8", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "45", "union_osiris": "551"}, {"centro": "HOSPITAL PARE JOFRE", "openalex_censo": "50", "wos": "0", "europepmc": "19", "europepmc_preprints": "0", "pubmed_org": "18", "doaj": "0", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "0", "union_osiris": "50"}, {"centro": "HOSPITAL SAN VICENTE DEL RASPEIG", "openalex_censo": "4", "wos": "0", "europepmc": "203", "europepmc_preprints": "0", "pubmed_org": "6", "doaj": "3", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "1", "union_osiris": "216"}, {"centro": "HOSPITAL UNIVERSITARIO DR.PESET", "openalex_censo": "2391", "wos": "1676", "europepmc": "1569", "europepmc_preprints": "0", "pubmed_org": "150", "doaj": "52", "zenodo_texto": "9", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "1780", "terceros_enlazados": "520", "union_osiris": "3454"}, {"centro": "HOSPITAL UNIVERSITARIO SAN JUAN DE ALICANTE", "openalex_censo": "1216", "wos": "0", "europepmc": "1861", "europepmc_preprints": "0", "pubmed_org": "6", "doaj": "5", "zenodo_texto": "2", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "676", "union_osiris": "3274"}, {"centro": "HOSPITAL VEGA BAJA DE ORIHUELA", "openalex_censo": "366", "wos": "0", "europepmc": "229", "europepmc_preprints": "0", "pubmed_org": "2", "doaj": "0", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "30", "union_osiris": "452"}, {"centro": "HOSPITAL VINALOPÓ SALUD", "openalex_censo": "423", "wos": "0", "europepmc": "306", "europepmc_preprints": "0", "pubmed_org": "23", "doaj": "3", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "21", "union_osiris": "533"}, {"centro": "HOSPITAL VIRGEN DE LOS LIRIOS DE ALCOI", "openalex_censo": "251", "wos": "0", "europepmc": "175", "europepmc_preprints": "0", "pubmed_org": "118", "doaj": "35", "zenodo_texto": "6", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "25", "union_osiris": "427"}, {"centro": "Hospital Intermutual de Levante", "openalex_censo": "32", "wos": "0", "europepmc": "0", "europepmc_preprints": "0", "pubmed_org": "16", "doaj": "7", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "0", "union_osiris": "32"}, {"centro": "SERVICIO DE EMERGENCIAS SANITARIAS DE LA COMUNITAT VALENCIANA (SESCV)", "openalex_censo": "31", "wos": "0", "europepmc": "0", "europepmc_preprints": "0", "pubmed_org": "2", "doaj": "0", "zenodo_texto": "0", "arxiv_todo": "0", "ckan_gva": "0", "cris_fundanet": "0", "terceros_enlazados": "0", "union_osiris": "31"}];
+
   // ---------------------- Render ----------------------
   const grid = document.getElementById('sources-grid');
   const searchInput = document.getElementById('search');
@@ -786,7 +807,7 @@
     const q = searchInput.value.toLowerCase().trim();
     const filtered = sources.filter(s => {
       const byRing = activeFilter === 'todos' || s.anillo === activeFilter;
-      const hay = [s.name, s.summary, s.details, s.protocol, CAT[s.cat], RING[s.anillo], LEGAL[s.id] || ""].join(' ').toLowerCase();
+      const hay = [s.name, s.summary, s.details, s.protocol, CAT[s.cat], RING[s.anillo], LEGAL[s.id] || "", VERIF[s.id] || ""].join(' ').toLowerCase();
       return byRing && (!q || hay.includes(q));
     });
 
@@ -824,6 +845,8 @@
             '<dt>Coste</dt><dd>' + esc(s.coste) + '</dd>' +
             '<dt>Alineación</dt><dd>' + esc(s.oe) + '</dd>' +
             '<dt>Base legal</dt><dd>' + esc(LEGAL[s.id] || "—") + '</dd>' +
+          (VERIF[s.id] ? '<dt>Validación (nov-2026)</dt><dd>' + EST[s.id] + ' ' + esc(VERIF[s.id]) + '</dd>' : '') +
+          (CEN_TOT[s.id] ? '<dt>Censo 30 sedes</dt><dd>' + CEN_TOT[s.id].map(x => x.et + ': ' + x.tot.toLocaleString('es-ES')).join(' · ') + ' (2020-2026)</dd>' : '') +
           '</dl>' +
           '<p class="note">' + esc(s.details) + '</p>' +
           '<a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer" class="link-btn" onclick="event.stopPropagation();">Visitar fuente</a>' +
@@ -841,8 +864,34 @@
     });
   }
 
+  function renderFase1() {
+    const body = document.getElementById('f1body');
+    const cols = Object.keys(CEN[0]).filter(c => c !== 'centro');
+    let h = '<p><b>Qué se ha hecho.</b> Se han sondado los 55 endpoints del catálogo (OAI-PMH <i>Identify</i>, APIs de búsqueda y robots.txt, sin cosechar contenido) y se ha medido cuántos resultados devuelve cada base consultable para las <b>30 sedes del perímetro oficial FISABIO</b> (la entidad + 19 departamentos + 5 hospitales HACLE, Centro de Transfusión y SESCV), ejercicio 2020-2026. Evidencia completa: <code>data-fundanet/derivados/validacion_endpoints_2026-11.csv</code> y <code>censo_fuentes_centros_2026-11.csv</code>.</p>';
+    h += '<p><b>Cómo leer las cifras.</b> Son <i>hits crudos de la consulta por sede</i>: las bases multicéntricas inflan (una obra con 3 firmas de 3 sedes cuenta en las 3). OpenAlex, Europe PMC, WoS, CRIS y la unión se reutilizan de los censos calibrados de las sesiones 106-114; el resto (PubMed por [Organization], DOAJ por afiliación, Zenodo, arXiv, CKAN, preprints por SRC:ppr) se midió en esta fase con alias distintivos. Crossref y CORE devolvieron conteos sin sentido por centro (desunión de tokens) y quedan marcados como no contables.</p>';
+    const est = { '✅': 0, '⚠️': 0, '⛔': 0, '➖': 0 };
+    Object.values(EST).forEach(e => est[e]++);
+    h += '<p><b>Veredicto de la validación.</b> ' + est['✅'] + ' fuentes operativas · ' + est['⚠️'] + ' condicionadas (clave, registro o ruta por confirmar) · ' + est['⛔'] + ' bloqueadas (robots/ToS/403: Dialnet, RACO, SciELO, Sherpa, REDIB, RECOLECTA*) · ' + est['➖'] + ' no aplicables por centro o licenciadas. *RECOLECTA no indexa a FISABIO: 0 registros en su buscador, un hueco de agregación que debe tramitarse con FECYT.</p>';
+    h += '<details><summary>Tabla de validación (55 fichas)</summary><div class="matriz-wrap"><table><tr><th>#</th><th>Fuente</th><th>Estado</th><th>Veredicto nov-2026</th></tr>';
+    sources.forEach(s => { h += '<tr><td class="num">' + s.id + '</td><td>' + esc(s.name) + '</td><td>' + (EST[s.id] || '—') + '</td><td>' + esc((VERIF[s.id] || '').slice(2)) + '</td></tr>'; });
+    h += '</table></div></details>';
+    h += '<details open><summary>Matriz del censo · resultados por sede y fuente</summary><div class="matriz-wrap"><table><tr><th>Sede</th>';
+    cols.forEach(c => { h += '<th class="num">' + esc(LAB[c] || c) + '</th>'; });
+    h += '</tr>';
+    CEN.forEach(r => {
+      h += '<tr><td>' + esc(r.centro) + '</td>';
+      cols.forEach(c => { const v = r[c]; h += '<td class="num">' + (v === '' || v == null ? '—' : Number(v).toLocaleString('es-ES')) + '</td>'; });
+      h += '</tr>';
+    });
+    h += '<tr><th>TOTAL</th>';
+    cols.forEach(c => { const t = CEN.reduce((a, r) => a + (parseInt(r[c]) || 0), 0); h += '<th class="num">' + t.toLocaleString('es-ES') + '</th>'; });
+    h += '</tr></table></div><p class="note" style="font-size:0.78rem;color:#495057;">«—» = sin datos (fuente no contable por sede o fallo de red). WoS solo 4 sedes (descarga propia). «union_osiris» es la unión deduplicada por DOI, no una suma.</p></details>';
+    body.innerHTML = h;
+  }
+
   searchInput.addEventListener('input', render);
   render();
+  renderFase1();
 </script>
 
 </body>
